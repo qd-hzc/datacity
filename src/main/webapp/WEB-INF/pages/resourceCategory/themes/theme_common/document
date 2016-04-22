@@ -1,0 +1,154 @@
+一：请求数据
+方法：EsiTheme.getData()
+data:{
+         "contentType": 7,//数据类型：1:综合表，2：自定义表，3：图表，4：地图，5：文字分析，6：文件，7：目录，8：页面，9：数据集，10：分析主题
+         "contentValue": "121;141;142;143"//数据id
+     }
+
+结果：
+1、返回综合表
+返回结果：{success:true,code:200,msg:"请求成功",datas:datas}
+datas:{
+    "table":"<table></table>",
+    //报告期
+    "reportInfos":[
+        {
+            id:143,//id：唯一主键
+            name:'俩',
+            time:'2016年3月',
+            type:1,
+            rptStatus:'4',
+            submitStatus:0,
+            dptId:121,
+            rptStyleId:221,
+            tmpId:221,
+            submitDaysDelay:30
+        }
+    ]
+}
+查询不同报告期：
+EsiReport.getReportByPeriod(id)
+参数：reportInfos[i].id
+
+2、自定义表
+返回结果：{success:true,code:200,msg:"请求成功",datas:datas}
+datas:{
+    //自定义查询bean信息
+    "research":{
+        "id":48,//id
+        "researchGroupId":2,//自定义查询分组id
+        "name":"aa",//名称
+        "dataSet":{//数据源
+            "id":21,//数据源id
+            "name":"ceshi",//数据源名称
+            "comments":"test"//数据源说明
+        },
+        "type":1,//自定义查询类型
+        "period":1//时间频度：年报，半年报，季报，月报
+    },
+    //时间范围：查询报表是时间范围是否为报告期数:1:连续时间范围，2：选择时间范围，3：报告期数
+    "timeRange":{
+        "id": 2039,//id
+        "foreignId": 48,//自定义查询id或图表id
+        "foreignType": 1,//关联类型：1：报表类型，2：图表类型
+        "type": 3,//时间范围类型：1:连续时间范围，2：选择时间范围，3：报告期数
+        "dataType": 1,//时间类型：开始年：1，开始期度：2，结束年：3，结束期度：4，年份：5，期度：6，报告期数：7
+        "dataValue": 2010,//时间类型值
+        "status": 1//状态
+    },
+    //自定义查询表
+    "table":"<table></table>",
+    //分析报表的有效报告期
+    "periods":[
+        {
+            //频度
+            frequency:3,
+            //年
+            year:2015,
+            //分析报表期度：年：12，半年：6、12，季：3、6、9、12，月：1、2、3、4、5、6、7、8、9、10、11、12
+            period:List<Integer>
+        }
+    ]
+}
+如果为报告期数，查询报告期数，
+url：EsiReport.getResearchByPeriod(data)
+data:{
+    researchId:research.id,
+    frequency:research.period,
+    year:2016、2015、2014,//年份
+    period:1、2、3、4、5、6、7//期度
+}
+
+7、目录
+返回结果：{success:true,code:200,msg:"请求成功",datas:datas}
+datas:[
+    {
+    "id": 121,//id
+    "name": "经济指标",//目录名称
+    "parentId": 0,//目录父id
+    "themeConfigPath": "theme_common/common.config",//目录对应的配置文件
+    "modulePath": "theme_common/pages/panel",//目录对应的页面
+    "status": 1,//状态
+    "contents": [//目录对应页面的内容
+        {
+            "id": 89,//id
+            "themePageId": 121,//目录id
+            "containerId": "paneldiv2",//内容id
+            "contentType": 8,//内容类型:1:综合表，2：自定义表，3：图表，4：地图，5：文字分析，6：文件，7：目录，8：页面，9：数据集
+            "contentValue": "161",//
+        }
+    ],
+    "sortIndex": 4,//顺序
+    "leaf": true,//是否为子节点，如果为子节点，则该菜单无子菜单
+    "role": "145;181;148"//目录权限
+    }
+]
+
+9、数据集
+成功：{datas:List<RptDataPojo>,msg:"请求成功",success:true,code:200}
+失败：程序错误
+datas:[
+    {
+        time:{
+            //报表频度：1：年报，2：半年报，3：季报，4：月报
+            frequency:3,
+            //年：2016,2015
+            year:2016,
+            //期度:1：1月，2:2月，3:3月、一季度，4:4月，5:5月，6:6月，二季度，上半年
+            //7:7月，8：8月，9:9月、三季度，10:10月，11:11月，12：12月，四季度，下半年，年报
+            period:1
+        },
+        datas:[
+            {
+                //报表数据，该数据集数据
+            }
+        }
+    }
+]
+
+二：返回页面
+url:EsiTheme.getPageHtml();
+data:1(id)
+结果：
+1、返回一个页面和一个page对象
+{
+    "id": 121,//id
+    "name": "经济指标",//目录名称
+    "parentId": 0,//目录父id
+    "themeConfigPath": "theme_common/common.config",//目录对应的配置文件
+    "modulePath": "theme_common/pages/panel",//目录对应的页面
+    "status": 1,//状态
+    "contents": [//目录对应页面的内容
+        {
+            "id": 89,//id
+            "themePageId": 121,//目录id
+            "containerId": "paneldiv2",//内容id
+            "contentType": 8,//内容类型:1:综合表，2：自定义表，3：图表，4：地图，5：文字分析，6：文件，7：目录，8：页面，9：数据集
+            "contentValue": "161",//
+        }
+    ],
+    "sortIndex": 4,//顺序
+    "leaf": true,//是否为子节点，如果为子节点，则该菜单无子菜单
+    "role": "145;181;148"//目录权限
+}
+

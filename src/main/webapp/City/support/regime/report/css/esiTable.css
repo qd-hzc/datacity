@@ -1,0 +1,59 @@
+/**生成的表样样式*/
+table.esi {
+    width: 98%;
+    height: 100%;
+    margin-left: 1%;
+}
+
+table.esi td {
+    border: 1px solid red;
+}
+
+/*主栏*/
+table.esi td[esi-type=main] {
+    border-color: #bc74a8;
+    border-top: 0;
+    border-right: 0;
+}
+
+/*主栏实节点*/
+table.esi td[esi-type=main].real {
+    border-left: 0;
+}
+
+/*宾栏*/
+table.esi td[esi-type=second] {
+    border-color: #e6bb2f;
+    border-bottom: 0;
+    border-left: 0;
+}
+
+/*宾栏实节点*/
+table.esi td[esi-type=second].real {
+    border-top: 0;
+}
+
+/*数据域*/
+table.esi td[esi-type=data] {
+    border-color: #34af1e;
+    text-align: center;
+    border-right: 0;
+    border-bottom: 0;
+}
+
+/*数据域 每行的最后一个单元格添加右侧边框*/
+table.esi tr td[esi-type=data]:last-child {
+    border-right: 1px solid #34af1e;
+}
+
+/*数据域 最后一行单元格添加下边框*/
+table.esi tr:last-child td[esi-type=data] {
+    border-bottom: 1px solid #34af1e;
+}
+
+table.esi td.active {
+    background-color: #2aabd2;
+}
+table.esi thead{
+    display: none;
+}

@@ -1,0 +1,86 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+       xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:context="http://www.springframework.org/schema/context"
+       xmlns:aop="http://www.springframework.org/schema/aop"
+       xmlns:task="http://www.springframework.org/schema/task"
+       xsi:schemaLocation="
+        http://www.springframework.org/schema/beans
+        http://www.springframework.org/schema/beans/spring-beans-4.2.xsd
+        http://www.springframework.org/schema/context
+        http://www.springframework.org/schema/context/spring-context-4.2.xsd
+        http://www.springframework.org/schema/aop 
+        http://www.springframework.org/schema/aop/spring-aop-4.2.xsd
+
+        http://www.springframework.org/schema/task
+        http://www.springframework.org/schema/task/spring-task-3.0.xsd">
+
+    <!-- 开启ben扫描 -->
+    <context:component-scan base-package="com.city" use-default-filters="false">
+        <context:include-filter type="annotation"
+                                expression="org.springframework.stereotype.Service"></context:include-filter>
+        <context:include-filter type="annotation"
+                                expression="org.springframework.stereotype.Repository"></context:include-filter>
+        <context:include-filter type="annotation"
+                                expression="org.springframework.stereotype.Component"></context:include-filter>
+        <context:exclude-filter type="annotation" expression="org.springframework.stereotype.Controller"/>
+    </context:component-scan>
+    <!-- 定时任务 createLastMonthReportInfos 生成上月报表  createNowMonthReportInfos 生成当期报表-->
+    <bean id="fixedTime" class="com.city.support.regime.collection.pojo.FixedTime"/>
+    <bean id="pushStateTask" class="com.city.app.push.pojo.PushStateTask"/>
+    <task:scheduled-tasks>
+        <task:scheduled ref="fixedTime" method="createLastMonthReportInfos" cron="${autoCreateReportPlan}"/>
+        <task:scheduled ref="pushStateTask" method="reset" cron="${autoPushStateResetPlan}"/>
+    </task:scheduled-tasks>
+
+    <!--<bean id="autoCreateReportPlan"
+          class="org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean">
+        <property name="targetObject">
+            <ref bean="fixedTime"/>
+        </property>
+        <property name="targetMethod">&lt;!&ndash; 要执行的方法名称 &ndash;&gt;
+            <value>timeFixed</value>
+        </property>
+    </bean>
+    <bean id="timeTigger" class=" org.springframework.scheduling.quartz.CronTriggerFactoryBean">
+        <property name="jobDetail">
+            <ref bean="autoCreateReportPlan"/>
+        </property>
+        <property name="cronExpression">
+            <value>${autoCreateReportPlan}</value>
+        </property>
+    </bean>
+    <bean id="startJob" lazy-init="false" autowire="no"
+          class="org.springframework.scheduling.quartz.SchedulerFactoryBean">
+        <property name="triggers">
+            <list>
+                <ref bean="timeTigger" />
+            </list>
+        </property>
+    </bean>-->
+    <!-- 加载配置文件 -->
+    <bean id="propertyConfigurer"
+          class="org.springframework.beans.factory.config.PropertyPlaceholderConfigurer">
+        <property name="locations">
+            <list>
+                <value>classpath:fixedTime.properties</value>
+                <value>classpath:hibernate.properties</value>
+            </list>
+        </property>
+    </bean>
+    <!-- 文件上传 -->
+    <bean id="multipartResolver" class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <property name="resolveLazily">
+            <value>true</value>
+        </property>
+        <property name="maxUploadSize">
+            <value>512024024</value>
+        </property>
+    </bean>
+
+    <!-- aop支持 -->
+    <aop:aspectj-autoproxy expose-proxy="true" proxy-target-class="true"/>
+    <task:annotation-driven />
+
+</beans>
+       	

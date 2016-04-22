@@ -1,0 +1,83 @@
+/**生成的表样样式*/
+table.esi td {
+    padding: 10px;
+}
+
+/*主栏*/
+table.esi td[esi-type=main] {
+    border-top: 0;
+    border-right: 0;
+    font-weight: 600;
+}
+
+table.esi td:first-child {
+    /*border-left: 0;*/
+}
+
+table.esi tr:last-child td {
+    border-bottom: 1px solid;
+}
+
+/*主栏实节点*/
+table.esi td[esi-type=main].real {
+    border-left: 0;
+}
+
+/*宾栏*/
+table.esi td[esi-type=second] {
+    border-bottom: 0;
+    /*border-left: 0;*/
+    font-weight: 600;
+}
+
+/*宾栏实节点*/
+table.esi td[esi-type=second].real {
+    border-top: 0;
+}
+
+/*数据域*/
+table.esi td[esi-type=data] {
+    border-right: 0;
+    border-bottom: 0;
+}
+
+/*table的右边框为0像素*/
+table.esi tr td:last-child {
+    border-right-width: 0px !important;
+}
+
+/*左边框1像素*/
+table.esi .borderleft-1 {
+    border-left: 1px solid !important;
+}
+
+/*左边框0像素*/
+table.esi .borderleft-0 {
+    border-left: 0px none !important;
+}
+
+/*table中的thead样式*/
+.esi-thead tr:first-child td {
+    border-width: 1px 0 2px 0px;
+    border-color: #000;
+    font-weight: 600;
+    font-size: 20px;
+    border-style: dotted;
+    border-bottom-style: solid;
+    padding: 15px;
+}
+
+/*table中的tfoot样式*/
+.esi-tfoot tr:last-child td {
+    border-width: 2px 0 1px 0px;
+    border-color: #000;
+    font-size: 16px;
+    border-style: dotted;
+    border-top-style: solid;
+}
+
+table.esi input {
+    border: medium none;
+    text-align: right;
+    margin-right: 1%;
+}
