@@ -319,9 +319,8 @@
                 store: yPushLeftStore,
                 region: 'west',
                 columns: [
-                    {text: '名称', dataIndex: 'name'},
-                    {text: '电话', dataIndex: 'phone', flex: 1},
-                    {text: '职位', dataIndex: 'duty'}
+                    {text: '名称', dataIndex: 'name',flex:1},
+                    {text: '职位', dataIndex: 'duty',flex:1}
                 ],
                 selModel: {
                     selType: 'checkboxmodel'

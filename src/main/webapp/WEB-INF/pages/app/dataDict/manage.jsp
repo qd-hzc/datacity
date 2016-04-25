@@ -380,12 +380,45 @@
                 }
             }, {
                 xtype: 'triggertext',
+                width: 110,
                 emptyText: '请输入名称检索',
                 handler: function (_this, n) {
                     gridParams.name = n;
                     reloadGrid();
                 }
             }, '->', {
+                text: '预览',
+                iconCls: 'Zoom',
+                handler: function () {
+                    var sel = menuTree.getSelectionModel().getSelection();
+                    //获取内容
+                    if (sel.length) {
+                        var menuRecord = sel[0];
+                        var menuId = menuRecord.get('id');
+                        var name= menuRecord.get('name');
+                        //获取属于这个的数据
+                        var count = dictStore.getCount();
+                        var flag = false;
+                        if (count) {
+                            for (var i = 0; i < count; i++) {
+                                var record = dictStore.getAt(i);
+                                if (record.get('menuId') == menuId) {
+                                    flag = true;
+                                    break;
+                                }
+                            }
+                        }
+                        if (flag) {
+                            //此处预览
+                            open(APP_DATADICT_PATH + '/previewPage?menuId=' + menuId+'&name='+name);
+                        } else {
+                            Ext.Msg.alert('提示', '无内容不可预览o(╯□╰)o');
+                        }
+                    } else {
+                        Ext.Msg.alert('提示', '请选择目录来预览页面!');
+                    }
+                }
+            }, {
                 text: '发布',
                 iconCls: 'Transmit',
                 handler: function () {
@@ -399,10 +432,10 @@
                             if (menuId == 0) {
                                 Ext.Msg.alert('提示', '根目录不可发布!');
                             } else {
-                                record.set('status',1);
+                                record.set('status', 1);
                                 menuStore.sync({
                                     callback: function () {
-                                        Ext.Msg.alert('提示','发布成功');
+                                        Ext.Msg.alert('提示', '发布成功');
                                     }
                                 });
                             }
@@ -411,7 +444,7 @@
                         Ext.Msg.alert('提示', '请选择目录来发布!');
                     }
                 }
-            }, {
+            }, '-', {
                 text: '添加',
                 iconCls: 'Add',
                 handler: function () {

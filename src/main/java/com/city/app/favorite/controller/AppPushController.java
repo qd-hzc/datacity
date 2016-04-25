@@ -6,6 +6,7 @@ import com.city.app.favorite.dao.AppFavoriteDao;
 import com.city.app.favorite.entity.AppPush;
 import com.city.app.favorite.service.AppPushService;
 import com.city.common.controller.BaseController;
+import com.city.common.util.ConvertUtil;
 import com.city.common.util.ListUtil;
 import com.city.common.util.StringUtil;
 import com.city.support.sys.user.entity.User;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -122,7 +124,6 @@ public class AppPushController extends BaseController {
     @RequestMapping("/saveAppPushes")
     @ResponseBody
     public Map<String, Object> saveAppPushes(String appPushs_str, HttpServletRequest request) {
-        Date date = new Date();
         User user = CurrentUser.getCurrentUser(request).getUser();
         List<AppPush> appPushs = new ArrayList<>();
         if (StringUtil.trimNotEmpty(appPushs_str)) {
@@ -130,9 +131,9 @@ public class AppPushController extends BaseController {
             }.getType());
         }
         for (AppPush appPush : appPushs) {
-            appPush.setUserId(user.getId());
-            appPush.setTime(date);
-            appPush.setFlag(0);
+                appPush.setUserId(user.getId());
+                appPush.setTime(new Date());
+                appPush.setFlag(0);
         }
         Map<String, Object> result = null;
         try {

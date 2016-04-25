@@ -571,7 +571,6 @@ EsiDataHandler.prototype.handleConditions = function (conditions,time) {
                                     }
                                 })
                             }
-                            console.log(year)
                             result.timeList.push(new EsiTimeRangePojo(metaExt.periodType, year, month, METADATA_TYPE.BAOGAOQI, metaExt.timeRange[j].dataValue));
                             break;
                     }

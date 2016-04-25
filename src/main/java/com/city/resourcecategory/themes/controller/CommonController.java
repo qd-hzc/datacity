@@ -678,4 +678,19 @@ public class CommonController extends BaseController {
         CurrentUser user = CurrentUser.getCurrentUser(request);
         return genSuccessMsg(commonService.returnAllData(contents, user), "成功", null);
     }
+
+    /**
+     * 返回重点关注菜单
+     *
+     * @param menus
+     * @return
+     * @author hzc
+     * @createDate 2016-4-22
+     */
+    @RequestMapping("/getSyntheticalMenus")
+    @ResponseBody
+    public Object getSyntheticalMenus(String menus) {
+
+        return genSuccessMsg(commonService.getSyntheticalMenus(menus), "调用成功", 200);
+    }
 }

@@ -59,7 +59,7 @@ public class DataValueController extends BaseController {
             case Constant.THEME_CONTENT_TYPE.TEXT_THEME://分析主题
                 return filterByName(textThemeDao.queryAll(), name);
             case Constant.THEME_CONTENT_TYPE.TEXT_DESC://文字分析
-                return filterByName(textContentDao.queryByThemeId(null, null, null, Constant.TEXT_CONTENT_STATUS.CHECKED), name);
+                return filterByName(textContentDao.queryByThemeId(null,null, null, null, Constant.TEXT_CONTENT_STATUS.CHECKED), name);
             case Constant.THEME_CONTENT_TYPE.DATA_SET://数据集
                 return filterByName(dataSetDao.queryAll(), name);
             case Constant.THEME_CONTENT_TYPE.FILE://文件

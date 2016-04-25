@@ -35,14 +35,20 @@ public class TextContent implements Serializable {
     private Integer sortIndex;
     @Column
     private Integer creator;//创建人
+    @Column(name = "CREATOR_NAME")
+    private String creatorName;
     @Column(name = "CREATE_TIME")
     private Date createTime;//创建时间
     @Column
     private Integer updator;//更新人
+    @Column(name = "UPDATOR_NAME")
+    private String updatorName;
     @Column(name = "UPDATE_TIME")
     private Date updateTime;//更新时间
     @Transient
     private String labelIds;
+    @Transient
+    private Boolean isSel;
 
     public Integer getId() {
         return id;
@@ -154,5 +160,29 @@ public class TextContent implements Serializable {
 
     public void setLabelIds(String labelIds) {
         this.labelIds = labelIds;
+    }
+
+    public Boolean getIsSel() {
+        return isSel;
+    }
+
+    public void setIsSel(Boolean isSel) {
+        this.isSel = isSel;
+    }
+
+    public String getCreatorName() {
+        return creatorName;
+    }
+
+    public void setCreatorName(String creatorName) {
+        this.creatorName = creatorName;
+    }
+
+    public String getUpdatorName() {
+        return updatorName;
+    }
+
+    public void setUpdatorName(String updatorName) {
+        this.updatorName = updatorName;
     }
 }

@@ -69,7 +69,15 @@ public class TextManageController extends BaseController {
 
         return mv;
     }
-
+    /**
+     * 进入文字分析发布界面
+     */
+    @RequestMapping("/textSubmit")
+    public ModelAndView textSubmitJsp(Integer themeId) {
+        ModelAndView mv = new ModelAndView("resourceCategory/analysis/text/textSubmit");
+        mv.addObject("themeId", themeId);
+        return mv;
+    }
     /**
      * 查询所有分析主题
      */
@@ -169,6 +177,7 @@ public class TextManageController extends BaseController {
         String statusStr = null;
         Integer status = null;
         try {
+            //获取当前用户
             themeIdStr = paramUtil.getParam(request, "themeId");
             contentSortType = paramUtil.getParam(request, "contentSortType");
             themeId = Integer.parseInt(themeIdStr);
@@ -177,7 +186,7 @@ public class TextManageController extends BaseController {
             if (statusStr != null && !"".equals(statusStr)) {
                 status = Integer.parseInt(statusStr);
             }
-            datas = textContentService.queryAllTextContentByThemeId(themeId, contentSortType, name, status);
+            datas = textContentService.queryAllTextContentByThemeId(null,themeId, contentSortType, name, status);
             result = genSuccessMsg(datas, "查询成功", null);
         } catch (Exception e) {
             e.printStackTrace();

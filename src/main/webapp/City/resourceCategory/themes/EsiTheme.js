@@ -169,6 +169,14 @@ EsiTheme.prototype = {
         $('#esi-theme-dialog').on('shown.bs.modal', function (e) {
             $('#esi-theme-dialog').css('padding-right', '0');
         })
+    },
+    /**
+     * 返回重点关注菜单
+     * @param menus 菜单id,使用逗号分隔：3,4,5,8
+     * @param fn :回调函数
+     */
+    getSyntheticalMenu: function (menus, fn) {
+        this._ajax('/resourcecategory/themes/commonController/getSyntheticalMenus', {menus: menus}, 'json', fn);
     }
 }
 

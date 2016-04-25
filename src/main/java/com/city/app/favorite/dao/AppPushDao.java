@@ -2,6 +2,7 @@ package com.city.app.favorite.dao;
 
 import com.city.app.favorite.entity.AppPush;
 import com.city.common.dao.BaseDao;
+import com.city.common.util.ListUtil;
 import com.city.common.util.StringUtil;
 import org.springframework.stereotype.Repository;
 
@@ -34,7 +35,32 @@ public class AppPushDao extends BaseDao<AppPush> {
         StringBuilder sb = new StringBuilder("delete from AppPush where id in (").append(ids).append(")");
         updateByHQL(sb.toString());
     }
+/**
+ * 单个查询
+ */
+public AppPush queryOne(String receiver, String name) {
+   StringBuilder hql=new StringBuilder("from AppPush where 1=1");
+    if(StringUtil.trimNotEmpty(receiver)){
+        hql.append(" and receiver=").append(receiver.trim());
+    }
+    if(StringUtil.trimNotEmpty(name)){
+        hql.append(" and name like '%").append(name.trim()).append("%'");
+    }
+    List<AppPush> appPushs = this.queryByHQL(hql.toString());
+    if(ListUtil.notEmpty(appPushs)){
+        return appPushs.get(0);
+    }
+    return null;
+}
 
+    /**
+     *  @param menuId
+     * @param receiver
+     */
+    public List<AppPush> queryByInfo(Integer menuId, Integer receiver){
+        String hql="from AppPush where menuId=? and receiver=?";
+        return queryWithParamsByHQL(hql,new Object[]{menuId,receiver});
+    }
     /**
      * 单个保存
      * @param appPush
@@ -53,7 +79,12 @@ public class AppPushDao extends BaseDao<AppPush> {
      */
     public void saveAppPushes(List<AppPush> appPushs) {
         for (AppPush appPush : appPushs) {
-            insert(appPush, true);
+            if(appPush.getId()!=null){
+               update(appPush,true);
+            }else{
+                insert(appPush, true);
+            }
+
         }
     }
 

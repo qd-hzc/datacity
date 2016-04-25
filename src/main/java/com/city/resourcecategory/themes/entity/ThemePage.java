@@ -4,6 +4,7 @@ import org.hibernate.annotations.IndexColumn;
 
 import javax.persistence.*;
 import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
@@ -42,6 +43,42 @@ public class ThemePage implements Serializable {
 
     @Column(name = "role")
     private String role;
+
+    //    子
+    @Transient
+    private List<ThemePage> child = new ArrayList<>();
+
+    //    是否为root节点
+    @Transient
+    private boolean root = true;
+
+    //    是否为title
+    @Transient
+    private boolean title = false;
+
+    public boolean isTitle() {
+        return title;
+    }
+
+    public void setTitle(boolean title) {
+        this.title = title;
+    }
+
+    public boolean isRoot() {
+        return root;
+    }
+
+    public void setRoot(boolean root) {
+        this.root = root;
+    }
+
+    public List<ThemePage> getChild() {
+        return child;
+    }
+
+    public void setChild(List<ThemePage> child) {
+        this.child = child;
+    }
 
     public Integer getId() {
         return id;

@@ -46,7 +46,7 @@
 </div>
 <script>
     var chartId =${chartId};
-    var time = EsiDynamicTime(2015,10);
+    var time =null; //(2015,10);
     var series = EsiDynamic(103, "zengsu", 12);
     Ext.onReady(function () {
         var navV = new Vue({

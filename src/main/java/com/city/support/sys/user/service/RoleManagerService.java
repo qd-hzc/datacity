@@ -472,17 +472,7 @@ public class RoleManagerService {
                         map.put("checked",false);
                         //map.put("leaf",true);
                         Integer parentDepId = d.getpDep();
-                        if(parentDepId!=0 && permMap.get(parentDepId) == null){
-                            Department parent = departmentManagerService.findDepById(parentDepId);
-                            Map parentMap = new HashMap();
-                            parentMap.put("text", parent.getDepName() + " 报表");
-                            parentMap.put("reportPermissionType", ReportPermissionType.DEPARTMENT_OTHERS);
-                            parentMap.put("checked",false);
-                            parentMap.put("flagPid",parent.getpDep()+"");
-                            parentMap.put("depId",parentDepId+"");
-                            parentMap.put("expanded",true);
-                            list.add(parentMap);
-                        }
+                        findParentDep(list, permMap, parentDepId);//获取所有父目录
                         map.put("flagPid",d.getpDep()+"");
 
                         map.put("expanded",true);
@@ -509,6 +499,21 @@ public class RoleManagerService {
             return true;
         }
         return false;
+    }
+
+    private void findParentDep(List list, Map<Integer, List<Permission>> permMap, Integer parentDepId) {
+        if(parentDepId!=0 && permMap.get(parentDepId) == null){
+            Department parent = departmentManagerService.findDepById(parentDepId);
+            Map parentMap = new HashMap();
+            parentMap.put("text", parent.getDepName() + " 报表");
+            parentMap.put("reportPermissionType", ReportPermissionType.DEPARTMENT_OTHERS);
+            parentMap.put("checked",false);
+            parentMap.put("flagPid",parent.getpDep()+"");
+            parentMap.put("depId",parentDepId+"");
+            parentMap.put("expanded",true);
+            list.add(parentMap);
+            findParentDep(list, permMap, parent.getpDep());
+        }
     }
 
     /**
@@ -599,6 +604,8 @@ public class RoleManagerService {
                     String id = (String) map.get("depId");
                     List<Map> childList2 = sequenceRpt((String) map.get("depId"), mapList);//递归
                     map.put("children", childList2);
+                    if(childList2.size() == 0)
+                        map.put("leaf", true);
                     // map.put("expanded", true);
                     map.put("checked", false);
                 }

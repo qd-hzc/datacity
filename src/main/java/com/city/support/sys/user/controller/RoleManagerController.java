@@ -78,9 +78,9 @@ public class RoleManagerController extends BaseController {
         tmpRole.setComments(role.getComments());
         role.setId(null);
         //role.setCreateUser(CurrentUser.getCurrentUser(request).getUser());
-        roleManagerService.saveRole(role);
+        roleManagerService.saveRole(tmpRole);
         result.put("success",true);
-        result.put("roleId",role.getId());
+        result.put("roleId",tmpRole.getId());
         return result;
     }
 

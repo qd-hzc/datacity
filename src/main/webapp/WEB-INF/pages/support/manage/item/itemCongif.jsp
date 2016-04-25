@@ -70,9 +70,10 @@
             pageSize: 10,
             proxy: {
                 type: 'ajax',
-                api:{
+                url:'<%=request.getContextPath()%>/support/manage/item/getItemsForPage',
+                /*api:{
                     read: '<%=request.getContextPath()%>/support/manage/item/getItemsForPage'
-                },
+                },*/
                 extraParams:commonParams.itemParams,
                 reader: {
                     type: 'json',
@@ -85,6 +86,10 @@
                     operation.params=commonParams.itemParams;
                 }
             }*/
+        });
+        // 重新加载参数
+        itemStore.on('beforeload', function(s) {
+            s.getProxy().extraParams = commonParams.itemParams;
         });
         //指标选项菜单
         var itemMenu = new Ext.menu.Menu({

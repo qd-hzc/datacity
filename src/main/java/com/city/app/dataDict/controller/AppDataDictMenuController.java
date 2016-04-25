@@ -1,7 +1,9 @@
 package com.city.app.dataDict.controller;
 
+import com.city.app.dataDict.entity.AppDataDict;
 import com.city.app.dataDict.entity.AppDataDictMenu;
 import com.city.app.dataDict.service.AppDataDictMenuService;
+import com.city.app.dataDict.service.AppDataDictService;
 import com.city.common.controller.BaseController;
 import com.city.common.util.EsiJsonParamUtil;
 import com.city.support.dataSet.query.pojo.TimePojo;
@@ -27,6 +29,8 @@ import java.util.Map;
 public class AppDataDictMenuController extends BaseController {
     @Autowired
     private AppDataDictMenuService appDataDictMenuService;
+    @Autowired
+    private AppDataDictService appDataDictService;
 
     private Gson gson = new Gson();
 
@@ -171,5 +175,29 @@ public class AppDataDictMenuController extends BaseController {
     public Map<Integer, Map<String, Object>> getRptDatas(Integer menuId, TimePojo time) {
         return appDataDictMenuService.queryRptData(menuId, time);
     }
+
+    /**
+     * 预览
+     */
+    @RequestMapping("/previewPage")
+    public ModelAndView previewPage(Integer menuId,String name) {
+        ModelAndView mv = new ModelAndView("/app/dataDict/previewPage");
+        mv.addObject("menuId", menuId);
+        mv.addObject("name",name);
+        return mv;
+    }
+
+    /**
+     * 预览内容
+     */
+    @RequestMapping("/previewContent")
+    public ModelAndView previewContent(Integer menuId,String name) {
+        ModelAndView mv = new ModelAndView("/app/dataDict/previewContent");
+        Map<String, List<AppDataDict>> infos = appDataDictService.queryDictsForGroup(menuId);
+        mv.addObject("infos", new Gson().toJson(infos));
+        mv.addObject("name",name);
+        return mv;
+    }
+
 
 }

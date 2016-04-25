@@ -45,10 +45,10 @@ public class TextContentService {
     @Autowired
     private QueryRptService queryRptService;
 
-    public List<TextContent> queryAllTextContentByThemeId(Integer themeId, String contentSortType, String name, Integer status) {
+    public List<TextContent> queryAllTextContentByThemeId(User user,Integer themeId, String contentSortType, String name, Integer status) {
         List<TextContent> result = null;
         if (themeId != null) {
-            result = textContentDao.queryByThemeId(themeId, contentSortType, name, status);
+            result = textContentDao.queryByThemeId(user,themeId, contentSortType, name, status);
             for (TextContent textContent : result) {
                 // 如果内容为空，读取关联模板的内容
                 if ((textContent.getContent() == null || "".equals(textContent.getContent())) && textContent.getStatus() != Constant.TEXT_CONTENT_STATUS.CHECKED) {
@@ -98,7 +98,7 @@ public class TextContentService {
                 List<TimePojo> times = queryRptService.convertTime(timePojos, null, null);
                 return textContentDao.queryByTime(themeId, times, theme.getContentSortType(), status);
             } else {//返回主题下所有已审核
-                return textContentDao.queryByThemeId(themeId, theme.getContentSortType(), null, status);
+                return textContentDao.queryByThemeId(null,themeId, theme.getContentSortType(), null, status);
             }
         }
         return null;
@@ -122,6 +122,7 @@ public class TextContentService {
                     textTheme.setId(themeId);
                     data.setTheme(textTheme);
                     data.setCreator(user.getId());
+                    data.setCreatorName(user.getUserName());
                     data.setCreateTime(new Date());
                     data.setStatus(Constant.TEXT_CONTENT_STATUS.WAIT_CHECK);
                     TextTheme textTheme1 = textThemeDao.queryById(themeId);
@@ -138,6 +139,7 @@ public class TextContentService {
                 TextContent textContent = textContentDao.queryById(dataId);
                 cu.replication(data, textContent, TextContent.class.getName());
                 textContent.setUpdator(user.getId());
+                textContent.setUpdatorName(user.getUserName());
                 textContent.setUpdateTime(new Date());
                 textContentDao.update(textContent, true);
                 result.add(textContent);
@@ -170,6 +172,16 @@ public class TextContentService {
      */
     public TextContent queryById(Integer id) {
         return textContentDao.queryById(id);
+    }
+
+    /**
+     * 根据id查询分析内容
+     *
+     * @param id
+     */
+    public String getTextContentById(Integer id) {
+        TextContent textContent = textContentDao.queryById(id);
+        return textContent!=null?textContent.getContent():"";
     }
 
     /**

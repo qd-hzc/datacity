@@ -236,14 +236,14 @@
                 listeners: {
                     change: function (_this, n, o) {
                         commonParams.tmpParams.includeGroupChildren = n;
-                        rptInfoStore.reload({params: commonParams.tmpParams});
+                        rptInfoStore.loadPage(1,{params: commonParams.tmpParams});
                     }
                 }
             },' '],
             listeners: {
                 itemclick: function (view, rec) {
                     commonParams.tmpParams.groupId = rec.getId();
-                    rptInfoStore.reload({params: commonParams.tmpParams});
+                    rptInfoStore.loadPage(1,{params: commonParams.tmpParams});
                 }
             }
         });
@@ -499,7 +499,7 @@
                         listeners: {
                             select: function (_this, record, o) {
                                 commonParams.tmpParams.depId = record.get('id');
-                                rptInfoStore.reload({params: commonParams.tmpParams});
+                                rptInfoStore.loadPage(1,{params: commonParams.tmpParams});
                             }
                         }
                     }, {
@@ -539,7 +539,7 @@
                         listeners: {
                             change: function (_this, n, o) {
                                 commonParams.tmpParams.rptStatus = n;
-                                rptInfoStore.reload({params: commonParams.tmpParams});
+                                rptInfoStore.loadPage(1,{params: commonParams.tmpParams});
                             }
                         }
                     }, {
@@ -561,7 +561,7 @@
                         text: '查询',
                         iconCls: 'Find',
                         handler: function () {
-                            rptInfoStore.reload({params: commonParams.tmpParams});
+                            rptInfoStore.loadPage(1,{params: commonParams.tmpParams});
                         }
                     }, '->', {
                         xtype: 'button',
@@ -619,7 +619,7 @@
                         listeners: {
                             change: function (_this, n, o) {
                                 commonParams.tmpParams.type = n;
-                                rptInfoStore.reload({params: commonParams.tmpParams});
+                                rptInfoStore.loadPage(1,{params: commonParams.tmpParams});
                             }
                         }
                     }, {
@@ -667,7 +667,7 @@
                         listeners: {
                             change: function (_this, n, o) {
                                 commonParams.tmpParams.beginYear = n;
-                                rptInfoStore.reload({params: commonParams.tmpParams});
+                                rptInfoStore.loadPage(1,{params: commonParams.tmpParams});
                             }
                         }
                     }, {
@@ -693,7 +693,7 @@
                         listeners: {
                             change: function (_this, n, o) {
                                 commonParams.tmpParams.endYear = n;
-                                rptInfoStore.reload({params: commonParams.tmpParams});
+                                rptInfoStore.loadPage(1,{params: commonParams.tmpParams});
                             }
                         }
                     }]

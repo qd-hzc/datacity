@@ -1,6 +1,7 @@
 package com.city.resourcecategory.themes.service;
 
 import com.city.common.pojo.Constant;
+import com.city.common.util.tree.PackageListToTree;
 import com.city.resourcecategory.analysis.chart.service.BasicChartConfigService;
 import com.city.resourcecategory.analysis.common.entity.TimeRangeEntity;
 import com.city.resourcecategory.analysis.common.service.TimeRangeService;
@@ -31,9 +32,16 @@ import com.city.support.sys.user.pojo.CurrentUser;
 import com.city.support.sys.user.pojo.ReportPermission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.ui.context.Theme;
 import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
+import java.beans.BeanInfo;
+import java.beans.IntrospectionException;
+import java.beans.Introspector;
+import java.beans.PropertyDescriptor;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -123,7 +131,7 @@ public class CommonService {
                 result = getChart(user, contentValue);
                 break;
             case Constant.THEME_CONTENT_TYPE.TEXT_DESC://文字分析
-                //result = getTextContent(user,contentValue);;
+                result = getTextContent(user, contentValue);
                 break;
             case Constant.THEME_CONTENT_TYPE.FILE://文件
                 break;
@@ -134,7 +142,7 @@ public class CommonService {
                 result = getDataSetData(contentValue);
                 break;
             case Constant.THEME_CONTENT_TYPE.TEXT_THEME://分析主题
-                result = getTextContent(user,contentValue);;
+                result = getTextContentList(user, contentValue);
                 break;
         }
         return result;
@@ -157,6 +165,7 @@ public class CommonService {
         }
         return "无数据";
     }
+
     /**
      * 返回分析主题
      *
@@ -174,6 +183,29 @@ public class CommonService {
         }
         return "无数据";
     }
+
+    /**
+     * 返回分析内容列表
+     *
+     * @param user
+     * @param contentValue
+     * @return
+     */
+    private Object getTextContentList(CurrentUser user, String contentValue) {
+        int themeId = Integer.parseInt(contentValue);
+        if (1 == 1) {// 权限验证
+            Map<String, Object> result = new HashMap<>();
+            List<TextContent> textContentList = textContentService.queryAllTextContentByThemeId(null, themeId, TextTheme.SORT_BY_DATE, null, null);
+            List<TextContent> textContentListByUser = textContentService.queryAllTextContentByThemeId(user.getUser(), themeId, TextTheme.SORT_BY_DATE, null, null);
+            if (textContentList != null) {
+                result.put("all", textContentList);
+                result.put("user", textContentListByUser);
+                return result;
+            }
+        }
+        return "无数据";
+    }
+
     /**
      * 返回分析内容列表
      *
@@ -182,16 +214,17 @@ public class CommonService {
      * @return
      */
     private Object getTextContent(CurrentUser user, String contentValue) {
-        int themeId = Integer.parseInt(contentValue);
+        int contentId = Integer.parseInt(contentValue);
         if (1 == 1) {// 权限验证
 
-            List<TextContent> result = textContentService.queryAllTextContentByThemeId(themeId, TextTheme.SORT_BY_DATE,null,null);
+            TextContent result = textContentService.queryById(contentId);
             if (result != null) {
                 return result;
             }
         }
         return "无数据";
     }
+
     /**
      * 返回综合表
      * <pre>
@@ -844,4 +877,92 @@ public class CommonService {
         }
         return list;
     }
+    /**
+     * 返回重点关注菜单
+     * @param menus
+     * @return
+     * @author hzc
+     * @createDate 2016-4-22
+     */
+    public Object getSyntheticalMenus(String menus) {
+        menus = menus.replaceAll(";", ",");
+        List<ThemePage> list = themesService.getThemesPageByIds(menus);
+        List<ThemePage> treeList = listToTreeList(list);
+        ArrayList<Object> result = new ArrayList<>();
+        for (int i = 0; i < treeList.size(); i++) {
+            ArrayList<ThemePage> newList = new ArrayList<>();
+            ThemePage themePage = treeList.get(i);
+            platTree(themePage.getChild(), 1, newList);
+            themePage.setChild(newList);
+            result.add(themePage);
+        }
+        return result;
+    }
+
+    /**
+     * 拆平树
+     *
+     * @param list
+     * @param cengji
+     * @param newList
+     */
+    private void platTree(List<ThemePage> list, Integer cengji, List newList) {
+        for (int i = 0; i < list.size(); i++) {
+            ThemePage themePage = list.get(i);
+            List<ThemePage> child = themePage.getChild();
+//            层级为2的倍数时，拆平
+            if (cengji % 2 == 0) {
+                themePage.setTitle(true);
+                themePage.setChild(new ArrayList<ThemePage>());
+                newList.add(themePage);
+                if (null != child && child.size() > 0) {
+                    for (int j = 0; j < child.size(); j++) {
+                        child.get(j).setTitle(false);
+                    }
+                    newList.addAll(child);
+                    themePage.setChild(new ArrayList<ThemePage>());
+                    platTree(child, cengji + 1, themePage.getChild());
+                }
+            } else {
+                if (null != child && child.size() > 0) {
+                    themePage.setChild(new ArrayList<ThemePage>());
+                    platTree(child, cengji + 1, themePage.getChild());
+                }
+                newList.add(themePage);
+            }
+        }
+    }
+
+    /**
+     * 将list封装成treeList，返回新list
+     *
+     * @param list
+     * @return
+     */
+    private List<ThemePage> listToTreeList(List<ThemePage> list) {
+        List<ThemePage> result = new LinkedList<>();
+        if (null != list && list.size() > 0) {
+            for (int i = 0; i < list.size(); i++) {
+                ThemePage themePage = list.get(i);
+                for (int j = 0; j < list.size(); j++) {
+                    ThemePage themePageJ = list.get(j);
+                    if (String.valueOf(themePageJ.getParentId()).equals(String.valueOf(themePage.getId()))) {
+//                        当前对象不是root节点
+                        themePageJ.setRoot(false);
+                        themePage.getChild().add(themePageJ);
+                    }
+                }
+                result.add(themePage);
+            }
+            for (int i = 0; i < result.size(); i++) {
+                ThemePage themePage = result.get(i);
+                if (!themePage.isRoot()) {
+                    result.remove(themePage);
+                    i--;
+                }
+            }
+        }
+        return result;
+    }
+
 }

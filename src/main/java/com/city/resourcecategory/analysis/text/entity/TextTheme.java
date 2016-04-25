@@ -42,8 +42,6 @@ public class TextTheme implements Serializable {
     private Date updateTime;//更新时间
     @Transient
     private Integer unChecked;
-    @Transient
-    private List<TextContent> textContentList;
 
     public Integer getId() {
         return id;
@@ -133,11 +131,4 @@ public class TextTheme implements Serializable {
         this.unChecked = unChecked;
     }
 
-    public List<TextContent> getTextContentList() {
-        return textContentList;
-    }
-
-    public void setTextContentList(List<TextContent> textContentList) {
-        this.textContentList = textContentList;
-    }
 }

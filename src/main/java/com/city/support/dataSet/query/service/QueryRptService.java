@@ -39,6 +39,18 @@ import java.util.*;
 @Service
 @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
 public class QueryRptService {
+    private final static int YEAR = Constant.PeriodType.YEAR;//年报
+    private final static int HALFYEAR = Constant.PeriodType.HALF;//半年报
+    private final static int QUARTER = Constant.PeriodType.QUARTER;//季报
+    private final static int MONTH = Constant.PeriodType.MONTH;//月报
+    private final static int YEAR_12 = Constant.FrequencyType.YEAR;
+    private final static int HALF_UP = Constant.FrequencyType.HALF_UP;//上半年
+    private final static int HALF_DOWN = Constant.FrequencyType.HALF_DOWN;//下半年
+    private final static int QUARTER_1 = Constant.FrequencyType.QUARTER_1;//一季度
+    private final static int QUARTER_2 = Constant.FrequencyType.QUARTER_2;//二季度
+    private final static int QUARTER_3 = Constant.FrequencyType.QUARTER_3;
+    private final static int QUARTER_4 = Constant.FrequencyType.QUARTER_4;
+
     @Autowired
     private CustomResearchDao customResearchDao;
     @Autowired
@@ -137,7 +149,11 @@ public class QueryRptService {
 
         //如果为最新报告期，则填时间
         if (timePojo != null) {
+
             timePojo.setFrequency(tmp.getPeriod());
+
+            handleTime(timePojo);
+
             FillDataUtil.fillTime(table, timePojo);
         }
 
@@ -149,6 +165,43 @@ public class QueryRptService {
             fillTableData(style, tmp, table);
         }
         return table.toString();
+    }
+
+    /**
+     * 处理时间
+     * <pre>
+     *     根据报表频度，处理时间pojo，设置每个频度中对应月份值得修改
+     *     例如：半年报，出入月份为4月，则处理pojo中的月份为6月
+     * </pre>
+     *
+     * @param timePojo
+     */
+    private void handleTime(TimePojo timePojo) {
+        Integer frequency = timePojo.getFrequency();
+        int period = timePojo.getPeriod();
+        switch (frequency) {
+            case YEAR:
+                timePojo.setPeriod(YEAR_12);
+                break;
+            case HALFYEAR:
+                if (period < HALF_UP) {
+                    timePojo.setPeriod(HALF_UP);
+                } else {
+                    timePojo.setPeriod(HALF_DOWN);
+                }
+                break;
+            case QUARTER:
+                if (period < QUARTER_1) {
+                    timePojo.setPeriod(QUARTER_1);
+                } else if (QUARTER_1 < period && period < QUARTER_2) {
+                    timePojo.setPeriod(QUARTER_2);
+                } else if (QUARTER_2 < period && period < QUARTER_3) {
+                    timePojo.setPeriod(QUARTER_3);
+                } else if (QUARTER_3 < period && period < QUARTER_4) {
+                    timePojo.setPeriod(QUARTER_4);
+                }
+                break;
+        }
     }
 
     /**

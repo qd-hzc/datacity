@@ -8,6 +8,7 @@ import com.city.resourcecategory.analysis.text.entity.TextContent;
 import com.city.resourcecategory.analysis.text.pojo.TimeSpan;
 import com.city.support.dataSet.query.pojo.TimePojo;
 import com.city.support.dataSet.query.pojo.TimeRangePojo;
+import com.city.support.sys.user.entity.User;
 import org.hibernate.Query;
 import org.springframework.stereotype.Repository;
 
@@ -34,10 +35,13 @@ public class TextContentDao extends BaseDao<TextContent> {
         q.executeUpdate();
     }
 
-    public List<TextContent> queryByThemeId(Integer themeId, String contentSortType, String name, Integer status) {
+    public List<TextContent> queryByThemeId(User user,Integer themeId, String contentSortType, String name, Integer status) {
         StringBuilder sb = new StringBuilder("from TextContent where 1=1");
         if (name != null && !"".equals(name)) {
             sb.append(" and( name like '%").append(name).append("%' or infos like '%").append(name).append("%')");
+        }
+        if (user != null && user.getId() != 0) {
+            sb.append(" and creator=").append(user.getId());
         }
         if (status != null && status != 0) {
             sb.append(" and status=").append(status);

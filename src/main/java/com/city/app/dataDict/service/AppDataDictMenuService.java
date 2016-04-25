@@ -146,7 +146,7 @@ public class AppDataDictMenuService {
         List<AppDataDictMenu> menus = new ArrayList<>();
         if (ListUtil.notEmpty(allMenus)) {
             for (AppDataDictMenu menu : allMenus) {
-                if (menu.getName().contains(name.trim())) {
+                if (menu.getName().toUpperCase().contains(name.trim().toUpperCase())) {
                     menus.add(menu);
                 }
             }
