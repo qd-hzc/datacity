@@ -115,6 +115,10 @@ public class ReportReviewController extends BaseController{
             operateType = Constant.OPERATE_TYPE.WAITING_PASS;
         }
         EsiEvent esiEvent = new EsiEvent();
+        long startMili=System.currentTimeMillis();// 当前时间对应的毫秒数
+        System.out.println("开始 "+startMili);
+
+
         try {
             // 获取当前用户
             User user = SessionUtil.getUser(request.getSession());
@@ -133,6 +137,9 @@ public class ReportReviewController extends BaseController{
                 updateReportLog(request,  Integer.valueOf(rptId), info, operateType);
             }*/
         }
+        long endMili=System.currentTimeMillis();
+        System.out.println("结束 s"+endMili);
+        System.out.println("总耗时为："+(endMili-startMili)+"毫秒");
         return result;
     }
 

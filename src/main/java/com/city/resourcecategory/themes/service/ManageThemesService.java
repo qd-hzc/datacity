@@ -1,14 +1,13 @@
 package com.city.resourcecategory.themes.service;
 
 import com.city.common.util.ConvertUtil;
-import com.city.common.util.tree.TreeSortUtil;
+import com.city.common.util.ListUtil;
 import com.city.resourcecategory.themes.dao.ThemePageContentDao;
 import com.city.resourcecategory.themes.dao.ThemePageDao;
 import com.city.resourcecategory.themes.entity.ThemePage;
 import com.city.resourcecategory.themes.entity.ThemePageContent;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 
 import javax.transaction.Transactional;
 import java.util.*;
@@ -19,7 +18,7 @@ import java.util.*;
 
 @Service
 @Transactional
-public class ManageThemesService extends TreeSortUtil<ThemePage> {
+public class ManageThemesService {
 
     @Autowired
     private ThemePageDao pageDao;
@@ -79,14 +78,32 @@ public class ManageThemesService extends TreeSortUtil<ThemePage> {
                 parent.setLeaf(Boolean.FALSE);
                 pageDao.saveOrUpdate(parent, false);
             }
-            List<ThemePage> list = getThemePagesByParentId(parentId);
+            List sorts = pageDao.getMaxSort(parentId);
+            page.setSortIndex(getIndex(sorts));
+
             page.setStatus(1);
-            page.setSortIndex(list.size() + 1);
             page.setLeaf(Boolean.TRUE);
             pageDao.saveOrUpdate(page, false);
             return page;
         }
 
+    }
+
+    /**
+     * 根据查询的List 获取顺序
+     *
+     * @param sorts
+     * @return
+     */
+    private int getIndex(List sorts) {
+        int s = 1;
+        if (sorts != null && sorts.size() > 0) {
+            Integer sort = (Integer) sorts.get(0);
+            if (sort != null) {
+                s += sort;
+            }
+        }
+        return s;
     }
 
     /**
@@ -153,40 +170,6 @@ public class ManageThemesService extends TreeSortUtil<ThemePage> {
         pageDao.deleteThemePages(string.toString());
     }
 
-    @Override
-    protected int getSort(ThemePage page) {
-        return page.getSortIndex();
-    }
-
-    @Override
-    protected void setSort(ThemePage page, int sort) {
-        page.setSortIndex(sort);
-    }
-
-    @Override
-    protected void setParentId(ThemePage page, int parentId) {
-        page.setParentId(parentId);
-    }
-
-    @Override
-    protected ThemePage getEntityById(int id) {
-        return getThemePageById(id);
-    }
-
-    @Override
-    protected List<ThemePage> getEntitiesByParent(int id) {
-        return getThemePagesByParentId(id);
-    }
-
-    @Override
-    protected void updateEntity(ThemePage page) {
-        saveOrUpdateManageTheme(page);
-    }
-
-    @Override
-    protected void setLeaf(ThemePage over, boolean b) {
-        over.setLeaf(b);
-    }
 
     /**
      * 保存模板菜单配置
@@ -243,4 +226,27 @@ public class ManageThemesService extends TreeSortUtil<ThemePage> {
     public List<ThemePage> getThemePagesByParentIdAndStatus(Integer id) {
         return pageDao.selectPagesByPIdAndStatus(id);
     }
+
+    /**
+     * 主题配置排序
+     *
+     * @param pages
+     */
+    public void saveThemeSort(List<ThemePage> pages) {
+        if (ListUtil.notEmpty(pages)) {
+            ConvertUtil<ThemePage> util = new ConvertUtil<>();
+            //转换并保存
+            for (ThemePage group : pages) {
+                if (group.getId() != null) {
+                    ThemePage curGroup = getThemePageById(group.getId());
+                    //赋值
+                    util.apply(curGroup, group, ThemePage.class);
+                    pageDao.update(curGroup, false);
+                } else {
+                    pageDao.insert(group, true);
+                }
+            }
+        }
+    }
+
 }

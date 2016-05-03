@@ -7,7 +7,8 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <script type="text/javascript">
     var GLOBAL_PATH = '<%=request.getContextPath()%>';
-    var INDEX_PAGE = '/app/dataDict/manageJsp';//配置页面首页
+//    var INDEX_PAGE = '/app/dataDict/manageJsp';//配置页面首页
+    var INDEX_PAGE = '';//配置页面首页
     var DEFAULT_CONFIGPAGE = '/support/sys/index';//默认配置页面
     var MODULE_TYPE = {
         ROOT: 0,//根

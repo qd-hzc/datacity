@@ -91,7 +91,7 @@ public class AppStaffController extends BaseController {
             result = genSuccessMsg(null, "保存成功", 200);
         } catch (Exception e) {
             e.printStackTrace();
-            result = genFaultMsg(null, "保存失败", 500);
+            result = genFaultMsg(null, "保存失败,服务端保存异常!", 500);
         }
         return result;
     }

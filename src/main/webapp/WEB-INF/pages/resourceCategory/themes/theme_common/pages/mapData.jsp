@@ -127,6 +127,7 @@
                         var contentHtml = '';
                         $.each(pages, function (i, li) {
                             li.index = i;
+                            console.log(li)
                             menuHtml += $.render(tempMenuHtml, li);
                         });
                         var menuContainer = $('[data-id=mapdatadiv1][data-uuid=' + MapData.uuid + ']');

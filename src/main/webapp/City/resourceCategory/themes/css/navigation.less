@@ -1,0 +1,62 @@
+/**
+* @author hzc
+* @createDate 2016-4-28
+*/
+@bg-color: #EDF2F6;
+@nav-width: 10%;
+@nav-height: 5rem;
+@nav-bg-color: #344154;
+@nav-max-width: 10rem;
+@nav-font-color: #A2B1CC;
+@nav-border-radius: 0px;
+@nav-bg-color-active: #36AEEA;
+@nav-font-color-active: white;
+@nav-font-weight-active: 800;
+
+@nav-font-size: @nav-height*0.33;
+@nav-padding-top: @nav-height*0.32;
+
+body {
+  background-color: @bg-color !important;
+}
+
+.esi-nav-pills {
+  background-color: @nav-bg-color;
+  margin-left: -15px;
+  margin-right: -15px;
+  padding-left: 18px !important;
+  width: auto !important;
+  height: @nav-height;
+}
+
+.esi-nav-pills > li {
+  display: table-cell !important;
+  width: @nav-width !important;
+  min-width: @nav-height !important;
+  max-width: @nav-max-width !important;
+  height: @nav-height;
+}
+
+.esi-nav-pills > li > a {
+  border-radius: @nav-border-radius !important;
+  color: @nav-font-color;
+  padding-top: @nav-padding-top !important;
+  height: @nav-height;
+  font-size: @nav-font-size;
+}
+
+.esi-nav-pills > li.active > a, .esi-nav-pills > li.active > a:focus, .esi-nav-pills > li.active > a:hover {
+  background-color: @nav-bg-color-active !important;
+  color: @nav-font-color-active;
+  font-weight: @nav-font-weight-active;
+  position: absolute;
+  top: 10px;
+  bottom: -10px;
+  width: 100%;
+}
+
+.esi-nav-pills > li > a:focus, .esi-nav-pills > li > a:hover {
+  background-color: lighten(@nav-bg-color, 10%) !important;
+  text-decoration: none;
+  height: @nav-height;
+}

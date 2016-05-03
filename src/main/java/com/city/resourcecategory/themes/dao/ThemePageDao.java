@@ -110,4 +110,16 @@ public class ThemePageDao extends BaseDao<ThemePage> {
     public List<ThemePage> selectPagesByPIdAndStatus(Integer id) {
         return queryByHQL("from ThemePage where status = 1 and parentId = " + id);
     }
+
+    /**
+     * 获取最大序号
+     *
+     * @param parentId
+     * @return
+     * @author hzc
+     * @createDate 2016-4-29
+     */
+    public List getMaxSort(Integer parentId) {
+        return queryByHQL("select max(sort) from ThemePage where parentId = " + parentId);
+    }
 }

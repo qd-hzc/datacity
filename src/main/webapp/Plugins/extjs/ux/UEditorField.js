@@ -4,7 +4,7 @@
  */
 createModel('Ext.form.field.UEditor', function () {
     Ext.define('Ext.form.field.UEditor', {
-        extend: 'Ext.form.field.Text',
+        extend: 'Ext.form.field.TextArea',
         xtype: 'ueditor',//xtype名称
         fieldSubTpl: [
             '<textarea id="{id}" {inputAttrTpl} style="width:100%;height:100%"',
@@ -30,18 +30,20 @@ createModel('Ext.form.field.UEditor', function () {
             zIndex: 99999,
             //定制工具栏
             toolbars: [[
-                'source', '|', 'undo', '|','bold', 'italic', 'underline', 'fontborder', 'strikethrough', 'superscript',
-                'subscript', 'removeformat', 'formatmatch','autotypeset', 'pasteplain', '|', 'forecolor', 'backcolor',
-                'insertorderedlist', 'insertunorderedlist',  'cleardoc', '|','customstyle', 'paragraph', 'fontfamily',
-                'fontsize', '|','directionalityltr', 'directionalityrtl', 'indent', '|','justifyleft', 'justifycenter',
-                'justifyright', 'justifyjustify', '|','link', 'unlink', '|', 'imagenone', 'imageleft', 'imageright',
-                'imagecenter', '|', 'simpleupload', 'insertimage', 'scrawl',  'attachment',  'insertcode','pagebreak',
+                'source', '|', 'undo', '|', 'bold', 'italic', 'underline', 'fontborder', 'strikethrough', 'superscript',
+                'subscript', 'removeformat', 'formatmatch', 'autotypeset', 'pasteplain', '|', 'forecolor', 'backcolor',
+                'insertorderedlist', 'insertunorderedlist', 'cleardoc', '|', 'customstyle', 'paragraph', 'fontfamily',
+                'fontsize', '|', 'directionalityltr', 'directionalityrtl', 'indent', '|', 'justifyleft', 'justifycenter',
+                'justifyright', 'justifyjustify', '|', 'link', 'unlink', '|', 'imagenone', 'imageleft', 'imageright',
+                'imagecenter', '|', 'simpleupload', 'insertimage', 'scrawl', 'attachment', 'insertcode', 'pagebreak',
                 'template', 'background', '|', 'horizontal', 'date', 'time', 'spechars', 'snapscreen', 'wordimage', '|',
                 'inserttable', 'deletetable', 'insertparagraphbeforetable', 'insertrow', 'deleterow', 'insertcol', 'deletecol',
                 'mergecells', 'mergeright', 'mergeleft', 'mergeup', 'mergedown', 'splittocells', 'splittorows', 'splittocols',
                 'lefttophzc', 'centertophzc', 'righttophzc', 'leftmiddlehzc', 'centermiddlehzc', 'rightmiddlehzc', 'leftbottomhzc',
-                'centerbottomhzc', 'rightbottomhzc','|','print', 'preview', 'searchreplace', 'help'
-            ]]
+                'centerbottomhzc', 'rightbottomhzc', '|', 'print', 'preview', 'searchreplace', 'help'
+            ]],
+            enableAutoSave: false,
+            autoSyncData: false
         },//定制默认配置项
         initComponent: function () {
             var me = this;
@@ -51,13 +53,8 @@ createModel('Ext.form.field.UEditor', function () {
             var me = this;
             me.callParent(arguments);
             if (!me.ue) {
-
-                me.ueditorConfig = Ext.apply(me.ueditorConfig,me.defaultUeditorConfig);
-                console.log(me)
-                me.ue = UE.getEditor(me.getInputId(), Ext.apply(me.ueditorConfig/*, {
-                    initialFrameHeight: me.height || '600px',
-                    initialFrameWidth: '100%'
-                }*/));
+                me.ueditorConfig = Ext.apply(me.ueditorConfig, me.defaultUeditorConfig);
+                me.ue = UE.getEditor(me.getInputId(), me.ueditorConfig);
                 me.ue.ready(function () {
                     me.UEditorIsReady = true;
                 });
@@ -96,9 +93,23 @@ createModel('Ext.form.field.UEditor', function () {
             if (me.UEditorIsReady) {
                 me.ue.sync(me.getInputId());
             }
-            v = (me.inputEl ? me.inputEl.getValue() : Ext.valueFrom(me.rawValue, ''));
+            if (me.inputEl) {
+                var doms = Ext.get(Ext.dom.Query.select('textarea[componentid=' + me.getId() + ']')).elements;
+                if (doms.length) {
+                    var dom = doms[0];
+                    if (dom) {
+                        me.inputEl.dom = dom;
+                    }
+                }
+            }
+
+            var v = (me.inputEl ? me.inputEl.getValue() : Ext.valueFrom(me.rawValue, ''));
             me.rawValue = v;
             return v;
+        },
+        getValue: function () {
+            console.log(this);
+            return this.getRawValue();
         },
         destroyUEditor: function () {
             var me = this;

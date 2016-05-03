@@ -19,6 +19,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
@@ -31,6 +32,9 @@ import java.util.Map;
 public class ReportDataService {
     @Autowired
     private ReportDataDao reportDataDao;
+    @Autowired
+    private ReportInfoService reportInfoService;
+
     private EsiEventWatched esiEventWatched;
     private EsiEventWatched esiEventWatched1;
     @Autowired
@@ -125,7 +129,7 @@ public class ReportDataService {
      *
      * @param rptHtml
      */
-    public void saveOrSubmitRptData(User user,RptHtmlPojo rptHtml,Integer rptStatus,ReportInfo reportInfo) {
+    public ReportData saveOrSubmitRptData(User user,RptHtmlPojo rptHtml,Integer rptStatus,ReportInfo reportInfo) {
         Map<String, String> map = rptHtml.getMap();
         ReportDataId reportDataId = rptHtml.getReportDataId();
         String value = rptHtml.getValue();
@@ -183,11 +187,9 @@ public class ReportDataService {
             }
             reportData.setExplain(explain);
             reportDataDao.saveOrUpdate(reportData, true);
-            List<ReportData> reportDataList = new ArrayList<>();
-            reportDataList.add(reportData);
-            // 添加触发事件
-            sendListener(user, SystemLog.UPDATE, reportInfo, Thread.currentThread().getStackTrace()[1].getMethodName(), reportDataList);
+            return reportData;
         }
+        return null;
     }
     public ReportData getReportDataByReportDataId(ReportDataId reportDataId){
         return reportDataDao.queryById(reportDataId);
@@ -203,4 +205,22 @@ public class ReportDataService {
         reportDataDao.removeRptDatasByTmpIds(infoIds);
     }
 
+    /**
+     * 批量添加数据，方便提高记录日志效率
+     * @param user
+     * @param rptHtmlList
+     * @param rptStatus
+     * @param reportInfo
+     */
+    public void saveOrSubmitRptDataList(User user, List<RptHtmlPojo> rptHtmlList, Integer rptStatus, ReportInfo reportInfo) {
+        List<ReportData> reportDataList = new ArrayList<>();
+        for (RptHtmlPojo rptHtml : rptHtmlList) {
+            ReportData reportData = saveOrSubmitRptData(user, rptHtml, rptStatus, reportInfo);
+            if(reportData!=null){
+                reportDataList.add(reportData);
+            }
+        }
+        // 添加触发事件
+        sendListener(user, SystemLog.UPDATE, reportInfo, Thread.currentThread().getStackTrace()[1].getMethodName(), reportDataList);
+    }
 }

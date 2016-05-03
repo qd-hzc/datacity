@@ -27,10 +27,6 @@
 <script>
     var chartId =${chartId};
     $(function () {
-//        var p = new EsiDataHandler();
-//        p.load(config.series,config.category,true);
-
-
         Ext.Ajax.request({
             url: GLOBAL_PATH + '/support/resourcecategory/analysis/chart/queryAnalysisChartInfoByChartId',
             method: 'POST',
@@ -40,11 +36,8 @@
             success: function (response, opts) {
                 var config = Ext.JSON.decode(response.responseText);
                 var gg = new EsiChart(config);
-                console.log(gg)
                 var option = gg.createOption();
-                console.log(option)
                 $('#main').highcharts(option);
-
             }
         });
     })

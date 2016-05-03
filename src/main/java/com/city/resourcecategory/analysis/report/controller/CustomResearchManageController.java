@@ -1,6 +1,7 @@
 package com.city.resourcecategory.analysis.report.controller;
 
 import com.city.common.controller.BaseController;
+import com.city.common.util.EsiJsonParamUtil;
 import com.city.common.util.SessionUtil;
 import com.city.resourcecategory.analysis.report.entity.CustomResearchEntity;
 import com.city.resourcecategory.analysis.report.entity.ResearchGroupEntity;
@@ -18,6 +19,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 自定义查询分组管理controller类
@@ -105,17 +107,6 @@ public class CustomResearchManageController extends BaseController {
     }
 
     /**
-     * 自定义查询分组排序
-     *
-     * @return
-     */
-    @RequestMapping("/sortResearchGroup")
-    @ResponseBody
-    public Object sortResearchGroup(DragAndDropVO vo) {
-        return manageService.saveDragAndDrop(vo);
-    }
-
-    /**
      * 保存自定义查询分组
      *
      * @param entity
@@ -189,5 +180,29 @@ public class CustomResearchManageController extends BaseController {
         }
         researchService.deleteResearchById(id);
         return true;
+    }
+
+    /**
+     * 保存报表分组排序
+     *
+     * @param request
+     * @return
+     * @author hzc
+     * @createDate 2016-4-29
+     */
+    @RequestMapping("/sortGroupIndex")
+    @ResponseBody
+    public Object sortGroupIndex(HttpServletRequest request) {
+        Map<String, Object> result = null;
+        EsiJsonParamUtil<ResearchGroupEntity> util = new EsiJsonParamUtil<>();
+        try {
+            List<ResearchGroupEntity> groups = util.parseObjToList(request, ResearchGroupEntity.class);
+            manageService.saveGroupSorts(groups);
+            result = genSuccessMsg("保存成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            result = genFaultMsg("保存失败,服务端运行异常!");
+        }
+        return result;
     }
 }

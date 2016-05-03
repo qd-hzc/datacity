@@ -1,10 +1,9 @@
 package com.city.resourcecategory.analysis.report.service;
 
 import com.city.common.util.ConvertUtil;
-import com.city.common.util.tree.TreeSortUtil;
+import com.city.common.util.ListUtil;
 import com.city.resourcecategory.analysis.report.dao.ResearchGroupDao;
 import com.city.resourcecategory.analysis.report.entity.ResearchGroupEntity;
-import com.city.support.manage.pojo.DragAndDropVO;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
@@ -16,7 +15,7 @@ import java.util.List;
  * Created by HZC on 2016/2/22.
  */
 @Service
-public class CustomResearchManageService extends TreeSortUtil<ResearchGroupEntity> {
+public class CustomResearchManageService {
     @Autowired
     private ResearchGroupDao groupDao;
 
@@ -88,11 +87,28 @@ public class CustomResearchManageService extends TreeSortUtil<ResearchGroupEntit
             groupEntity = entity;
             groupEntity.setLeaf(true);
             groupEntity.setStatus(1);
-            List<ResearchGroupEntity> list = getResearchGroupByParentId(parentId);
-            groupEntity.setSort(list.size() + 1);
+            List sorts = groupDao.getMaxSort(parentId);
+            groupEntity.setSort(getIndex(sorts));
         }
         saveOrUpdate(groupEntity);
         return groupEntity;
+    }
+
+    /**
+     * 根据查询的List 获取顺序
+     *
+     * @param sorts
+     * @return
+     */
+    private int getIndex(List sorts) {
+        int s = 1;
+        if (sorts != null && sorts.size() > 0) {
+            Integer sort = (Integer) sorts.get(0);
+            if (sort != null) {
+                s += sort;
+            }
+        }
+        return s;
     }
 
     /**
@@ -143,72 +159,26 @@ public class CustomResearchManageService extends TreeSortUtil<ResearchGroupEntit
     }
 
     /**
-     * 获取序号
+     * 保存报表分组排序
      *
-     * @param entity
-     * @return
+     * @param groups
+     * @author hzc
+     * @createDate 2016-4-28
      */
-    @Override
-    protected int getSort(ResearchGroupEntity entity) {
-        return entity.getSort();
-    }
-
-    /**
-     * 设置序号
-     *
-     * @param entity
-     * @param sort
-     */
-    @Override
-    protected void setSort(ResearchGroupEntity entity, int sort) {
-        entity.setSort(sort);
-    }
-
-    /**
-     * 设置父id
-     *
-     * @param entity
-     * @param parentId
-     */
-    @Override
-    protected void setParentId(ResearchGroupEntity entity, int parentId) {
-        entity.setParentId(parentId);
-    }
-
-    /**
-     * 根据id获取entity
-     *
-     * @param id
-     * @return
-     */
-    @Override
-    protected ResearchGroupEntity getEntityById(int id) {
-        return getResearchGroupById(id);
-    }
-
-    /**
-     * 根据父id获取集合
-     *
-     * @param id
-     * @return
-     */
-    @Override
-    protected List<ResearchGroupEntity> getEntitiesByParent(int id) {
-        return getResearchGroupByParentId(id);
-    }
-
-    /**
-     * 更新entity
-     *
-     * @param entity
-     */
-    @Override
-    protected void updateEntity(ResearchGroupEntity entity) {
-        saveOrUpdate(entity);
-    }
-
-    @Override
-    protected void setLeaf(ResearchGroupEntity over, boolean b) {
-        over.setLeaf(b);
+    public void saveGroupSorts(List<ResearchGroupEntity> groups) {
+        if (ListUtil.notEmpty(groups)) {
+            ConvertUtil<ResearchGroupEntity> util = new ConvertUtil<>();
+            //转换并保存
+            for (ResearchGroupEntity group : groups) {
+                if (group.getId() != null) {
+                    ResearchGroupEntity curGroup = getResearchGroupById(group.getId());
+                    //赋值
+                    util.apply(curGroup, group, ResearchGroupEntity.class);
+                    groupDao.update(curGroup, false);
+                } else {
+                    groupDao.insert(group, true);
+                }
+            }
+        }
     }
 }

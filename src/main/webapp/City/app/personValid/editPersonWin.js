@@ -16,7 +16,6 @@ createModel('Ext.personValid.EditPersonWin', function () {
  * @param fn回调函数
  */
 Ext.personValid.EditPersonWin.init = function (record, fn) {
-    console.log(record);
     //自定义电话检验
     Ext.apply(Ext.form.field.VTypes,{
         phone:function(v){
@@ -24,7 +23,7 @@ Ext.personValid.EditPersonWin.init = function (record, fn) {
         },
         phoneText:"请输入有效电话号码，如：0591-6487256，15005059587",
         phoneMask:/[\d-]/i//只允许输入数字和-号
-    })
+    });
     var form = new Ext.form.Panel({
         width: '100%',
         layout: 'column',

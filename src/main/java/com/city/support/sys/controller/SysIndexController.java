@@ -1,5 +1,6 @@
 package com.city.support.sys.controller;
 
+import com.city.common.pojo.Constant;
 import com.city.common.util.EsiLogUtil;
 import com.city.common.util.ListUtil;
 import com.city.common.util.SessionUtil;
@@ -23,6 +24,7 @@ import com.city.common.controller.BaseController;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
+import java.util.List;
 import java.util.Map;
 import java.util.Set;
 
@@ -34,6 +36,11 @@ import java.util.Set;
 public class SysIndexController extends BaseController {
     public static Integer LOGINFAIL = 400;//登录失败返回400
     public static Integer LOGINSUCCESS = 200;//登录成功返回200
+
+    //    前台用户登录页面
+    private static final String userIndex = Constant.userIndex;
+    //    后台用户登录页面
+    private static final String manageIndex = Constant.manageIndex;
 
     @Autowired
     private UserManagerService userManagerService;
@@ -94,14 +101,33 @@ public class SysIndexController extends BaseController {
         Map<String, Object> userInfo = null;
         Map<String, Object> result = null;
         //验证用户
-        userInfo = userManagerService.vailUser(loginName, MD5Util.MD5(loginPwd));
+        userInfo = userManagerService.vailUser(loginName.trim(), MD5Util.MD5(loginPwd));
         //登录返回信息
         if (userInfo != null && (Boolean) userInfo.get("success")) {
             User user = (User) userInfo.get("data");
 
-            sysService.setUserInfo(request, user);
+            String indexPage = user.getIndexPage();
+            boolean hasModule = false;
 
-            result = this.genSuccessMsg(user.getIndexPage(), "登录成功", LOGINSUCCESS);
+            Set<Role> roles = user.getRoles();
+            if (null != roles && roles.size() > 0) {
+                for (Role r : roles) {
+                    List<Module> modules = r.getModules();
+                    if (null != modules && modules.size() > 0) {
+                        hasModule = true;
+                        user.setManageRole(true);
+                        break;
+                    }
+                }
+            }
+            if (indexPage.equals(manageIndex)) {
+                if (!hasModule) {
+                    indexPage = userIndex;
+                }
+            }
+            user.setIndexPage(indexPage);
+            sysService.setUserInfo(request, user);
+            result = this.genSuccessMsg(indexPage, "登录成功", LOGINSUCCESS);
             return result;
         } else {
             result = this.genFaultMsg("", "登录失败", LOGINFAIL);

@@ -61,7 +61,7 @@ public class Constant {
         /**
          * 加工表
          */
-        public static final int PROCESS = 2;
+//        public static final int PROCESS = 2;
 
         /**
          * 获取所有类型
@@ -72,10 +72,10 @@ public class Constant {
             map.put("text", "综合表");
             map.put("value", SYNTHESIS);
             result.add(map);
-            map = new HashMap<>();
-            map.put("text", "加工表");
-            map.put("value", PROCESS);
-            result.add(map);
+//            map = new HashMap<>();
+//            map.put("text", "加工表");
+//            map.put("value", PROCESS);
+//            result.add(map);
             return result;
         }
     }
@@ -298,6 +298,10 @@ public class Constant {
             map = new HashMap<>();
             map.put("text", "时间");
             map.put("value", TIME);
+            result.add(map);
+            map = new HashMap<>();
+            map.put("text", "动态时间");
+            map.put("value", DYNAMIC_TIME);
             result.add(map);
             return result;
         }
@@ -1071,4 +1075,8 @@ public class Constant {
         public static final int CONTENT = 2;
     }
 
+    //    后台用户登录页面
+    public static final String manageIndex = "/support/sys/index";
+    //    前台用户登录页面
+    public static final String userIndex = "/resourcecategory/themes/commonController/returnIndex";
 }

@@ -18,6 +18,8 @@ public class TextContent implements Serializable {
     private Integer id;
     @Column(nullable = false)
     private String name;
+    @Column(name = "SUB_TITLE")
+    private String subTitle;
     @OneToOne
     @JoinColumn(name = "THEME_ID")
     private TextTheme theme;
@@ -64,6 +66,14 @@ public class TextContent implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getSubTitle() {
+        return subTitle;
+    }
+
+    public void setSubTitle(String subTitle) {
+        this.subTitle = subTitle;
     }
 
     public TextTheme getTheme() {

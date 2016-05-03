@@ -1,0 +1,73 @@
+/**
+* @author hzc
+* @createDate 2016-4-28
+*/
+@main: #355993;
+@mainFont: white;
+@navHeight: 6rem;
+@containerMinWidth: 600px;
+@btnRadius: 0px;
+@btnMinWidth: 80px;
+
+@titleFont: @navHeight*0.5;
+@navTitlePaddingTop: @navHeight*0.2;
+@navSettingPaddingTop: @navHeight*0.2;
+@navTitleSpace: @navHeight*0.16;
+
+.container-fluid {
+  min-width: @containerMinWidth;
+}
+
+//下拉菜单宽度
+.dropdown-menu {
+  min-width: @btnMinWidth;
+}
+
+//nav的btn颜色
+.btn-default {
+  background-color: @main;
+  border-color: @main;
+  color: @main;
+}
+
+//首页右上角菜单
+.btn-default.active, .btn-default.focus, .btn-default:active, .btn-default:focus, .btn-default:hover, .open > .dropdown-toggle.btn-default {
+  background-color: lighten(@main, 10%);
+  border-color: lighten(@main, 10%);
+  color: lighten(@main, 10%);
+}
+
+//logo 标题
+.esi-main-title {
+  padding-top: @navTitlePaddingTop;
+  padding-left: @navHeight;
+  background-color: @main;
+  height: @navHeight;
+}
+
+//首页右上角菜单
+.esi-main-setting {
+  padding-top: @navSettingPaddingTop;
+  height: @navHeight;
+  background-color: @main;
+}
+
+//按钮文字颜色
+button span {
+  color: @mainFont;
+}
+
+//网站部门
+.esi-title {
+  font-size: @titleFont;
+  font-weight: 700;
+  font-family: 'Courier New';
+  color: @mainFont;
+  text-shadow: 0 6px 12px rgba(0, 0, 0, 0.176);
+  letter-spacing: @navTitleSpace;
+}
+
+//按钮边角
+.btn {
+  border-radius: @btnRadius;
+}

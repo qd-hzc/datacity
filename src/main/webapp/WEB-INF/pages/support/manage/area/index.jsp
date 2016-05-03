@@ -67,8 +67,7 @@
                         leftTreeAreaStore.sync();
                     }
                 }
-            }
-            ,
+            } ,
             listeners: {
                 itemclick: function (_this, record, item, index, e, eOpts) {
                     areaInfoPanel.getForm().loadRecord(record);

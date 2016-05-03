@@ -45,4 +45,14 @@ public class ResearchGroupDao extends BaseDao<ResearchGroupEntity> {
         sql.append("-1 )");
         updateByHQL(sql.toString());
     }
+
+    /**
+     * 获取最大序号
+     *
+     * @param parentId
+     * @return
+     */
+    public List getMaxSort(int parentId) {
+        return queryByHQL("select max(sort) from ResearchGroupEntity where parentId = " + parentId);
+    }
 }

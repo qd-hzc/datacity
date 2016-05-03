@@ -16,7 +16,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -681,8 +680,11 @@ public class CommonController extends BaseController {
 
     /**
      * 返回重点关注菜单
+     * <pre>
+     *     返回重点关注菜单集合，集合是树结构，保存在 child 中
+     * </pre>
      *
-     * @param menus
+     * @param menus 菜单id的字符串，使用英文逗号（,）分隔
      * @return
      * @author hzc
      * @createDate 2016-4-22
@@ -690,7 +692,6 @@ public class CommonController extends BaseController {
     @RequestMapping("/getSyntheticalMenus")
     @ResponseBody
     public Object getSyntheticalMenus(String menus) {
-
         return genSuccessMsg(commonService.getSyntheticalMenus(menus), "调用成功", 200);
     }
 }

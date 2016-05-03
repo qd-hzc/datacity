@@ -58,7 +58,6 @@
                 text:'删除人员',
                 iconCls: 'Delete',
                 handler: function (_this, n, o) {
-                    console.log(n);//change事件
                     var selModel = personGrid.getSelectionModel();
                     var sels = selModel.getSelection();
                     if (sels.length >0) {
@@ -220,7 +219,6 @@
                     text: '导出人员',
                     handler:function(){
                         var sels=personGrid.getSelectionModel().getSelection();
-                        //console.log(personStore.getData().items);
                        if(sels.length==0){
                            var staffs="";
                            for(var i=0;i<personStore.getData().items.length;i++){

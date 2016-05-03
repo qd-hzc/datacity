@@ -193,13 +193,19 @@ public class ReportExcelController extends BaseController {
                                             }
                                             List<RptHtmlPojo> rptHtmlList = ImportUtils.getRptHtml(reportInfo.getId(), Constant.DATA_TYPE.NUMBER, Constant.COLLECTION_TYPE.LEADIN, reportInfo.getTime(),reportInfo.getYear(),reportInfo.getMonth(), doc,reportInfo.getDptId());
 
-                                            for (RptHtmlPojo rptHtml : rptHtmlList) {
+
+                                            reportDataService.saveOrSubmitRptDataList(user,rptHtmlList,reportInfo.getRptStatus(),reportInfo);
+                                            if(reportInfo.getRptStatus()!=Constant.RPT_STATUS.REJECT){
+                                                //修改报表状态
+                                                reportInfoService.updateStatus(user,reportInfo.getId(), Constant.RPT_STATUS.DRAFT,request);
+                                            }
+                                            /*for (RptHtmlPojo rptHtml : rptHtmlList) {
                                                 reportDataService.saveOrSubmitRptData(user,rptHtml,reportInfo.getRptStatus(),reportInfo);
                                                 if(reportInfo.getRptStatus()!=Constant.RPT_STATUS.REJECT){
                                                     //修改报表状态
                                                     reportInfoService.updateStatus(user,rptHtml.getRptId(), Constant.RPT_STATUS.DRAFT,request);
                                                 }
-                                            }
+                                            }*/
                                             importAll++;
                                         }
                                     }else{
@@ -308,13 +314,18 @@ public class ReportExcelController extends BaseController {
                                             }
                                             List<RptHtmlPojo> rptHtmlList = ImportUtils.getRptHtml(reportInfo.getId(), Constant.DATA_TYPE.NUMBER, Constant.COLLECTION_TYPE.LEADIN, reportInfo.getTime(),reportInfo.getYear(),reportInfo.getMonth(), doc,reportInfo.getDptId());
 
-                                            for (RptHtmlPojo rptHtml : rptHtmlList) {
+                                            reportDataService.saveOrSubmitRptDataList(user,rptHtmlList,reportInfo.getRptStatus(),reportInfo);
+                                            if(reportInfo.getRptStatus()!=Constant.RPT_STATUS.REJECT){
+                                                //修改报表状态
+                                                reportInfoService.updateStatus(user,reportInfo.getId(), Constant.RPT_STATUS.DRAFT,request);
+                                            }
+                                            /*for (RptHtmlPojo rptHtml : rptHtmlList) {
                                                 reportDataService.saveOrSubmitRptData(user,rptHtml,reportInfo.getRptStatus(),reportInfo);
                                                 if(reportInfo.getRptStatus()!=Constant.RPT_STATUS.REJECT){
                                                     //修改报表状态
                                                     reportInfoService.updateStatus(user,rptHtml.getRptId(), Constant.RPT_STATUS.DRAFT,request);
                                                 }
-                                            }
+                                            }*/
                                             importAll++;
                                         }
                                     }else{

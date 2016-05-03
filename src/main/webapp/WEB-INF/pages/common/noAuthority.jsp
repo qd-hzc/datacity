@@ -11,6 +11,6 @@
 </head>
 <body>
 
-<div style="width: 100%;text-align: center;font-weight: 800;margin-top: 40px;color: red;font-size: 20px;">无权限</div>
+<div style="width: 100%;text-align: center;font-weight: 800;margin-top: 40px;font-size: 20px;">无权限</div>
 </body>
 </html>

@@ -1,7 +1,6 @@
 package com.city.resourcecategory.themes.service;
 
 import com.city.common.pojo.Constant;
-import com.city.common.util.tree.PackageListToTree;
 import com.city.resourcecategory.analysis.chart.service.BasicChartConfigService;
 import com.city.resourcecategory.analysis.common.entity.TimeRangeEntity;
 import com.city.resourcecategory.analysis.common.service.TimeRangeService;
@@ -32,16 +31,9 @@ import com.city.support.sys.user.pojo.CurrentUser;
 import com.city.support.sys.user.pojo.ReportPermission;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-import org.springframework.ui.context.Theme;
 import org.springframework.util.StringUtils;
 
 import javax.transaction.Transactional;
-import java.beans.BeanInfo;
-import java.beans.IntrospectionException;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
 import java.util.*;
 
 /**
@@ -195,11 +187,33 @@ public class CommonService {
         int themeId = Integer.parseInt(contentValue);
         if (1 == 1) {// 权限验证
             Map<String, Object> result = new HashMap<>();
-            List<TextContent> textContentList = textContentService.queryAllTextContentByThemeId(null, themeId, TextTheme.SORT_BY_DATE, null, null);
+            List<TextContent> textContentList = textContentService.queryAllTextContentByThemeId(null, themeId, TextTheme.SORT_BY_DATE, null, Constant.TEXT_CONTENT_STATUS.CHECKED);
             List<TextContent> textContentListByUser = textContentService.queryAllTextContentByThemeId(user.getUser(), themeId, TextTheme.SORT_BY_DATE, null, null);
             if (textContentList != null) {
-                result.put("all", textContentList);
-                result.put("user", textContentListByUser);
+                List<Map<String, Object>> allTextMapList = new ArrayList<>();
+                List<Map<String, Object>> userTextMapList = new ArrayList<>();
+                for(TextContent textContent: textContentList){
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id",textContent.getId());
+                    map.put("creatorName", textContent.getCreatorName());
+                    map.put("analysisDate",textContent.getAnalysisDate());
+                    map.put("name", textContent.getName());
+                    map.put("subtitle",textContent.getSubTitle());
+                    map.put("isSel",false);
+                    allTextMapList.add(map);
+                }
+                for(TextContent textContent: textContentListByUser){
+                    Map<String, Object> map = new HashMap<>();
+                    map.put("id",textContent.getId());
+                    map.put("creatorName", textContent.getCreatorName());
+                    map.put("analysisDate",textContent.getAnalysisDate());
+                    map.put("name", textContent.getName());
+                    map.put("subtitle",textContent.getSubTitle());
+                    map.put("isSel",false);
+                    userTextMapList.add(map);
+                }
+                result.put("all", allTextMapList);
+                result.put("user", userTextMapList);
                 return result;
             }
         }
@@ -777,7 +791,7 @@ public class CommonService {
      * @author hzc
      * @createDate 2016-4-1
      */
-    public String getResearchBy(Integer id) {
+    public String getResearchById(Integer id) {
         CustomResearchEntity research = researchService.getCustomResearchById(id);
         //        分析报表有效报告期时间：年，月
         List<TimePojo> periods = queryRptService.getResearchTime(research);
@@ -852,10 +866,15 @@ public class CommonService {
 
     /**
      * 返回所有数据
+     * <pre>
+     *     根据配置集合，返会所有配置详细信息
+     * </pre>
      *
-     * @param contents
-     * @param user
+     * @param contents 所有配置主题
+     * @param user     当前用户
      * @return
+     * @author hzc
+     * @createDate 2016-4-8
      */
     public Object returnAllData(List<ThemePageContent> contents, CurrentUser user) throws Exception {
 
@@ -877,58 +896,93 @@ public class CommonService {
         }
         return list;
     }
+
     /**
      * 返回重点关注菜单
-     * @param menus
+     * <pre>
+     *     返回重点关注菜单集合，集合是树结构，保存在 child 中
+     * </pre>
+     *
+     * @param menus 菜单id的字符串，使用英文逗号（,）分隔
      * @return
      * @author hzc
      * @createDate 2016-4-22
      */
     public Object getSyntheticalMenus(String menus) {
+
         menus = menus.replaceAll(";", ",");
+
         List<ThemePage> list = themesService.getThemesPageByIds(menus);
+
         List<ThemePage> treeList = listToTreeList(list);
+
         ArrayList<Object> result = new ArrayList<>();
+
+//        处理树非第一级的节点
         for (int i = 0; i < treeList.size(); i++) {
+
             ArrayList<ThemePage> newList = new ArrayList<>();
+
             ThemePage themePage = treeList.get(i);
+
             platTree(themePage.getChild(), 1, newList);
+
             themePage.setChild(newList);
+
             result.add(themePage);
         }
+
         return result;
     }
 
     /**
      * 拆平树
+     * <pre>
+     *     将树的级别，每2级变为一级
+     * </pre>
      *
-     * @param list
-     * @param cengji
-     * @param newList
+     * @param list    原树集合
+     * @param cengji  初始层级：0：树的第一级和第二级开始变为一级，1：树的第二级和第一级开始变为一级
+     * @param newList 新树集合
+     * @author hzc
+     * @createDate 2016-4-22
      */
     private void platTree(List<ThemePage> list, Integer cengji, List newList) {
-        for (int i = 0; i < list.size(); i++) {
-            ThemePage themePage = list.get(i);
-            List<ThemePage> child = themePage.getChild();
-//            层级为2的倍数时，拆平
-            if (cengji % 2 == 0) {
-                themePage.setTitle(true);
-                themePage.setChild(new ArrayList<ThemePage>());
-                newList.add(themePage);
-                if (null != child && child.size() > 0) {
-                    for (int j = 0; j < child.size(); j++) {
-                        child.get(j).setTitle(false);
+
+        if (null != list && list.size() > 0) {
+            for (int i = 0; i < list.size(); i++) {
+
+                ThemePage themePage = list.get(i);
+                List<ThemePage> child = themePage.getChild();
+
+//                  层级为2的倍数时，拆平
+                if (cengji % 2 == 0) {
+
+                    themePage.setTitle(true);
+                    themePage.setChild(new ArrayList<ThemePage>());
+
+                    newList.add(themePage);
+                    if (null != child && child.size() > 0) {
+
+                        for (int j = 0; j < child.size(); j++) {
+                            child.get(j).setTitle(false);
+                        }
+
+                        newList.addAll(child);
+
+                        platTree(child, cengji + 1, new ArrayList());
                     }
-                    newList.addAll(child);
-                    themePage.setChild(new ArrayList<ThemePage>());
-                    platTree(child, cengji + 1, themePage.getChild());
+                } else {
+
+                    if (null != child && child.size() > 0) {
+
+                        themePage.setChild(new ArrayList<ThemePage>());
+                        platTree(child, cengji + 1, themePage.getChild());
+
+                    }
+
+                    newList.add(themePage);
                 }
-            } else {
-                if (null != child && child.size() > 0) {
-                    themePage.setChild(new ArrayList<ThemePage>());
-                    platTree(child, cengji + 1, themePage.getChild());
-                }
-                newList.add(themePage);
             }
         }
     }
@@ -937,32 +991,42 @@ public class CommonService {
      * 将list封装成treeList，返回新list
      *
      * @param list
-     * @return
+     * @return 树结构的list
+     * @author hzc
+     * @createDate 2016-4-22
      */
     private List<ThemePage> listToTreeList(List<ThemePage> list) {
+
         List<ThemePage> result = new LinkedList<>();
+
         if (null != list && list.size() > 0) {
+
             for (int i = 0; i < list.size(); i++) {
                 ThemePage themePage = list.get(i);
                 for (int j = 0; j < list.size(); j++) {
                     ThemePage themePageJ = list.get(j);
+
                     if (String.valueOf(themePageJ.getParentId()).equals(String.valueOf(themePage.getId()))) {
 //                        当前对象不是root节点
                         themePageJ.setRoot(false);
                         themePage.getChild().add(themePageJ);
                     }
                 }
+
                 result.add(themePage);
             }
+
+//            删除非根节点的bean
             for (int i = 0; i < result.size(); i++) {
                 ThemePage themePage = result.get(i);
                 if (!themePage.isRoot()) {
+
                     result.remove(themePage);
                     i--;
                 }
             }
         }
+
         return result;
     }
-
 }

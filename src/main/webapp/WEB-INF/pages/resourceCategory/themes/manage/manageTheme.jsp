@@ -348,11 +348,12 @@
     Ext.onReady(function () {
         //左侧重点关注树查询数据
         var attentionStore = Ext.create('Ext.data.TreeStore', {
-            fields: ['id', 'name', 'parentId', 'themeConfigPath', 'modulePath', 'status', 'leaf'],
+            fields: ['id', 'name', 'parentId', 'themeConfigPath', 'modulePath', 'status', 'leaf','sortIndex'],
             proxy: {
                 type: 'ajax',
                 api: {
-                    read: contextPath + '/resourcecategory/themes/manageThemesController/getManageThemeTree'
+                    read: contextPath + '/resourcecategory/themes/manageThemesController/getManageThemeTree',
+                    update: contextPath + '/resourcecategory/themes/manageThemesController/sortThemeIndex'
                 }
             },
             root: {
@@ -375,11 +376,11 @@
                     dragZone: {
                         afterDragOver: function (zone) {
                             var rec = zone.overRecord;
-                            if(zone.curRecoder){
-                                if(rec != zone.curRecoder){
+                            if (zone.curRecoder) {
+                                if (rec != zone.curRecoder) {
 //                                    zone.curRecoder.reject();
-                                    if(!zone.curRecoder.hasChildNodes())
-                                        zone.curRecoder.set('leaf',true);
+                                    if (!zone.curRecoder.hasChildNodes())
+                                        zone.curRecoder.set('leaf', true);
                                 }
                             }
                             zone.curRecoder = rec;
@@ -393,35 +394,14 @@
 
                 },
                 listeners: {
-                    'beforedrop': function (node, data, overModel, dropPosition, dropHandlers) {//overModel是一个NodeInterface,data是一个object，有records、item、view等等。
-                        dropHandlers.wait = true;
-                        var overParentId = overModel.get('parentId');
-                        var moveParentId = data.records[0].get('parentId');
-                        var moveId = data.records[0].get('id');
-                        var overId = overModel.get('id');
-                        //与后台交互
-                        Ext.Ajax.request({
-                            url: contextPath + '/resourcecategory/themes/manageThemesController/sortThemePage',
-                            method: 'POST',
-                            params: {
-                                moveId: moveId,
-                                overId: overId,
-                                moveParentId: moveParentId,
-                                overParentId: overParentId,
-                                dropPosition: dropPosition
-                            },
-                            success: function (data) {
-                                if (data) {
-                                    dropHandlers.processDrop();
-                                } else {
-                                    dropHandlers.cancelDrop();
-                                }
-                            },
-                            failure: function (response, opts) {
-                                var result = Ext.decode(response.responseText);
-                                dropHandlers.cancelDrop();
-                            }
+                    drop: function (node, data, overModel, dropPosition, dropHandlers) {
+                        var dragNode = data.records[0];
+                        var pNode = dragNode.parentNode;
+                        dragNode.set('parentId', pNode.getId());
+                        Ext.Array.each(pNode.childNodes, function (child) {
+                            child.set('sortIndex', child.data.index);
                         });
+                        attentionStore.sync();
                     }
                 }
             },
@@ -545,7 +525,7 @@
                         for (var i = 0; i < contents.length; i++) {
                             var c = contents[i];
                             var types = c.contentTypes;
-                            var containerName= c.containerName;
+                            var containerName = c.containerName;
                             var containerId = c.containerId;
                             var list = [];
                             if (types && types.length > 0) {
@@ -642,7 +622,7 @@
                     read: contextPath + '/resourcecategory/themes/manageThemesController/getAllRoles'
                 }
             },
-            autoLoad:true
+            autoLoad: true
         });
         var privilegeCombo = Ext.create('Ext.ux.ComboBoxTree', {
             fieldLabel: '权限',

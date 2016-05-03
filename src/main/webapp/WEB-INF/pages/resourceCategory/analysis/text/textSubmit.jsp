@@ -24,7 +24,7 @@
             height: 40px;
             margin-top: 20px;
             padding-left: 100px;
-            /*            padding-right: 37px;*/
+            padding-right: 37px;
         }
 
         .content {
@@ -66,12 +66,16 @@
             width: 100%;
         }
 
-        div.submitBtn {
+        i.timeBtn {
+            background-image: url("<%=contextPath%>/City/resourceCategory/themes/images/timeBtn.png");
             border: 0 none;
-            width: 100px;
-            height: 50px;
+            width: 37px;
+            height: 36px;
             margin-top: 2px;
             text-align: center;
+            position: absolute;
+            right: 0;
+            top: 0;
             z-index: 99;
         }
 
@@ -94,6 +98,16 @@
             text-align: center;
             width: 120px;
         }
+
+        div.datetimepicker-years{
+            z-index:1000;;
+        }
+        div.datetimepicker-months{
+            z-index:1000;;
+        }
+        div.datetimepicker-days{
+            z-index:1000;;
+        }
     </style>
 </head>
 <body>
@@ -106,8 +120,10 @@
         <span class="left-title">发布日期</span>
 
         <div class="input-append date form_datetime">
-            <input class="inputtext" size="16" type="text" value="" readonly id="textTime">
-            <span class="add-on"><i class="icon-calendar"></i></span>
+            <input class="inputtext" size="16" type="text" value="" id="textTime" disabled="true"
+                   style="background:#fff">
+            <span class="add-on"><i class="timeBtn icon-calendar" type="button"
+                                    style="width: 37px;height: 36px;"></i></span>
         </div>
     </div>
 
@@ -131,6 +147,7 @@
     var UEDITOR_HOME_URL = '<%=request.getContextPath()%>/Plugins/ueditor/';
     var contextPath = '<%=contextPath%>';
     var themeId = ${themeId};
+    var contentId = null;
     (function () {
         $(".form_datetime").datetimepicker({
             format: "yyyy-mm-dd",
@@ -138,13 +155,15 @@
             language: 'zh-CN', //汉化
             autoclose: true,
             todayBtn: true,
-            minuteStep: 10
+            minuteStep: 10,
+            pickerPosition: 'bottom-left'
         });
         $(".form_datetime").datetimepicker('setEndDate', new Date());
         /**
          * 发布
          */
         $('#submitText').click(function () {
+            var $this = $(this);
             var textTitle = $.trim($('#textTitle').val());
             var textTime = $.trim($('#textTime').val());
             var textContent = ue.getContent();
@@ -153,30 +172,39 @@
             console.log(textContent)
             if (textTitle != "" && textTime != "") {
                 var msg = {
+                    themeId: themeId,
                     name: textTitle,
-
+                    id:contentId,
                     status: 3,
                     type: 1,
                     content: textContent,
                     analysisDate: parserDate(textTime),
-                    sortIndex: 1,
+                    sortIndex: 1
+
                 }
                 $.ajax({
                     type: "POST",
                     dataType: "json",
-                    url: contextPath + "/support/resourceCategory/analysis/text/updateTextContent",
-                    params: {
-                        'themeId': themeId
-                    },
+                    url: contextPath + "/support/resourceCategory/analysis/text/addTextContent",
                     data: msg,
                     error: function (error) {
                         alert("出现异常!");
                     },
                     success: function (data) {
+                        console.log(data);
                         //改变加载状态 已发送
                         //alert(data.msg);
+                        if(data.success) {
+                            alert(data.msg);
+                            contentId = data.datas.id;
+                            $this.attr("value", "修改");
+                        }else{
+                            alert(data.msg);
+                        }
                     }
                 });
+            } else {
+                alert("标题或发布日期不能为空！");
             }
             //var msgType=$('input[name="msgType"]:checked').val();
             /*if(userIds.length&&msgTitle!=""&&msgBody!=""){

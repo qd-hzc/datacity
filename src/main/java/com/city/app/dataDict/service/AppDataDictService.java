@@ -11,10 +11,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by wxl on 2016/3/23.
@@ -69,7 +66,7 @@ public class AppDataDictService {
         //根据分组分
         Map<String, List<AppDataDict>> result = null;
         if (ListUtil.notEmpty(dicts)) {
-            result = new HashMap<>();
+            result = new LinkedHashMap<>();
             for (AppDataDict dict : dicts) {
                 String groupName = dict.getGroupName();
                 List<AppDataDict> groupDicts = result.get(groupName);

@@ -546,7 +546,6 @@ EsiChart.prototype.handleStruct = function (structList) {
                                                 tmpEsiStruct.info.name = tmpEsiStruct.esiTime.year + "年" + FREQUENCY_TYPE.getString(metaExt.periodType, tmpEsiStruct.esiTime.period);
                                             else
                                                 tmpEsiStruct.info.name += tmpEsiStruct.esiTime.year + "年" + FREQUENCY_TYPE.getString(metaExt.periodType, tmpEsiStruct.esiTime.period);
-                                            console.log(tmpEsiStruct.info.name)
                                             result.push(tmpEsiStruct);
                                             isAdd = true;
                                             tmpM += span;
@@ -566,7 +565,6 @@ EsiChart.prototype.handleStruct = function (structList) {
                                                 tmpEsiStruct.info.name = tmpEsiStruct.esiTime.year + "年" + FREQUENCY_TYPE.getString(metaExt.periodType, tmpEsiStruct.esiTime.period);
                                             else
                                                 tmpEsiStruct.info.name += tmpEsiStruct.esiTime.year + "年" + FREQUENCY_TYPE.getString(metaExt.periodType, tmpEsiStruct.esiTime.period);
-                                            console.log(tmpEsiStruct.info.name)
                                             result.push(tmpEsiStruct);
                                             isAdd = true;
                                         }
@@ -584,7 +582,6 @@ EsiChart.prototype.handleStruct = function (structList) {
                                                 tmpEsiStruct.info.name = tmpEsiStruct.esiTime.year + "年" + FREQUENCY_TYPE.getString(metaExt.periodType, tmpEsiStruct.esiTime.period);
                                             else
                                                 tmpEsiStruct.info.name += tmpEsiStruct.esiTime.year + "年" + FREQUENCY_TYPE.getString(metaExt.periodType, tmpEsiStruct.esiTime.period);
-                                            console.log(tmpEsiStruct.info.name)
                                             result.push(tmpEsiStruct);
                                             isAdd = true;
                                         }
@@ -636,6 +633,5 @@ EsiChart.prototype.handleStruct = function (structList) {
         }
         isAdd = false;
     });
-    console.log(result)
     return result;
 };

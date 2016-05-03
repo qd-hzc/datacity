@@ -30,7 +30,6 @@
             success: function (response, opts) {
                 var config = Ext.JSON.decode(response.responseText);
                 var gg = new EsiChart(config);
-                console.log(gg)
                 gg.addParam(item);
                 var option = gg.createOption();
                 gg.dynSeries.shift();
@@ -38,7 +37,6 @@
                 gg.dynCategory.shift();
                 gg.addSeriesParam(otherItem);
                 option = gg.createOption();
-                console.log(option)
                 var myChart = echarts.init(document.getElementById('main'));
                 if(myChart)
                     myChart.setOption(option);

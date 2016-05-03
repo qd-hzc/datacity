@@ -135,6 +135,7 @@
                 success: function (response, opts) {
                     var result = Ext.decode(response.responseText);
                     Ext.Msg.alert("成功", result.msg);
+                    if(fn)
                     fn();
                 },
                 failure: function (response, opts) {
@@ -162,6 +163,7 @@
             success: function (response, opts) {
                 var result = Ext.decode(response.responseText);
                 Ext.Msg.alert("成功", result.msg);
+                if(fn)
                 fn();
             },
             failure: function (response, opts) {
@@ -214,9 +216,11 @@
                     text: '保存',
                     handler: function () {
                         if(rptStatus == RPT_STATUS.REGECT){
-                            saveOrSubmitRptData(rptStatus);
+                            saveOrSubmitRptData(rptStatus,function(){
+                            });
                         }else{
-                            saveOrSubmitRptData(RPT_STATUS.DRAFT);
+                            saveOrSubmitRptData(RPT_STATUS.DRAFT,function(){
+                            });
                         }
                     }
                 }, {

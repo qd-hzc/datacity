@@ -382,29 +382,33 @@ EsiDataHandler.prototype.loadData = function (datas, isAdd) {
 EsiChart.prototype.init = function (fn,time, seriesParam, categoryParam) {
     this.dynSeries = [];
     this.dynCategory = [];
-    var addDynamicSeries = [];
-    var addDynamicCategory = [];
-    if (seriesParam && seriesParam.dynamicType) {
-        addDynamicSeries = this.getDynamicSeries(seriesParam)
-    } else if (seriesParam && seriesParam.length) {
-        addDynamicSeries = this.getDynamicSeriesList(seriesParam, this);
+    if(this.chartType) {
+        var addDynamicSeries = [];
+        var addDynamicCategory = [];
+        if (seriesParam && seriesParam.dynamicType) {
+            addDynamicSeries = this.getDynamicSeries(seriesParam)
+        } else if (seriesParam && seriesParam.length) {
+            addDynamicSeries = this.getDynamicSeriesList(seriesParam, this);
+        }
+        if (addDynamicSeries && addDynamicSeries.length) {
+            $.extend(this.dynSeries, addDynamicSeries);
+        }
+        if (categoryParam && categoryParam.dynamicType) {
+            addDynamicCategory = this.getDynamicCategory(categoryParam);
+        } else if (categoryParam && categoryParam.length) {
+            addDynamicCategory = this.getDynamicCategoryList(categoryParam, this);
+        }
+        if (addDynamicCategory && addDynamicCategory.length) {
+            $.extend(this.dynCategory, addDynamicCategory);
+        }
+        var series = [];
+        $.extend(series, this.esiSeriesList)
+        var categories = [];
+        $.extend(categories, this.esiCategoryList)
+        this.esiDataHandler.load(series.concat(this.dynSeries), categories.concat(this.dynCategory), time, false, true, fn, this);
+    }else{
+        this.esiDataHandler.load(this.esiSeriesList, this.esiCategoryList, time, false, true, fn, this);
     }
-    if (addDynamicSeries && addDynamicSeries.length) {
-        $.extend(this.dynSeries, addDynamicSeries);
-    }
-    if (categoryParam && categoryParam.dynamicType) {
-        addDynamicCategory = this.getDynamicCategory(categoryParam);
-    } else if (categoryParam && categoryParam.length) {
-        addDynamicCategory = this.getDynamicCategoryList(categoryParam, this);
-    }
-    if (addDynamicCategory && addDynamicCategory.length) {
-        $.extend(this.dynCategory, addDynamicCategory);
-    }
-    var series = [];
-    $.extend(series, this.esiSeriesList)
-    var categories = [];
-    $.extend(categories, this.esiCategoryList)
-    this.esiDataHandler.load(series.concat(this.dynSeries), categories.concat(this.dynCategory),time, false, true, fn, this);
 }
 //根据序列加载数据
 /**
@@ -1258,15 +1262,19 @@ EsiChart.prototype.initDynamicCategory = function (categoryParamList,time, fn, i
  * @param isAdd
  */
 EsiChart.prototype.initDynamicMetadata = function (seriesParamList, categoryParamList,time, fn, isAdd, isClear) {
-    var _this = this;
-    if (categoryParamList && (categoryParamList.length || categoryParamList.dynamicType)) {
-        this.initDynamicSeries(seriesParamList,time, function (o, esichart) {
-            _this.initDynamicCategory(categoryParamList,time, fn, isAdd, isClear);
-        }, isAdd);
-    } else {
-        this.initDynamicCategory(categoryParamList,time, function (o, esichart) {
-            _this.initDynamicSeries(seriesParamList,time, fn, isAdd, isClear);
-        }, isAdd);
+    if(this.chartType) {
+        var _this = this;
+        if (categoryParamList && (categoryParamList.length || categoryParamList.dynamicType)) {
+            this.initDynamicSeries(seriesParamList, time, function (o, esichart) {
+                _this.initDynamicCategory(categoryParamList, time, fn, isAdd, isClear);
+            }, isAdd);
+        } else {
+            this.initDynamicCategory(categoryParamList, time, function (o, esichart) {
+                _this.initDynamicSeries(seriesParamList, time, fn, isAdd, isClear);
+            }, isAdd);
+        }
+    }else{
+        this.init(fn,time);
     }
 }
 

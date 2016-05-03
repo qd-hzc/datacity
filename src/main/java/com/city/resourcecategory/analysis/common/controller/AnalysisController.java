@@ -48,8 +48,8 @@ public class AnalysisController extends BaseController {
 
     @RequestMapping("/getGroupInfoTreeForChart")
     @ResponseBody
-    public Object getGroupInfoTreeForChart() {
-        return analysisService.getGroupInfoTreeForChart();
+    public Object getGroupInfoTreeForChart(boolean isDynamic) {
+        return analysisService.getGroupInfoTreeForChart(isDynamic);
     }
 
     @RequestMapping("/getItemGroupTree")

@@ -222,6 +222,42 @@ public class TextManageController extends BaseController {
     }
 
     /**
+     * 添加分析数据
+     * @param request
+     * @param themeId
+     * @return
+     */
+    @RequestMapping("/addTextContent")
+    @ResponseBody
+    public Map<String, Object> addTextContent(HttpServletRequest request,Integer id, Integer themeId,String name,String content,String analysisDate) {
+        Map<String, Object> result = null;
+        TextContent data = new TextContent();
+        try {
+            //获取当前用户
+            User user = SessionUtil.getUser(request.getSession());
+            data = textContentService.addTextContent(user,id, themeId,name,content,analysisDate);
+            if (data!=null) {
+                if(id!=null){
+                    result = genSuccessMsg(data, "修改成功!", null);
+                }else {
+                    result = genSuccessMsg(data, "添加成功!", null);
+                }
+            } else {
+                if(id!=null) {
+                    result = genFaultMsg(null, "修改失败!", null);
+                }else{
+                    result = genFaultMsg(null, "添加失败!", null);
+                }
+            }
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            EsiLogUtil.error(getLog(), e.getMessage());
+            result = genFaultMsg(null, "更新失败!", null);
+        }
+        return result;
+    }
+    /**
      * 审核内容
      *
      * @param ids    要审核的内容

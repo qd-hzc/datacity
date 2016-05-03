@@ -36,7 +36,6 @@
         //console.log(esichart.getData());
         //esichart.loadData([2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3])
         var option = esichart.createOption();
-          console.log(option)
         /*                console.log(esichart.getData())
          console.log(option)
          //console.log(esichart.createOption());

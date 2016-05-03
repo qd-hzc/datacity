@@ -88,9 +88,15 @@
                 menu: {
                     xtype: 'menu',
                     items: [{
-                        text: '主页1'
+                        text: '用户主页',
+                        handler: function () {
+                            window.location.href=contextPath+'/resourcecategory/themes/commonController/returnIndex'
+                        }
                     }, {
-                        text: '主页2'
+                        text: '管理主页',
+                        handler:function(){
+                            window.location.href=contextPath+'/support/sys/index'
+                        }
                     }]
                 }
             }, {//消息

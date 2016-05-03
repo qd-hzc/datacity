@@ -14,7 +14,6 @@ function getContents(combo, record) {
     /**
      * 根据内容类型获取内容，并设置到内容的combobox中
      */
-    console.log(record);
     var container = Ext.getCmp('dataName');
     var type = parseInt(record.getId());
     var url = contextPath;
@@ -40,13 +39,9 @@ function getContents(combo, record) {
             container.getStore().setConfig(config).load();
             break;
     }
-    console.log(container);
 
 }
 Ext.addAnalysisDataWin.init = function (record, foreignType, fn) {
-    console.log("record");
-    console.log(record.data);
-    console.log(foreignType)
     var form = new Ext.form.Panel({
         width: '100%',
         height: '100%',

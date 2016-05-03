@@ -107,7 +107,7 @@
     this.pickerPosition = options.pickerPosition || this.element.data('picker-position') || 'bottom-right';
     this.showMeridian = options.showMeridian || this.element.data('show-meridian') || false;
     this.initialDate = options.initialDate || new Date();
-    this.zIndex = options.zIndex || this.element.data('z-index') || undefined;
+    this.zIndex = options.zIndex || this.element.data('z-index')|| 1000//undefined;
     this.title = typeof options.title === 'undefined' ? false : options.title;
 
     this.icons = {

@@ -70,7 +70,7 @@
                                         var panel = {
                                             xtype: 'panel',
                                             id: tabId,
-                                            title: tabTitle + '<span style="width:15px;height:15px;margin-right:0px;display: inline-block;" class="Arrowrefresh"></span>',
+                                            title: tabTitle,
                                             closable: true,
                                             closeAction: 'destroy',
                                             listeners: {
@@ -122,7 +122,6 @@
             } else {
                 //根节点为空
             }
-
             indexPanel = Ext.create('Ext.container.Viewport', {
                 renderTo: Ext.getBody(),
                 layout: 'border',
@@ -159,7 +158,6 @@
                     xtype: 'panel',
                     layout: {
                         type: 'accordion',
-                        //titleCollapse: false,
                         animate: true,
                         collapseFirst: false
                     },
@@ -171,9 +169,6 @@
                     frame: true,
                     region: 'center',//中
                     xtype: 'tabpanel',
-                    defaults: {
-                        closable: true
-                    },
                     plugins: {
                         ptype: 'tabclosemenu',
                         closeTabText: '关闭当前',
@@ -184,21 +179,16 @@
                         id: 'module_1',
                         title: '默认主页',
                         layout: 'fit',
-                        listeners: {
-                            activate: function () {
-                                //console.log(arguments);
-                            }
-                        },
-                        loader: {
+                        closable: true,
+                        loader: INDEX_PAGE ? {
                             autoLoad: true,
                             url: GLOBAL_PATH + INDEX_PAGE,
-//                            renderer:'html'
-                            renderer: function (loader, response, active) {
+                            renderer: function (loader, response) {
                                 var text = response.responseText;
                                 loader.getTarget().update(text, true, null);
                                 return true;
                             }
-                        }
+                        } : {}
                     }]
                 }]
             });

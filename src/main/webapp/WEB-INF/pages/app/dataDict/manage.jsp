@@ -97,7 +97,6 @@
 //                        _this.select(_this.getStore().getAt(0));
 //                    },
                     change: function (_this, n) {
-                        console.log(n);
                         menuParams.status = n;
                         queryStatusTreeByLocal(menuParams.name, menuParams.status);
                     }

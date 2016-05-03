@@ -47,7 +47,7 @@ public class AnalysisService {
         return result;
     }
 
-    public List getGroupInfoTreeForChart() {
+    public List getGroupInfoTreeForChart(boolean isDynamic) {
         //节点
         List<Map<String, Object>> result = reportService.getGroupInfoTrees();
         List<Map<String,Object>> dymicMeta = new ArrayList<>();
@@ -59,49 +59,51 @@ public class AnalysisService {
         item.put("allowDrag", true);
         item.put("leaf", true);
         result.add(item);
-        item = new HashMap<>();
-        item.put("dataName", "动态元数据");
-        item.put("dataType", Constant.MetadataType.SYSTEM_DESCRIBE_TYPE);
-        item.put("dataValue", 0);
-        item.put("allowDrag", false);
-        item.put("leaf", false);
-        item.put("children",dymicMeta);
-        result.add(item);
-        item = new HashMap<>();
-        item.put("dataName", "动态时间");
-        item.put("dataType", Constant.MetadataType.DYNAMIC_TIME);
-        item.put("dataValue", 0);
-        item.put("allowDrag", true);
-        item.put("leaf", true);
-        dymicMeta.add(item);
-        item = new HashMap<>();
-        item.put("dataName", "动态指标");
-        item.put("dataType", Constant.MetadataType.DYNAMIC_ITEM);
-        item.put("dataValue", 0);
-        item.put("allowDrag", true);
-        item.put("leaf", true);
-        dymicMeta.add(item);
-        item = new HashMap<>();
-        item.put("dataName", "动态时间框架");
-        item.put("dataType", Constant.MetadataType.DYNAMIC_TIMEFRAME);
-        item.put("dataValue", 0);
-        item.put("allowDrag", true);
-        item.put("leaf", true);
-        dymicMeta.add(item);
-        item = new HashMap<>();
-        item.put("dataName", "动态统计对象");
-        item.put("dataType", Constant.MetadataType.DYNAMIC_SUROBJ);
-        item.put("dataValue", 0);
-        item.put("allowDrag", true);
-        item.put("leaf", true);
-        dymicMeta.add(item);
-        item = new HashMap<>();
-        item.put("dataName", "动态分组目录");
-        item.put("dataType", Constant.MetadataType.DYNAMIC_ITEMGROUP);
-        item.put("dataValue", 0);
-        item.put("allowDrag", true);
-        item.put("leaf", true);
-        dymicMeta.add(item);
+        if(isDynamic) {
+            item = new HashMap<>();
+            item.put("dataName", "动态元数据");
+            item.put("dataType", Constant.MetadataType.SYSTEM_DESCRIBE_TYPE);
+            item.put("dataValue", 0);
+            item.put("allowDrag", false);
+            item.put("leaf", false);
+            item.put("children", dymicMeta);
+            result.add(item);
+            item = new HashMap<>();
+            item.put("dataName", "动态时间");
+            item.put("dataType", Constant.MetadataType.DYNAMIC_TIME);
+            item.put("dataValue", 0);
+            item.put("allowDrag", true);
+            item.put("leaf", true);
+            dymicMeta.add(item);
+            item = new HashMap<>();
+            item.put("dataName", "动态指标");
+            item.put("dataType", Constant.MetadataType.DYNAMIC_ITEM);
+            item.put("dataValue", 0);
+            item.put("allowDrag", true);
+            item.put("leaf", true);
+            dymicMeta.add(item);
+            item = new HashMap<>();
+            item.put("dataName", "动态时间框架");
+            item.put("dataType", Constant.MetadataType.DYNAMIC_TIMEFRAME);
+            item.put("dataValue", 0);
+            item.put("allowDrag", true);
+            item.put("leaf", true);
+            dymicMeta.add(item);
+            item = new HashMap<>();
+            item.put("dataName", "动态统计对象");
+            item.put("dataType", Constant.MetadataType.DYNAMIC_SUROBJ);
+            item.put("dataValue", 0);
+            item.put("allowDrag", true);
+            item.put("leaf", true);
+            dymicMeta.add(item);
+            item = new HashMap<>();
+            item.put("dataName", "动态分组目录");
+            item.put("dataType", Constant.MetadataType.DYNAMIC_ITEMGROUP);
+            item.put("dataValue", 0);
+            item.put("allowDrag", true);
+            item.put("leaf", true);
+            dymicMeta.add(item);
+        }
         return result;
     }
 

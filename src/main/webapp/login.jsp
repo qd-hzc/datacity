@@ -38,7 +38,6 @@
                         loginPwd: userPwd
                     },
                     success: function (result, textStatus, jqXHR) {
-                        //console.log(arguments);
                         if (result.success) {
                             if ((!result.datas) || result.datas == "") {
                                 //TODO 待添加默认跳转页面 后期通过配置文件实现，添加全局变量
@@ -74,9 +73,9 @@
         <h1>登录</h1>
 
         <form method="post">
-            <p><input type="text" id="user-name" name="user" value="admin" placeholder="用户名"></p>
+            <p><input type="text" id="user-name" name="user" placeholder="用户名"></p>
 
-            <p><input type="password" id="user-pwd" name="pwd" name="password" value="mdss" placeholder="密码"></p>
+            <p><input type="password" id="user-pwd" name="pwd" placeholder="密码"></p>
 
             <p id="submit" style="text-align: right"><input type="button" name="commit" value="登录"></p>
         </form>

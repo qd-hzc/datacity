@@ -16,42 +16,64 @@
         border: none;
     }
 
-    .row {
+    .esi-chart-row {
         margin-top: 13px;
         margin-left: -14px;
         margin-right: -14px;
     }
 
+    .esi-chart-title-row {
+        height: 50px;
+        background-color: #F6F9FE;
+        margin-left: 1px;
+        margin-right: 1px;
+        margin-top: -27px;
+        padding-top: 15px;
+        border-top-left-radius: 4px;
+        border-top-right-radius: 4px;
+        border-bottom: 1px solid #E8EEF6;
+    }
+
     .esi-chart-title {
-        padding-left: 4rem;
-        margin-top: -2rem;
-        font-size: 1.5rem;
+        padding-left: 20px;
+        font-size: 1.3rem;
         font-weight: 600;
     }
 
     .esi-chart-time {
-        padding-left: 20rem;
-        margin-top: -2rem;
-        font-size: 1.5rem;
+        font-size: 1.3rem;
+        text-align: right;
+        padding-right: 20px;
+    }
+
+    .esi-bottom {
+        margin-bottom: 30px;
+    }
+
+    .esi-bottom > div {
+        border-top: 1px solid #E8EEF6;
+        border-right: 1px solid #E8EEF6;
     }
 </style>
 <script type="text/html" data-uuid="${uuid}" data-id="temp">
-    <div class=" col-xs-4" style='color: {color};'>
+    <div class=" col-xs-4" style='color: {color};height: 73px;'>
         <p class="text-center" style="font-size: x-large;margin-top: 1rem">{value}</p>
 
         <p class="text-center" style="color:#a8a297;margin-top: -1rem">{name}</p>
     </div>
 </script>
-<div class="row">
-    <div class="row">
+<div class="row esi-chart-row">
+    <div class="row esi-chart-title-row esi-chart-row">
         <div class="col-xs-6 esi-chart-title" data-uuid="${uuid}" data-id="chartTitle"></div>
         <div class="col-xs-6 esi-chart-time" data-uuid="${uuid}" data-id="chartTime"></div>
     </div>
     <div data-uuid="${uuid}" data-id='chartdiv1' style="height: 200px;" class="col-md-12">
     </div>
     <div class="col-md-12">
-        <div data-uuid="${uuid}" data-id="zhibiao" style="height: 73px;background-color: #F6F6F6;" class="row">
-            <div class="col-xs-4 text-center pull-right" style="padding-top:2.5rem;">
+        <div data-uuid="${uuid}" data-id="zhibiao" style="height: 73px;background-color: white;"
+             class="row esi-bottom esi-chart-row">
+            <div class="col-xs-4 text-center pull-right"
+                 style="padding-top:2.5rem;height: 73px;border-right: none;display: none;">
                 <button data-uuid="${uuid}" data-id="xiangxi"
                         type="button" class="btn btn-default btn-sm esi-btn"
                         style="background-color: #007AE1;color:white;">
@@ -157,10 +179,9 @@
                                             option.yAxis[0] && ( option.yAxis[0].show = false);
                                             option.yAxis[1] && ( option.yAxis[1].show = false);
                                         }
-//                                        console.log(option)
                                         myChart.setOption(option);
                                     }
-                                }, null, time);
+                                }, time);
                             }
                         }
                     }
@@ -198,7 +219,7 @@
                             d.value = d.value ? d.value : '-';
                             htmlStr += $.render(temp, d);
                         }
-                        $('[data-id=zhibiao][data-uuid=' + Chart.uuid + ']').prepend(htmlStr);
+                        $('[data-id=zhibiao][data-uuid=' + Chart.uuid + ']').prepend(htmlStr).children(':last').show();
                     }
                 }
             });
@@ -211,7 +232,7 @@
                 var now = ev.date.toLocaleString();
                 var date = now.split("/");
                 var time = Chart.gg.createDynamicTime(date[0], date[1]);
-                Chart.gg.initDynamicMetadata(null, time, function (option) {
+                Chart.gg.initDynamicMetadata(null, time, time, function (option) {
                     var myChart = echarts.init($('[data-uuid=' + Chart.uuid + '][data-id=chartdiv1]').get(0));
                     if (myChart && option) {
                         $('[data-uuid=' + Chart.uuid + '][data-id=chartTitle]').html(option.title.text);

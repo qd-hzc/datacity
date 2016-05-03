@@ -157,28 +157,6 @@ public class AreaController extends BaseController {
     }
 
     /**
-     * 拖拽排序
-     *
-     * @param dragAndDrop
-     * @return
-     * @author hzc
-     * @createDate 2016-1-6
-     */
-    @RequestMapping("/dragAndDrop")
-    @ResponseBody
-    public Object dragAndDrop(DragAndDropVO dragAndDrop) {
-
-        String moveParentId = dragAndDrop.getMoveParentId();
-        dragAndDrop.setMoveParentId(moveParentId);
-
-        String overParentId = dragAndDrop.getOverParentId();
-        dragAndDrop.setOverParentId(overParentId);
-
-        boolean result = areaService.saveDragAndDrop(dragAndDrop);
-        return result;
-    }
-
-    /**
      * 读取地图文件
      *
      * @param areaId

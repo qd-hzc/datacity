@@ -17,6 +17,7 @@ import java.util.List;
 public class AppPersonDao extends BaseDao<AppPerson> {
     @Autowired
     private PushStateDao pushStateDao;
+
     /**
      * 根据条件查询
      *
@@ -68,6 +69,10 @@ public class AppPersonDao extends BaseDao<AppPerson> {
      * @param appPerson 人员
      */
     public void saveStaff(AppPerson appPerson) {
+        //设置角色
+        if (appPerson.getRole() == null || appPerson.getRole().getId() == null) {
+            appPerson.setRole(null);
+        }
         //修改
         if (appPerson.getId() != null) {
             update(appPerson, false);
@@ -76,10 +81,6 @@ public class AppPersonDao extends BaseDao<AppPerson> {
             String validCode = createValidcode();
             if (!isHasStaffs(validCode)) {
                 appPerson.setValidCode(validCode);
-                if (appPerson.getRole().getId() == null) {
-                    appPerson.setRole(null);
-
-                }
                 insert(appPerson, false);
             } else {
                 saveStaff(appPerson);

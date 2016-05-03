@@ -821,7 +821,7 @@ Ext.userAddWin.show = function(fnt,rec){//两个参数，fnt是回调函数，re
         id : 'userAdd_3',
         layout : "form",
         height : 400,
-        padding: "150 0 0 350",
+        //padding: "150 0 0 350",
         items : [{
             xtype : "checkbox",
             boxLabel : "添加信息",
@@ -859,7 +859,7 @@ Ext.userAddWin.show = function(fnt,rec){//两个参数，fnt是回调函数，re
             hidden : true,
             listeners : {
                 "click" : function(_this){
-                    var layout = roleAddWin.getLayout();
+                    var layout = userAddWin.getLayout();
                     layout.setActiveItem(layout.getPrev());
                     if(layout.getPrev() == false){
                         _this.hide();

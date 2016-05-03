@@ -43,7 +43,7 @@ public class SysService {
         currentUser.setReportPermissionMap(reportPermissionMap);
         List<Module> moduleList = userManagerService.findModulesByUser(user);//获取用户菜单权限
         currentUser.setModuleList(moduleList);
-        request.getSession().setAttribute("currentUser", currentUser);
+        SessionUtil.setCurrentUser(request.getSession(), currentUser);
     }
 
     /**

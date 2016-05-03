@@ -9,12 +9,15 @@ import com.city.common.util.SessionUtil;
 import com.city.support.sys.log.dao.SystemLogDao;
 import com.city.support.sys.log.entity.SystemLog;
 import com.city.support.sys.user.entity.User;
+import org.apache.poi.hssf.usermodel.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -83,22 +86,51 @@ public class SystemLogService {
     /**
      * 返回所有系统日志
      *
+     * @param name
+     * @param sDate
+     * @param eDate
      * @return
      */
-    public List<SystemLog> findByOrder(Page page) {
-        if (page != null) {
-            return systemLogDao.getPageByOrder(page);
-
-        }
-        return systemLogDao.getByOrder();
+    public List<SystemLog> findByOrder(String name, Date sDate, Date eDate) {
+        return systemLogDao.getByOrder(name, sDate, eDate);
     }
 
     /**
      * 返回日志数量
      *
+     * @param name
+     * @param sDate
+     * @param eDate
      * @return
      */
-    public Integer getLogCount() {
-        return systemLogDao.selectLogCount();
+    public Integer getLogCount(String name, Date sDate, Date eDate) {
+        return systemLogDao.selectLogCount(name, sDate, eDate);
+    }
+
+    /**
+     * 根据搜索内容查询系统日志
+     *
+     * @param page
+     * @param name  名称
+     * @param sDate 开始时间
+     * @param eDate 结束时间
+     * @return
+     * @author crx
+     * @createDate 2016-4-27
+     */
+    public List<SystemLog> findSystemLogByCondition(Page page, String name, Date sDate, Date eDate) {
+        return systemLogDao.findSystemLogByCondition(page, name, sDate, eDate);
+    }
+
+    /**
+     * 返回Excel列表
+     *
+     * @param response
+     * @param text     表格列名称
+     * @param list     按照查询条件得到要导出为Excel的系统日志
+     * @return
+     */
+    public Object getExcel(HttpServletResponse response, String text, List<SystemLog> list) {
+        return systemLogDao.createExcel(response, text, list);
     }
 }

@@ -12,10 +12,6 @@
 %>
 <head>
     <title>数据发布</title>
-    <script type="text/javascript" src="<%=request.getContextPath()%>/Plugins/jquery/jquery.min.js"></script>
-    <script type="text/javascript" src="<%=request.getContextPath()%>/Plugins/bootstrap/js/bootstrap.js"></script>
-    <script src="<%=request.getContextPath()%>/Plugins/vue/vue.js"></script>
-    <link href="<%=contextPath%>/Plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
     <style>
         ul, li {
             margin: 0;
@@ -29,13 +25,15 @@
         .submitcontainer {
             height: 100%;;
         }
+        .submitTab {
 
+        }
         .submitTab a {
             color: #43aea8;
         }
 
         .submitTab ul.nav {
-            width: 95%;
+            width: 100%;
         }
 
         .submitTab ul.nav li {
@@ -74,10 +72,12 @@
             background-color: #ffffff;
             border-color: #8f8f8f;
             border-image: none;
-            border-style: none solid solid;
+            border-style: none;
             border-width: 0 1px 1px;
             overflow: visible;
-            width: 95%;
+            width: 100%;
+            border-radius: 0 0 4px 4px;
+
         }
 
         ul.esi_nav li {
@@ -118,6 +118,21 @@
             position: absolute;
             top: 10px;
         }
+        ul.esi_nav li a span.sel {
+            position: absolute;
+            top: 0px;
+            left: 0px;
+            height:100%;
+            width:3px;
+        }
+        ul.esi_nav li.selected a span.sel {
+            position: absolute;
+            top: 0px;
+            left: 1px;
+            height:100%;
+            width:3px;
+            background-color: #43aea8;
+        }
 
         ul.esi_nav a span.subtitle {
             left: 20px;
@@ -132,18 +147,19 @@
         }
 
         ul.esi_nav li.selected a {
-            background-color: #53c2ef;
-            color: #ffffff;
+            background-color: #f0f7fd;
         }
 
-        ul.esi_nav li.selected a span.title {
+        /*ul.esi_nav li.selected a span.title {
             color: #ffffff;
-        }
+        }*/
 
         .textContent {
             width: 100%;
             height: 600px;
             padding: 20px;
+            overflow: auto;
+            border-radius: 5px;
             background-color: #fff;
         }
 
@@ -168,8 +184,8 @@
             padding: 10px;
         }
 
-        .submitBtn span{
-            width: 95%;
+        .submitBtn span {
+            width: 100%;
             height: 50px;
             color: #fff;
             background-color: #6f7e95;
@@ -177,9 +193,10 @@
             cursor: pointer;
             display: block;
             font-size: 22px;
-            line-height:50px;
+            line-height: 50px;
             text-align: center;
-            pading-top:5px
+            border-radius: 5px;
+            pading-top: 5px
         }
     </style>
 </head>
@@ -197,14 +214,15 @@
                         </li>
                     </ul>
                 </div>
-                <div :class="tab-pane:true">
+                <div class="tab-pane submitMenu" style="overflow:auto;padding-right:2px;">
                     <ul id="submitMenu" class="esi_nav">
                         <li v-for="item in items" :class="{selected:item.isSel}" @click="setSel($index)">
                             <a class="nav">
-                                <span class="sender">龙泉街道</span>
-                                <span class="datetime">2015-11-04</span>
+                                <span class="sel"></span>
+                                <span class="sender">{{ item.creatorName}}</span>
+                                <span class="datetime">{{ item.analysisDate }}</span>
                                 <span class="title">{{ item.name }}</span>
-                                <span class="subtitle">—2015年2月青岛经济运行情况分析</span>
+                                <span class="subtitle">{{item.subTitle}}</span>
                             </a>
                         </li>
                     </ul>
@@ -237,7 +255,50 @@
 
 <script>
     (function () {
+        var height = $(window).height();
+        $(".textContent").height(height-130);
+        $(".submitMenu").height(height-205);
         var submitMenu = null;
+        submitMenu = new Vue({
+            el: '#submitMenu',
+            data: {
+                items: [],
+                html: "",
+                isHidden: true,
+            },
+            // 在 `methods` 对象中定义方法
+            methods: {
+                setSel: function (index) {
+                    // 方法内 `this` 指向 submitTab
+                    var hasData = false;
+                    this.items.map(function (v, i) {
+                        hasData = true;
+                        i == index ? v.isSel = true : v.isSel = false;
+                        if (i == index) {
+                            var content = {
+                                contentType: 5,
+                                contentValue: v.id
+                            }
+                            submitTab.setContent(content);
+                        }
+                    });
+                    if (!hasData) {
+                        submitTab.datetime = "";
+                        submitTab.sender = "";
+                        submitTab.title = "";
+                        submitTab.subtitle = "";
+                        submitTab.html = "";
+                    }
+                },
+                setData: function (index, pages) {
+                    if (index == 0) {
+                        this.items = pages.all;
+                    } else {
+                        this.items = pages.user;
+                    }
+                }
+            }
+        })
         var submitBtn = new Vue({
             el: '#submitBtn',
             data: {},
@@ -252,14 +313,14 @@
                             '       <span aria-hidden="true" class="glyphicon glyphicon-remove"></span>' +
                             '   </button>' +
                             '   <h5 class="modal-title">' + "&nbsp" + '</h5>' +
-                            '</div>'+
+                            '</div>' +
                             '<iframe id="iframe-esi" style="width: 99%;height:' + height + 'px;background-color:#E7EBEE;" frameborder="0"></iframe>' +
 
                             '<script> ' +
 
                             '   var esi = new EsiTheme(); ' +
                             '   $("#iframe-esi").attr("src",\'' +
-                            SubmitData.contextPath + '/support/resourceCategory/analysis/text/textSubmit?themeId=' + SubmitData.page.id + '\')' +
+                            SubmitData.contextPath + '/support/resourceCategory/analysis/text/textSubmit?themeId=' + SubmitData.content.contentValue + '\')' +
 
                             '<\/script>';
                     SubmitData.esi.detailDialog(html);
@@ -286,6 +347,7 @@
                 setCur: function (index) {
                     // 方法内 `this` 指向 submitTab
                     var isChange = false;
+                    var hasText = false;
                     this.items.map(function (v, i) {
                         if (i == index && v.iscur == false) {
                             isChange = true;
@@ -293,7 +355,7 @@
                         i == index ? v.iscur = true : v.iscur = false;
                     });
                     if (submitMenu && isChange) {
-                        submitMenu.setData(index);
+                        submitMenu.setData(index, SubmitData.result);
                         submitMenu.setSel(0);
                     }
                 }
@@ -303,10 +365,10 @@
         var submitTab = new Vue({
             el: '#textContent',
             data: {
-                datetime: "2015-11-04",
-                sender: "龙泉街道",
+                datetime: "",
+                sender: "",
                 title: "",
-                subtitle: "—2015年2月青岛经济运行情况分析",
+                subtitle: "",
                 html: ""
             },
             // 在 `methods` 对象中定义方法
@@ -319,6 +381,9 @@
                             _this.html = textContent.content;
                             _this.title = textContent.name;
                             _this.sender = textContent.creatorName;
+                            var oldTime = (new Date(textContent.analysisDate)).getTime(); //得到毫秒数
+                            var newTime = new Date(oldTime); //就得到普通的时间了
+                            _this.datetime = newTime.Format("yyyy-MM-dd").toString();
                         }
                     });
                 }
@@ -337,47 +402,25 @@
         SubmitData.esi = new EsiTheme();
         var mapId = 0;
         //    初始化
-        console.log(SubmitData.content)
         SubmitData.init = function () {
             SubmitData.esi.getData(SubmitData.content, function (d) {
                 if (d.success) {
                     var pages = d.datas;
-                    console.log(pages)
                     if (pages) {
-                        if (pages.all && pages.all.length > 0) {
-                            SubmitData.result = pages;
-                            console.log(pages.user)
-                            submitMenu = new Vue({
-                                el: '#submitMenu',
-                                data: {
-                                    items: pages.user,
-                                    html: "",
-                                    isHidden: true,
-                                },
-                                // 在 `methods` 对象中定义方法
-                                methods: {
-                                    setSel: function (index) {
-                                        // 方法内 `this` 指向 submitTab
-                                        this.items.map(function (v, i) {
-                                            i == index ? v.isSel = true : v.isSel = false;
-                                            if (i == index) {
-                                                var content = {
-                                                    contentType: 5,
-                                                    contentValue: v.id
-                                                }
-                                                submitTab.setContent(content);
-                                            }
-                                        });
-                                    },
-                                    setData: function (index) {
-                                        if (index == 0) {
-                                            this.items = pages.all;
-                                        } else {
-                                            this.items = pages.user;
-                                        }
-                                    }
-                                }
+                        if (pages.all) {
+                            $.each(pages, function (i, page) {
+                                $.each(page, function (i, text) {
+                                    var oldTime = (new Date(text.analysisDate)).getTime(); //得到毫秒数
+                                    var newTime = new Date(oldTime); //就得到普通的时间了
+                                    text.analysisDate = newTime.Format("yyyy-MM-dd").toString();
+                                })
                             })
+
+                            SubmitData.result = pages;
+                            if (submitMenu) {
+                                submitMenu.setData(1, SubmitData.result);
+                                submitMenu.setSel(0);
+                            }
                             submitMenu.items.map(function (v, i) {
                                 if (i == 0) {
                                     v.isSel = true;
@@ -390,6 +433,10 @@
                                             var textContent = d.datas;
                                             submitTab.html = textContent.content;
                                             submitTab.title = textContent.name;
+                                            submitTab.sender = textContent.creatorName;
+                                            var oldTime = (new Date(textContent.analysisDate)).getTime(); //得到毫秒数
+                                            var newTime = new Date(oldTime); //就得到普通的时间了
+                                            submitTab.datetime = newTime.Format("yyyy-MM-dd").toString();
                                         }
                                     });
                                 } else {
@@ -416,9 +463,34 @@
         $(function () {
             SubmitData.init();
         });
+        window.onresize = function(){
+            var height = $(window).height();
+            $(".textContent").height(height-130);
+            $(".submitMenu").height(height-205);
+        }
     })()
+    // 对Date的扩展，将 Date 转化为指定格式的String
+    // 月(M)、日(d)、小时(h)、分(m)、秒(s)、季度(q) 可以用 1-2 个占位符，
+    // 年(y)可以用 1-4 个占位符，毫秒(S)只能用 1 个占位符(是 1-3 位的数字)
+    // 例子：
+    // (new Date()).Format("yyyy-MM-dd hh:mm:ss.S") ==> 2006-07-02 08:09:04.423
+    // (new Date()).Format("yyyy-M-d h:m:s.S")      ==> 2006-7-2 8:9:4.18
+    Date.prototype.Format = function (fmt) { //author: meizz
+        var o = {
+            "M+": this.getMonth() + 1,                 //月份
+            "d+": this.getDate(),                    //日
+            "h+": this.getHours(),                   //小时
+            "m+": this.getMinutes(),                 //分
+            "s+": this.getSeconds(),                 //秒
+            "q+": Math.floor((this.getMonth() + 3) / 3), //季度
+            "S": this.getMilliseconds()             //毫秒
+        };
+        if (/(y+)/.test(fmt))
+            fmt = fmt.replace(RegExp.$1, (this.getFullYear() + "").substr(4 - RegExp.$1.length));
+        for (var k in o)
+            if (new RegExp("(" + k + ")").test(fmt))
+                fmt = fmt.replace(RegExp.$1, (RegExp.$1.length == 1) ? (o[k]) : (("00" + o[k]).substr(("" + o[k]).length)));
+        return fmt;
+    }
 </script>
-<script src="<%=contextPath%>/Plugins/jquery/jquery.min.js"></script>
-<script src="<%=contextPath%>/Plugins/bootstrap/js/bootstrap.min.js"></script>
-<script src="<%=contextPath%>/City/resourceCategory/themes/EsiTheme.js"></script>
 </html>

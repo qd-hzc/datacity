@@ -25,25 +25,29 @@
         border-bottom-left-radius: 4px;
         border-top-left-radius: 4px;
     }
+
+    .esi-thumbnail {
+        border: 0px !important;
+    }
 </style>
-<div class="" style="width: 95%;float: left;">
+<div style="float: left;width: 93%">
     <div class="row" style="margin-top:10px;">
         <div class=" col-md-4">
-            <div class="thumbnail">
+            <div class="thumbnail esi-thumbnail">
                 <div class="caption">
                     <div data-uuid="${uuid}" data-id='paneldiv1'></div>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="thumbnail">
+            <div class="thumbnail esi-thumbnail">
                 <div class="caption">
                     <div data-uuid="${uuid}" data-id="paneldiv2"></div>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="thumbnail">
+            <div class="thumbnail esi-thumbnail">
                 <div class="caption">
                     <div data-uuid="${uuid}" data-id="paneldiv3"></div>
                 </div>
@@ -52,21 +56,21 @@
     </div>
     <div class="row">
         <div class=" col-md-4">
-            <div class="thumbnail">
+            <div class="thumbnail esi-thumbnail">
                 <div class="caption">
                     <div data-uuid="${uuid}" data-id="paneldiv4"></div>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="thumbnail">
+            <div class="thumbnail esi-thumbnail">
                 <div class="caption">
                     <div data-uuid="${uuid}" data-id="paneldiv5"></div>
                 </div>
             </div>
         </div>
         <div class="col-md-4">
-            <div class="thumbnail">
+            <div class="thumbnail esi-thumbnail">
                 <div class="caption">
                     <div data-uuid="${uuid}" data-id="paneldiv6"></div>
                 </div>
@@ -74,7 +78,7 @@
         </div>
     </div>
 </div>
-<div class="" style="width: 5%;float: right">
+<div style="float: right;width: 7%;">
     <div data-uuid="${uuid}" data-id="form_datetime" style="margin-top: 12px;float: right">
     </div>
 </div>

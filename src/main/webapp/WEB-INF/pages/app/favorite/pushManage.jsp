@@ -268,8 +268,8 @@
                                 idArr.push(rec.get('id'));
                             });
                             ids = idArr.join(',');
-                            Ext.Msg.alert('警告', '是否删除推送', function (btn) {
-                                if (btn == 'ok') {
+                            Ext.Msg.confirm('警告', '是否删除推送', function (btn) {
+                                if (btn == 'yes') {
                                     //TODO 删除
                                     Ext.Ajax.request({
                                         url: GLOBAL_PATH + '/app/favorite/push/deleteAppPush',
@@ -286,8 +286,7 @@
                                 }
                             });
                         } else {
-                            Ext.Msg.alert('警告', '请选择要删除的推送', function (btn) {
-                            });
+                            Ext.Msg.alert('警告', '请选择要删除的推送');
                         }
                     }
                 }],
@@ -319,8 +318,8 @@
                 store: yPushLeftStore,
                 region: 'west',
                 columns: [
-                    {text: '名称', dataIndex: 'name',flex:1},
-                    {text: '职位', dataIndex: 'duty',flex:1}
+                    {text: '名称', dataIndex: 'name', flex: 1},
+                    {text: '职位', dataIndex: 'duty', flex: 1}
                 ],
                 selModel: {
                     selType: 'checkboxmodel'

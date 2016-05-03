@@ -3,7 +3,6 @@ package com.city.support.manage.area.service;
 import com.city.common.util.ConvertUtil;
 import com.city.common.util.EsiLogUtil;
 import com.city.common.util.ListUtil;
-import com.city.common.util.tree.TreeSortUtil;
 import com.city.support.manage.area.dao.AreaDao;
 import com.city.support.manage.area.entity.SptMgrAreaEntity;
 import com.city.support.manage.area.util.GenAreaUtil;
@@ -25,7 +24,7 @@ import java.util.*;
  */
 @Service
 @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRED)
-public class AreaService extends TreeSortUtil<SptMgrAreaEntity> {
+public class AreaService {
 
     @Autowired
     private AreaDao areaDao;
@@ -176,40 +175,6 @@ public class AreaService extends TreeSortUtil<SptMgrAreaEntity> {
         return s;
     }
 
-    @Override
-    public int getSort(SptMgrAreaEntity entity) {
-        return entity.getSort();
-    }
-
-    @Override
-    public void setSort(SptMgrAreaEntity entity, int sort) {
-        entity.setSort(sort);
-    }
-
-    @Override
-    public void setParentId(SptMgrAreaEntity entity, int parentId) {
-        entity.setParentId(parentId);
-    }
-
-    @Override
-    public SptMgrAreaEntity getEntityById(int id) {
-        return getAreaById(id);
-    }
-
-    @Override
-    public List<SptMgrAreaEntity> getEntitiesByParent(int id) {
-        return getAreaByParent(id);
-    }
-
-    @Override
-    public void updateEntity(SptMgrAreaEntity entity) {
-        areaDao.update(entity, false);
-    }
-
-    @Override
-    protected void setLeaf(SptMgrAreaEntity over, boolean b) {
-        over.setLeaf(b);
-    }
 
     /**
      * 排序
@@ -360,7 +325,7 @@ public class AreaService extends TreeSortUtil<SptMgrAreaEntity> {
             //转换并保存
             for (SptMgrAreaEntity area : areas) {
                 if (area.getId() != null) {
-                    SptMgrAreaEntity curGroup = getEntityById(area.getId());
+                    SptMgrAreaEntity curGroup = getAreaById(area.getId());
                     //赋值
                     util.apply(curGroup, area, SptMgrAreaEntity.class);
                     areaDao.update(curGroup, false);

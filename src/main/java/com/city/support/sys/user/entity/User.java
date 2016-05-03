@@ -77,6 +77,9 @@ public class User {
 
     private Set<RptPermission> rptPermissions = new HashSet<RptPermission>();
 
+    //    是否有登录后台的权限
+    private boolean manageRole = false;
+
     /**
      * 用户登录ip
      */
@@ -238,5 +241,14 @@ public class User {
 
     public void setIp(String ip) {
         this.ip = ip;
+    }
+
+    @Transient
+    public boolean isManageRole() {
+        return manageRole;
+    }
+
+    public void setManageRole(boolean manageRole) {
+        this.manageRole = manageRole;
     }
 }

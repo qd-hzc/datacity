@@ -1,3 +1,5 @@
+<%@ page import="com.city.common.util.SessionUtil" %>
+<%@ page import="com.city.support.sys.user.pojo.CurrentUser" %>
 <%--
   User: HZC
   Date: 2016/3/18
@@ -8,6 +10,7 @@
 <html lang="en">
 <%
     String contextPath = request.getContextPath();
+    CurrentUser currentUser = SessionUtil.getCurrentUser(request.getSession());
 %>
 
 <head>
@@ -18,57 +21,19 @@
 
     <link rel="icon" sizes="any" mask href="<%=contextPath%>/City/resourceCategory/themes/images/icon.jpg">
     <link href="<%=contextPath%>/Plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
-    <style>
-        body {
-            background-color: #E9E9E9;
-        }
+    <link href="<%=contextPath%>/City/resourceCategory/themes/css/index.less" rel="stylesheet/less">
 
-        .dropdown-menu {
-            min-width: 80px;
-        }
-
-        .btn-default {
-            background-color: #262626;
-            border-color: #262626;
-            color: #262626;
-        }
-
-        .btn {
-            border-radius: 0px;
-        }
-
-        .esi-title {
-            font-size: 2.6em;
-            font-weight: 700;
-            font-family: 'Courier New';
-            color: white;
-            text-shadow: 0 6px 12px rgba(0, 0, 0, 0.176);
-            letter-spacing: 1.3rem;
-        }
-
-        button span {
-            color: #337ab7
-        }
-
-        .btn-default.active, .btn-default.focus, .btn-default:active, .btn-default:focus, .btn-default:hover, .open > .dropdown-toggle.btn-default {
-            background-color: #2d363d;
-            border-color: #262626;
-            color: #262626;
-        }
-    </style>
 </head>
 <body>
 
-<div class="container-fluid" style="min-width:600px;">
-    <div class="row" style="height: 75px;">
+<div class="container-fluid">
+    <div class="row">
         <div class="col-xs-12">
-            <div class="row">
-                <div class="col-xs-7 col-sm-8 col-md-9 "
-                     style="padding-top: 1.5rem;padding-left:6rem;background-color: #2D363D;height: 75px;">
+            <div class="row" id="title">
+                <div class="col-xs-7 col-sm-8 col-md-9 esi-main-title">
                     <span class="esi-title">济南统计局</span>
                 </div>
-                <div class="col-xs-5 col-sm-4 col-md-3 text-center"
-                     style="padding-top: 2.5rem; height: 75px;background-color: #262626">
+                <div class="col-xs-5 col-sm-4 col-md-3 text-center esi-main-setting">
                     <div class="row">
                         <div class="btn-group">
                             <button type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown"
@@ -87,9 +52,11 @@
                                 <span>${user.userName}</span>
                             </button>
                             <ul class="dropdown-menu">
+                                <li id="manageUrl"><a href="<%=contextPath%><%=currentUser.getUser().getIndexPage()%>">管理主页</a>
+                                </li>
                                 <li><a href="#">我的订阅</a></li>
                                 <li><a href="#">个人消息</a></li>
-                                <li><a onclick="logOut()">退出登录</a></li>
+                                <li><a href="#" onclick="logOut()">退出登录</a></li>
                             </ul>
                         </div>
                         <div class="btn-group">
@@ -116,6 +83,7 @@
     </div>
 </div>
 
+<script src="<%=contextPath%>/Plugins/less/less.min.js"></script>
 <script src="<%=contextPath%>/Plugins/jquery/jquery.min.js"></script>
 <script src="<%=contextPath%>/Plugins/bootstrap/js/bootstrap.min.js"></script>
 <script src="<%=contextPath%>/City/resourceCategory/themes/EsiTheme.js"></script>
@@ -130,6 +98,10 @@
         INDEX.esi = new EsiTheme();
 //        初始化
         INDEX.init = function () {
+            var manageRole = <%=currentUser.getUser().isManageRole()%>;
+            if (!manageRole) {
+                $('#manageUrl').remove();
+            }
             $('#indexdiv1').attr('src', INDEX.esi.getPageUrl(INDEX.content.contentValue));
         }
 
@@ -137,7 +109,7 @@
             INDEX.init();
             function resetHeight() {
                 var height = $(window).height();
-                $('#indexdiv1').height(height - 89);
+                $('#indexdiv1').height(height - $('#title').height());
             }
 
             resetHeight();

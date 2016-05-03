@@ -11,7 +11,6 @@ createModel('Ext.updateTextThemeWin', function () {
     });
 });
 Ext.updateTextThemeWin.init = function(record,fn){
-    console.log(record);
     var form = new Ext.form.Panel({
         width:'100%',
         layout:'column',

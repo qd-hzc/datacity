@@ -14,6 +14,7 @@ import com.city.support.regime.collection.dao.ReportInfoDao;
 import com.city.support.regime.collection.entity.ReportData;
 import com.city.support.regime.collection.entity.ReportDataId;
 import com.city.support.regime.collection.entity.ReportInfo;
+import com.city.support.regime.collection.pojo.RptHtmlPojo;
 import com.city.support.regime.collection.util.ImportUtils;
 import com.city.support.regime.collection.util.SystemLogUtils;
 import com.city.support.regime.report.dao.ReportTemplateDao;
@@ -584,17 +585,18 @@ public class ReportInfoService {
             for (ReportData reportData : reportDataList) {
                 reportData.setDataStatus(Constant.DATA_STATUS.USABLE);
                 reportDataDao.saveOrUpdate(reportData, true);
-                // 添加触发事件
-                sendListener(user,SystemLog.UPDATE,reportInfo,Thread.currentThread() .getStackTrace()[1].getMethodName(),reportDataList);
             }
+            // 添加触发事件
+            sendListener(user,SystemLog.UPDATE,reportInfo,Thread.currentThread() .getStackTrace()[1].getMethodName(),reportDataList);
         } else if (rptStatus.equals(Constant.RPT_STATUS.REJECT)) {//驳回后通过后修改数据状态
             List<ReportData> reportDataList = reportDataDao.queryByRptId(reportInfo.getId());
             for (ReportData reportData : reportDataList) {
                 reportData.setDataStatus(Constant.DATA_STATUS.UNUSABLE);
                 reportDataDao.saveOrUpdate(reportData, true);
-                // 添加触发事件
-                sendListener(user,SystemLog.UPDATE,reportInfo,Thread.currentThread() .getStackTrace()[1].getMethodName(),reportDataList);
+
             }
+            // 添加触发事件
+            sendListener(user,SystemLog.UPDATE,reportInfo,Thread.currentThread() .getStackTrace()[1].getMethodName(),reportDataList);
         }
     }
 
@@ -780,4 +782,5 @@ public class ReportInfoService {
     public List<ReportInfo> getInfoByTime(ReportVO vo) {
         return reportInfoDao.selectInfoByTime(vo);
     }
+
 }

@@ -1,6 +1,7 @@
 package com.city.common.util;
 
 import com.city.support.sys.user.entity.User;
+import com.city.support.sys.user.pojo.CurrentUser;
 
 import javax.servlet.http.HttpSession;
 
@@ -29,5 +30,29 @@ public class SessionUtil {
      */
     public static User getUser(HttpSession session) {
         return (User) session.getAttribute("user");
+    }
+
+    /**
+     * 设置当前用户
+     *
+     * @param session
+     * @param user
+     * @author hzc
+     * @crateDate 2016-5-3
+     */
+    public static void setCurrentUser(HttpSession session, CurrentUser user) {
+        session.setAttribute("currentUser", user);
+    }
+
+    /**
+     * 获取当前用户
+     *
+     * @param session
+     * @return
+     * @author hzc
+     * @createDate 2016-5-3
+     */
+    public static CurrentUser getCurrentUser(HttpSession session) {
+        return (CurrentUser) session.getAttribute("currentUser");
     }
 }

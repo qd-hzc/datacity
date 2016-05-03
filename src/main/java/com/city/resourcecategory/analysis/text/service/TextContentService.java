@@ -20,6 +20,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -45,10 +48,10 @@ public class TextContentService {
     @Autowired
     private QueryRptService queryRptService;
 
-    public List<TextContent> queryAllTextContentByThemeId(User user,Integer themeId, String contentSortType, String name, Integer status) {
+    public List<TextContent> queryAllTextContentByThemeId(User user, Integer themeId, String contentSortType, String name, Integer status) {
         List<TextContent> result = null;
         if (themeId != null) {
-            result = textContentDao.queryByThemeId(user,themeId, contentSortType, name, status);
+            result = textContentDao.queryByThemeId(user, themeId, contentSortType, name, status);
             for (TextContent textContent : result) {
                 // 如果内容为空，读取关联模板的内容
                 if ((textContent.getContent() == null || "".equals(textContent.getContent())) && textContent.getStatus() != Constant.TEXT_CONTENT_STATUS.CHECKED) {
@@ -98,7 +101,7 @@ public class TextContentService {
                 List<TimePojo> times = queryRptService.convertTime(timePojos, null, null);
                 return textContentDao.queryByTime(themeId, times, theme.getContentSortType(), status);
             } else {//返回主题下所有已审核
-                return textContentDao.queryByThemeId(null,themeId, theme.getContentSortType(), null, status);
+                return textContentDao.queryByThemeId(null, themeId, theme.getContentSortType(), null, status);
             }
         }
         return null;
@@ -152,6 +155,51 @@ public class TextContentService {
     }
 
     /**
+     * 添加分析主题(前台添加)
+     *
+     * @param user
+     * @param themeId
+     * @param name
+     * @param content
+     * @param analysisDate
+     * @return
+     */
+    public TextContent addTextContent(User user,Integer id, Integer themeId, String name, String content, String analysisDate) {
+        TextContent result = new TextContent();
+        if(id==null) {
+            if (themeId != null) {
+                List<TextContent> textContentList = queryAllTextContentByThemeId(null, themeId, null, null, null);
+                TextTheme textTheme = new TextTheme();
+                textTheme.setId(themeId);
+                result.setTheme(textTheme);
+                result.setCreator(user.getId());
+                result.setCreatorName(user.getUserName());
+                result.setCreateTime(new Date());
+                result.setStatus(Constant.TEXT_CONTENT_STATUS.WAIT_CHECK);
+                result.setSortIndex(textContentList.size());
+                result.setType(Constant.TEXT_CONTENT_TYPE.COMMON);
+                result.setContent(content);
+                result.setName(name);
+                result.setAnalysisDate(new Date(analysisDate));
+                textContentDao.insert(result, true);
+            }
+        }else{
+            TextContent data = new TextContent();
+            data.setName(name);
+            data.setContent(content);
+            data.setAnalysisDate(new Date(analysisDate));
+            ConvertUtil<TextContent> cu = new ConvertUtil<>();
+            TextContent textContent = textContentDao.queryById(id);
+            cu.replication(data, textContent, TextContent.class.getName());
+            textContent.setUpdator(user.getId());
+            textContent.setUpdatorName(user.getUserName());
+            textContent.setUpdateTime(new Date());
+            textContentDao.update(textContent, true);
+        }
+        return result;
+    }
+
+    /**
      * 删除分析内容
      *
      * @param datas
@@ -181,7 +229,7 @@ public class TextContentService {
      */
     public String getTextContentById(Integer id) {
         TextContent textContent = textContentDao.queryById(id);
-        return textContent!=null?textContent.getContent():"";
+        return textContent != null ? textContent.getContent() : "";
     }
 
     /**
@@ -193,4 +241,5 @@ public class TextContentService {
     public void checkTextContent(String ids, Integer status) {
         textContentDao.checkTextContent(ids, status);
     }
+
 }

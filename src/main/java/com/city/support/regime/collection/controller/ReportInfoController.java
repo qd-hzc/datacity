@@ -294,9 +294,10 @@ public class ReportInfoController extends BaseController {
             if (tableHtml != null) {
                 Document doc = Jsoup.parse(tableHtml, "", new Parser(new XmlTreeBuilder()));
                 List<RptHtmlPojo> rptHtmlList = ImportUtils.getRptHtml(reportId, dataType, collectionType, time, year, month, doc, depId);
-                for (RptHtmlPojo rptHtml : rptHtmlList) {
+                reportDataService.saveOrSubmitRptDataList(user,rptHtmlList,status,reportInfo);
+/*                for (RptHtmlPojo rptHtml : rptHtmlList) {
                     reportDataService.saveOrSubmitRptData(user,rptHtml, status,reportInfo);
-                }
+                }*/
                 result = genSuccessMsg(null, success, 200);
                 if (reportInfo.getRptStatus() != Constant.RPT_STATUS.REJECT && reportInfo.getRptStatus() != Constant.RPT_STATUS.PASS && reportInfo.getRptStatus() != Constant.RPT_STATUS.WAITING_PASS) {
                     //修改报表状态

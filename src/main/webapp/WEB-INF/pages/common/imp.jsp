@@ -1,10 +1,9 @@
 <%@ page language="java" contentType="text/html;charset=UTF-8" pageEncoding="UTF-8" %>
 <!--引入extjs-->
-<link href="<%=request.getContextPath()%>/Plugins/extjs/resources/ext-theme-classic/ext-theme-classic-all.css"
+<link href="<%=request.getContextPath()%>/Plugins/extjs/resources/ext-theme-green/happy-theme-green-all.css"
       rel="stylesheet" type="text/css">
-<%--<link href="<%=request.getContextPath()%>/Plugins/extjs/resources/ext-theme-neptune/ext-theme-neptune-all.css" rel="stylesheet" type="text/css">--%>
 <link rel="stylesheet" href="<%=request.getContextPath()%>/Plugins/extjs/resources/css/icon.css">
-<script type="text/javascript" src="<%=request.getContextPath()%>/Plugins/extjs/ext-all-debug.js"></script>
+<script type="text/javascript" src="<%=request.getContextPath()%>/Plugins/extjs/ext-all.js"></script>
 <script src="<%=request.getContextPath()%>/Plugins/extjs/ux/ComboBoxTree.js"></script>
 <script src="<%=request.getContextPath()%>/Plugins/extjs/ux/QueryPicker.js"></script>
 <script src="<%=request.getContextPath()%>/Plugins/extjs/ext-locale-zh_CN.js"></script>
@@ -94,15 +93,6 @@
                     });
                 });
     });
-    //封装console.log
-    var log;
-    if (console && console.log) {
-        log = console.log;
-    } else {
-        log = function () {
-        }
-    }
-
     //可监听resize的面板
     createModel('Ext.resizablePanel', function () {
         Ext.define('Ext.resizablePanel', {

@@ -34,7 +34,8 @@
             proxy: {
                 type: 'ajax',
                 api: {
-                    read: contextPath + '/resourcecategory/analysis/report/customResearchManage/getResearchGroupTree'
+                    read: contextPath + '/resourcecategory/analysis/report/customResearchManage/getResearchGroupTree',
+                    update: contextPath + '/resourcecategory/analysis/report/customResearchManage/sortGroupIndex'
                 }
             },
             root: {
@@ -56,51 +57,17 @@
                     ptype: 'treeviewdragdrop'
                 },
                 listeners: {
-                    'beforedrop': function (node, data, overModel, dropPosition, dropHandlers) {//overModel是一个NodeInterface,data是一个object，有records、item、view等等。
-                        dropHandlers.wait = true;
-                        var overParentId = overModel.get('parentId');
-                        var moveParentId = data.records[0].get('parentId');
-                        var moveId = data.records[0].get('id');
-                        var overId = overModel.get('id');
-                        //与后台交互
-                        Ext.Ajax.request({
-                            url: contextPath + '/resourcecategory/analysis/report/customResearchManage/sortResearchGroup',
-                            method: 'POST',
-                            params: {
-                                moveId: moveId,
-                                overId: overId,
-                                moveParentId: moveParentId,
-                                overParentId: overParentId,
-                                dropPosition: dropPosition
-                            },
-                            success: function (data) {
-                                if (data) {
-                                    dropHandlers.processDrop();
-                                } else {
-                                    dropHandlers.cancelDrop();
-                                }
-                            },
-                            failure: function (response, opts) {
-                                var result = Ext.decode(response.responseText);
-                                dropHandlers.cancelDrop();
-                            }
+                    drop: function (node, data, overModel, dropPosition, dropHandlers) {
+                        var dragNode = data.records[0];
+                        var pNode = dragNode.parentNode;
+                        dragNode.set('parentId', pNode.getId());
+                        Ext.Array.each(pNode.childNodes, function (child) {
+                            child.set('sort', child.data.index);
                         });
+                        researchGroupTreeStore.sync();
                     }
                 }
             },
-//            tbar: [{
-//                xtype: 'textfield',
-//                emptyText: '在此处查询',
-//                triggerCls: 'x-form-clear-trigger',
-//                onTriggerClick: function () {
-//                    this.reset();
-//                },
-//                listeners: {
-//                    change: function (_this, n, o) {
-//                        queryTreeByLocal(researchGroupTree, researchGroupTreeStore, 'name', n);
-//                    }
-//                }
-//            }],
             listeners: {
                 itemcontextmenu: function (_this, record, item, index, e) {
                     e.preventDefault();

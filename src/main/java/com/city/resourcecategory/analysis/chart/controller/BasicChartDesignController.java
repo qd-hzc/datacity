@@ -47,6 +47,12 @@ public class BasicChartDesignController extends BaseController {
         ModelAndView mv = new ModelAndView();
         mv.setViewName("/resourceCategory/analysis/chart/background/chartDesign");
         AnalysisChartBase analysisChartBase = basicChartConfigService.queryAnalysisChartBaseById(chartId);
+        Integer chartType = analysisChartBase.getChartType();
+        if(chartType ==Constant.ANALYSISCHART_TYPE.TYPE_DYMIC){
+            mv.addObject("isDynamic", true);
+        }else{
+            mv.addObject("isDynamic", false);
+        }
         //报送频率
         List<Map<String, Object>> fres = Constant.FrequencyType.getAllForArray(analysisChartBase.getPeriodType());
         mv.addObject("fres", gson.toJson(fres));

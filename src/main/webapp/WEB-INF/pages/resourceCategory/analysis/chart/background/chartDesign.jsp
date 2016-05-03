@@ -22,6 +22,7 @@
             type="text/javascript"></script>
     <script type="text/javascript">
         var chartId = ${chartId};
+        var isDynamic = ${isDynamic};
         var fres = ${fres};// 报送频率
         var periodType = ${periodType};
         var metadataTypes = ${metadataTypes};
@@ -197,6 +198,9 @@
                     actionMethods: {create: 'POST', read: 'POST', update: 'POST', destroy: 'POST'},
 //                    url: GLOBAL_PATH + '/resourcecategory/analysis/common/analysis/getItemGroupTree',
                     url: GLOBAL_PATH + '/resourcecategory/analysis/common/analysis/getGroupInfoTreeForChart',
+                    extraParams:{
+                        isDynamic:isDynamic
+                    },
                     /*api: {
                      create: GLOBAL_PATH + '/support/resourcecategory/analysis/chart/updateAnalysisChartBase',
                      update: GLOBAL_PATH + '/support/resourcecategory/analysis/chart/updateAnalysisChartBase',
@@ -215,10 +219,15 @@
 
             });
             var metaItem = new Ext.tree.Panel({
-                title: '指标元数据',
                 width: '100%',
                 autoScroll: true,
                 flex: 1,
+                tbar: ['<b>指标元数据</b>','->',{
+                    xtype: 'triggertext',
+                    handler: function (_this,n) {
+                        queryTreeByLocal(metaItem,itemDataStore,'dataName',n);
+                    }
+                }],
                 viewConfig: {
                     plugins: {
                         ptype: 'treeviewdragdrop',
@@ -252,10 +261,15 @@
                 }
             });
             var metaDict = new Ext.tree.Panel({
-                title: '其他元数据',
                 width: '100%',
                 flex: 1,
                 store: groupDataStore,
+                tbar: ['<b>其他元数据</b>','->',{
+                    xtype: 'triggertext',
+                    handler: function (_this,n) {
+                        queryTreeByLocal(metaDict,groupDataStore,'dataName',n);
+                    }
+                }],
                 viewConfig: {
                     plugins: {
                         ptype: 'treeviewdragdrop',
@@ -284,7 +298,6 @@
                 rootVisible: false
             });
             var metaPanel = new Ext.panel.Panel({
-                title: '元数据',
                 region: 'west',
                 width: '20%',
                 border: 0,
@@ -630,8 +643,7 @@
 
             };
             var structureCategory = new Ext.tree.Panel({
-                title: '分类轴结构',
-                tbar: ['->', {
+                tbar: ['<b>分类轴结构</b>','->', {
                     type: 'button',
                     text: '生成分类轴',
                     handler: function () {
@@ -822,8 +834,7 @@
             }
 
             var structureSeries = new Ext.tree.Panel({
-                title: '序列结构',
-                tbar: ['->', {
+                tbar: ['<b>序列结构</b>','->', {
                     type: 'button',
                     text: '生成序列',
                     handler: function () {
@@ -925,7 +936,6 @@
                 }
             });
             var structurePanel = new Ext.panel.Panel({
-                title: '图表结构',
                 region: 'center',
                 width: '20%',
                 height: '100%',
@@ -949,11 +959,11 @@
             });
 
             var nodeInfo = new Ext.panel.Panel({
-                title: '节点信息',
                 width: '50%',
                 height: '100%',
                 //autoScroll: true,
-                items: [propertyGrid]
+                items: [propertyGrid],
+                tbar: ['<b>节点信息</b>','->',{}]
             });
 
             //-----------------------------------------------结构结束---------------------------------------------
@@ -1020,7 +1030,6 @@
             });
 
             var infoCategory = new Ext.grid.Panel({
-                title: '分类轴',
                 width: '50%',
                 sortableColumns: false,
                 multiSelect: true,
@@ -1039,7 +1048,7 @@
                         }
                     }
                 },
-                tbar: ['->', {
+                tbar: ['<b>分类轴</b>','->', {
                     text: '修改分类轴',
                     handler: function () {
                         var selected = infoCategory.getSelection();
@@ -1076,7 +1085,6 @@
                 height: '100%'
             });
             var infoTop = new Ext.panel.Panel({
-                title: '图表信息Top',
                 width: '100%',
                 border: 0,
                 layout: 'hbox',
@@ -1084,7 +1092,6 @@
                 items: [nodeInfo, infoCategory]
             });
             var infoSeries = new Ext.grid.Panel({
-                title: '序列',
                 sortableColumns: false,
                 store: infoSeriesStore,
                 multiSelect: true,
@@ -1105,7 +1112,7 @@
                 },
                 width: '100%',
                 flex: 1,
-                tbar: ['->', {
+                tbar: ['<b>序列</b>','->', {
                     text: '修改序列',
                     handler: function () {
                         var selected = infoSeries.getSelection();
@@ -1158,7 +1165,6 @@
 
 
             var infoPanel = new Ext.panel.Panel({
-                title: '图表信息',
                 region: 'east',
                 width: '60%',
                 height: '100%',
@@ -1169,7 +1175,6 @@
             //-----------------------------------------------信息结束---------------------------------------------
             //-----------------------------------------------主页面板开始---------------------------------------------
             var mainPanel = new Ext.panel.Panel({
-                title: '图表设计',
                 html: 'ss',
                 height: '100%',
                 layout: 'border',
@@ -1195,6 +1200,7 @@
         });
 
     </script>
+    <script src="<%=request.getContextPath()%>/City/common/queryTreeByLocal.js"></script>
 </head>
 <body style="height: 100%">
 

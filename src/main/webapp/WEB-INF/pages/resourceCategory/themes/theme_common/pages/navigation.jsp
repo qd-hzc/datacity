@@ -17,32 +17,9 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>导航页</title>
-
+    <link href="<%=contextPath%>/City/resourceCategory/themes/css/navigation.less" rel="stylesheet/less">
     <link href="<%=contextPath%>/Plugins/bootstrap/css/bootstrap.min.css" rel="stylesheet">
 
-    <style>
-        body{
-            background-color: #E9E9E9 !important;
-        }
-        .nav-justified > li {
-            display: table-cell !important;
-            width: 10% !important;
-            min-width: 5rem !important;
-            max-width: 10rem !important;
-            height: 60px;
-        }
-
-        .nav-pills > li > a {
-            border-radius: 0px !important;
-            color: #a2b1c5;
-            padding-top:20px !important;
-            height:60px;
-        }
-        .nav-pills > li.active > a, .nav-pills > li.active > a:focus, .nav-pills > li.active > a:hover {
-            background-color: #337ab7;
-            color: white;
-        }
-    </style>
 </head>
 <body>
 
@@ -52,8 +29,7 @@
 <script data-id="navigationMenuTemp" data-uuid="${uuid}" type="text/template">
     <li role="presentation" style="cursor: pointer;" data-uuid="${uuid}" data-function="changeTab">
         <a data-id="{id}" data-index="{index}" aria-controls="home"
-           role="tab" data-toggle="tab"
-           style="font-size: 1.5rem;font-weight: 700;">{name}</a>
+           role="tab" data-toggle="tab">{name}</a>
     </li>
 </script>
 
@@ -63,17 +39,18 @@
 
 <div class="container-fluid">
 
-    <ul data-uuid="${uuid}" data-id="navigationdiv1" class="nav nav-pills nav-justified"
-        role="tablist" style="border-bottom: 2px solid lavender;background-color: white"></ul>
+    <ul data-uuid="${uuid}" data-id="navigationdiv1" class="nav nav-pills nav-justified esi-nav-pills"
+        role="tablist"></ul>
 
-    <div data-uuid="${uuid}" data-id="navigationdiv2" class="tab-content"></div>
+    <div data-uuid="${uuid}" data-id="navigationdiv2" class="tab-content"
+         style="margin-top: 18px;"></div>
 
 </div>
-
+<script src="<%=contextPath%>/Plugins/less/less.min.js"></script>
 <script src="<%=contextPath%>/Plugins/jquery/jquery.min.js"></script>
 <script src="<%=contextPath%>/Plugins/bootstrap/js/bootstrap.min.js"></script>
 <script src="<%=contextPath%>/Plugins/eharts/echarts-all.js"></script>
-
+<script src="<%=request.getContextPath()%>/Plugins/vue/vue.js"></script>
 <script src="<%=contextPath%>/Plugins/jquery/jquery.esi.1.0.js"></script>
 <script src="<%=contextPath%>/City/resourceCategory/themes/EsiTheme.js"></script>
 <script src="<%=contextPath%>/City/resourceCategory/themes/EsiReport.js"></script>

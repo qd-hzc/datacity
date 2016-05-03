@@ -35,13 +35,14 @@ Ext.addContentWin.init = function (record, fn) {
         modal: true,
         items: [form],
         buttons: [{
-            id:"formSave",
+            id: "formSave",
             text: '保存',
             hidden: isChecked,
             handler: function () {
                 if (form.isValid()) {
                     if (fn) {
-                        fn(form.getForm().getFieldValues());
+                        var fieldValues = form.getValues();
+                        fn(fieldValues);
                     }
                 }
             }
@@ -52,7 +53,6 @@ Ext.addContentWin.init = function (record, fn) {
             }
         }]
     });
-    console.log(record);
     form.loadRecord(record);
     if (isChecked) {
         win.setTitle('查看');
@@ -61,5 +61,4 @@ Ext.addContentWin.init = function (record, fn) {
     }
     win.show();
     return win;
-
-}
+};

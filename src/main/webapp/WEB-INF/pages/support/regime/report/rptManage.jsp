@@ -520,16 +520,16 @@
                     }
                     return '停用';
                 }
-            }, {
-                text: '操作',
-                dataIndex: 'rptType',
-                flex: 0.5,
-                renderer: function (data) {
-                    if (data == 2) {//加工表
-                        return '<b style="color: #3437ff">编辑公式</b>';
-                    }
-                    return '';
-                }
+//            }, {
+//                text: '操作',
+//                dataIndex: 'rptType',
+//                flex: 0.5,
+//                renderer: function (data) {
+//                    if (data == 2) {//加工表
+//                        return '<b style="color: #3437ff">编辑公式</b>';
+//                    }
+//                    return '';
+//                }
             }, {
                 text: '生成往期报表',
                 dataIndex: '',
@@ -600,13 +600,11 @@
                     styleStore.load({params: commonParams.styleParams});
                     tmpContainerMenu.hide();
                     tmpMenu.hide();
-                    if (cellIndex == 8) {//生成报表
-                        console.log(commonParams.styleParams.tmpId);
+                    if (cellIndex == 7) {//生成报表
                         Ext.Ajax.request({
                             url: Global_Path + '/getRptStyleByTmp?tmpId=' + commonParams.styleParams.tmpId,
                             success: function (response, opts) {
                                 var obj = Ext.decode(response.responseText);
-                                console.log(obj[0].id);
                                 Ext.Ajax.request({
                                     url: Global_Path + '/isHasBar?styleId=' + obj[0].id,
                                     success: function (response, opts) {
@@ -618,7 +616,6 @@
                                         } else {
                                             var sel = tmpGrid.getSelectionModel().getSelection();
                                             var record = sel[0];
-                                            console.log(record)
                                             Ext.addAllReportInfosWin.init(record, function (rec) {
                                             });
                                         }
@@ -626,7 +623,6 @@
                                 });
                             }
                         });
-
                     }
                 },
                 containerclick: function () {
@@ -740,6 +736,7 @@
                 flex: 1
             }, {
                 text: '表样类型',
+                hidden: true,
                 dataIndex: 'styleType',
                 flex: 0.5,
                 renderer: function (data) {
@@ -768,13 +765,13 @@
                 renderer: function () {
                     return '<a style="color:#0000FF">表样设计</a>';
                 }
-            }, {
-                text: '审核规则',
-                flex: 0.5,
-                align: 'center',
-                renderer: function () {
-                    return '<a style="color:#0000FF">审核规则</a>';
-                }
+//            }, {
+//                text: '审核规则',
+//                flex: 0.5,
+//                align: 'center',
+//                renderer: function () {
+//                    return '<a style="color:#0000FF">审核规则</a>';
+//                }
             }],
             listeners: {
                 containercontextmenu: function (_this, e) {

@@ -141,7 +141,6 @@ Ext.itemDictManageAddSameWin.show = function (rec, fnt) {// 两个参数，fnt�
                             parentId: rec.get('id')
                         },
                         success: function (form, action) {
-                            console.log(action)
                             var datas = Ext.decode(action.result.datas);
                             var msg = action.result.msg;
 

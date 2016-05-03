@@ -41,7 +41,6 @@ Ext.addAllReportInfosWin.init = function (record, fn) {
             var nowYear = result.nowyear;//当前年
             var nowMonth = result.nowmonth;//当前月
             var timeExistList = result.timeExistList;//已经生成的报表
-            //console.log(Ext.encode(timeExistList));
             var yearLength;
             var monthLength;
             if(endYear>=nowYear||endYear==0){
@@ -125,7 +124,6 @@ Ext.addAllReportInfosWin.init = function (record, fn) {
                 items: []
             });
             form.add(yearList);
-            console.log(timeExistList)
             //已经生成的报表报告期不可选
             for (var j = 0; j < timeExistList.length; j++) {
                 var existyear = timeExistList[j].year;

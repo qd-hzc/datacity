@@ -1,6 +1,7 @@
 package com.city.resourcecategory.themes.controller;
 
 import com.city.common.controller.BaseController;
+import com.city.common.util.EsiJsonParamUtil;
 import com.city.resourcecategory.themes.entity.ThemePage;
 import com.city.resourcecategory.themes.entity.ThemePageContent;
 import com.city.resourcecategory.themes.pojo.EsiTheme;
@@ -100,16 +101,27 @@ public class ManageThemesController extends BaseController {
     }
 
     /**
-     * 模板菜单排序
+     * 保存排序
      *
+     * @param request
      * @return
-     * @author crx
-     * @createDate 2016-3-11
+     * @author hzc
+     * @createDate 2016-4-29
      */
-    @RequestMapping("/sortThemePage")
+    @RequestMapping("/sortThemeIndex")
     @ResponseBody
-    public Object sortThemePage(DragAndDropVO vo) {
-        return themesService.saveDragAndDrop(vo);
+    public Object sortThemeIndex(HttpServletRequest request) {
+        Map<String, Object> result = null;
+        EsiJsonParamUtil<ThemePage> util = new EsiJsonParamUtil<>();
+        try {
+            List<ThemePage> pages = util.parseObjToList(request, ThemePage.class);
+            themesService.saveThemeSort(pages);
+            result = genSuccessMsg("保存成功");
+        } catch (Exception e) {
+            e.printStackTrace();
+            result = genFaultMsg("保存失败,服务端运行异常!");
+        }
+        return result;
     }
 
     /**
