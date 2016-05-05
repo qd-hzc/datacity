@@ -47,7 +47,6 @@
                         Ext.Msg.alert("提示", "登录超时", function () {
                             window.location.href = '<%=request.getContextPath()%>'
                         });
-
                 }
             })
         }

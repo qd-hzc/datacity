@@ -189,6 +189,7 @@ public class DesignCustomResearchService {
     private Map<String, Object> genInfoMap(CustomResearchBarInfoEntity barInfo) {
         Map<String, Object> infoMap = new HashMap<>();
         infoMap.put("dataName", barInfo.getDataName());
+        infoMap.put("text", barInfo.getDataName());
         infoMap.put("dataValue", barInfo.getDataValue());
         infoMap.put("dataType", barInfo.getDataType());
         infoMap.put("dataInfo1", barInfo.getDataInfo1());

@@ -168,7 +168,15 @@
                 this.reset();
                 commonParams.themeParams.name = '';
                 systemLogStore.reload({params: commonParams.themeParams});
-            }
+            },
+//            listeners: {
+//                specialkey: function (field, e) {
+//                    if (e.getKey() == e.ENTER || e.getKey() == e.TAB) {
+//                        commonParams.themeParams.name = searchInfoField.value;
+//                        systemLogStore.reload({params: commonParams.themeParams});
+//                    }
+//                }
+//            }
         });
 
         var searchStartDate = Ext.create('Ext.form.field.Date', {

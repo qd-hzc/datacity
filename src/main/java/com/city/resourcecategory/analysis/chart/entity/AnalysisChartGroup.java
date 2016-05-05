@@ -31,7 +31,7 @@ public class AnalysisChartGroup {
         this.id = id;
     }
 
-    @Column(name = "NAME")
+    @Column(name = "NAME",unique = true,length=200)
     public String getName() {
         return name;
     }

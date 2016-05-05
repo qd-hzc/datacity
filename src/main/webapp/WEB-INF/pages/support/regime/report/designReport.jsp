@@ -51,7 +51,7 @@
     Ext.onReady(function () {
         //指标体系store
         var itemGroupStore = Ext.create('Ext.data.TreeStore', {
-            fields: ['dataType', 'dataName', 'dataValue', 'dataInfo1', 'dataInfo2', 'children', 'leaf'],
+            fields: ['dataType', 'dataName', 'text', 'dataValue', 'dataInfo1', 'dataInfo2', 'children', 'leaf'],
             proxy: {
                 type: 'ajax',
                 api: {
@@ -69,7 +69,6 @@
             height: '50%',
             store: itemGroupStore,
             rootVisible: false,
-            displayField: 'dataName',
             region: 'north',
             viewConfig: {
                 plugins: {
@@ -94,7 +93,7 @@
         });
         //分组store
         var groupStore = Ext.create('Ext.data.TreeStore', {
-            fields: ['dataType', 'dataName', 'dataValue', 'dataInfo1', 'dataInfo2', 'children', 'leaf'],
+            fields: ['dataType', 'dataName','text', 'dataValue', 'dataInfo1', 'dataInfo2', 'children', 'leaf'],
             proxy: {
                 type: 'ajax',
                 api: {
@@ -102,7 +101,7 @@
                 }
             },
             root: {
-                dataName: '根节点',
+                text: '根节点',
                 expanded: true
             }
         });
@@ -111,7 +110,6 @@
             height: '50%',
             store: groupStore,
             rootVisible: false,
-            displayField: 'dataName',
             region: 'south',
             viewConfig: {
                 plugins: {
@@ -136,7 +134,7 @@
         });
         //主栏store
         var mainBarStore = Ext.create('Ext.data.TreeStore', {
-            fields: ['dataName', 'dataValue', 'dataInfo1', 'dataInfo2', 'dataType', 'isRealNode', 'isProperty', 'leaf', 'expanded', 'children'],
+            fields: ['dataName', 'text', 'dataValue', 'dataInfo1', 'dataInfo2', 'dataType', 'isRealNode', 'isProperty', 'leaf', 'expanded', 'children'],
             proxy: {
                 type: 'ajax',
                 api: {
@@ -149,14 +147,13 @@
             },
             root: {
                 expanded: true,
-                dataName: "主栏"
+                text: "主栏"
             }
         });
         //主栏
         var mainBarTree = Ext.create('Ext.tree.Panel', {
             height: '50%',
             store: mainBarStore,
-            displayField: 'dataName',
             rootVisible: true,
             region: 'north',
             enableDD: true,//是否支持拖拽效果
@@ -205,7 +202,7 @@
         });
         //宾栏store
         var guestBarStore = Ext.create('Ext.data.TreeStore', {
-            fields: ['dataName', 'dataValue', 'dataInfo1', 'dataInfo2', 'dataType', 'isRealNode', 'isProperty', 'leaf', 'expanded', 'children'],
+            fields: ['dataName','text', 'dataValue', 'dataInfo1', 'dataInfo2', 'dataType', 'isRealNode', 'isProperty', 'leaf', 'expanded', 'children'],
             proxy: {
                 type: 'ajax',
                 api: {
@@ -218,7 +215,7 @@
             },
             root: {
                 expanded: true,
-                dataName: "宾栏"
+                text: "宾栏"
             }
         });
         //菜单
@@ -227,7 +224,6 @@
         var guestBarTree = Ext.create('Ext.tree.Panel', {
             height: '50%',
             store: guestBarStore,
-            displayField: 'dataName',
             rootVisible: true,
             region: 'south',
             enableDD: true,//是否支持拖拽效果
@@ -275,7 +271,7 @@
         });
         //节点信息表格store
         var nodeInfoStore = new Ext.data.Store({
-            fields: ['dataName', 'dataValue', 'dataInfo1', 'dataInfo2', 'dataType', 'isRealNode', 'isProperty'],
+            fields: ['dataName','text', 'dataValue', 'dataInfo1', 'dataInfo2', 'dataType', 'isRealNode', 'isProperty'],
             data: []
         });
         //节点信息表格菜单
@@ -970,6 +966,7 @@
                     }
                     //校验成功,继续
                     node.set('dataName', data.dataName);
+                    node.set('text', data.dataName);
                     if (level == 1) {//拖动下级
                         //将子集添加
                         appendAll(node, overModel);
@@ -998,6 +995,7 @@
                         properties.push(getSimpleObj(node.data));
                         overModel.set('properties', properties);
                         overModel.set('dataName', data.dataName);
+                        overModel.set('text', data.dataName);
                     } else if (level == 3) {//全部
                         //将子集添加
                         appendAll(node, overModel);
@@ -1056,6 +1054,7 @@
             }
             var nodeInfo = {
                 dataName: obj.dataName,
+                text:obj.dataName,
                 dataType: METADATA_TYPE.SYSTEM_DESCRIBE_TYPE,
                 isRealNode: obj.isRealNode || 0,
                 isProperty: 1,
@@ -1075,6 +1074,7 @@
             }
             return {
                 dataName: obj.dataName,
+                text:obj.dataName,
                 dataValue: obj.dataValue,
                 dataType: obj.dataType,
                 dataInfo1: obj.dataInfo1,
@@ -1227,6 +1227,7 @@
             }
             if (levelType == 2) {//添加下级
                 node.set('dataName', rs.dataName);
+                node.set('text', rs.dataName);
                 if (level == 1) {//拖动下级
                     //将子集添加
                     var rc = data.records[0].childNodes;
@@ -1252,6 +1253,7 @@
         function copy(rc, overModel) {
             var conf = {
                 dataName: rc.get('dataName'),
+                text:rc.get('dataName'),
                 dataType: rc.get('dataType'),
                 dataValue: rc.get('dataValue'),
                 dataInfo1: rc.get('dataInfo1'),

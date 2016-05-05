@@ -55,4 +55,44 @@ public class ResearchGroupDao extends BaseDao<ResearchGroupEntity> {
     public List getMaxSort(int parentId) {
         return queryByHQL("select max(sort) from ResearchGroupEntity where parentId = " + parentId);
     }
+
+    /**
+     * 获取分组
+     * <pre>
+     *     根据分组名称和状态查询，如果参数为空，则查询所有
+     * </pre>
+     *
+     * @param name
+     * @param status
+     * @return
+     * @author hzc
+     * @createDate 2016-5-5
+     */
+    public List<ResearchGroupEntity> selectGroups(String name, Integer status) {
+        StringBuilder sb = new StringBuilder("from ResearchGroupEntity where 1=1");
+        if (name != null && name.trim().length() > 0) {
+            sb.append(" and name like '%").append(name).append("%'");
+        }
+        if (status != null) {
+            sb.append(" and status =").append(status);
+        }
+        sb.append(" order by parentId,sort");
+        return queryByHQL(sb.toString());
+    }
+
+    /**
+     * 返回分组
+     * <pre>
+     *     根据父id，查询分析报表分组
+     * </pre>
+     *
+     * @param groupId
+     * @return
+     * @author hzc
+     * @createDate 2016-5-5
+     */
+    public List<ResearchGroupEntity> selectGroupsByParentId(Integer groupId) {
+        String hql = "from ResearchGroupEntity where parentId=? order by sort";
+        return queryWithParamsByHQL(hql, new Object[]{groupId});
+    }
 }

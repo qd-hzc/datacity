@@ -1,6 +1,7 @@
 package com.city.resourcecategory.analysis.report.controller;
 
 import com.city.common.controller.BaseController;
+import com.city.common.pojo.Page;
 import com.city.common.util.EsiJsonParamUtil;
 import com.city.common.util.SessionUtil;
 import com.city.resourcecategory.analysis.report.entity.CustomResearchEntity;
@@ -53,12 +54,8 @@ public class CustomResearchManageController extends BaseController {
      */
     @RequestMapping("/getResearchGroupTree")
     @ResponseBody
-    public Object getResearchGroupTree(HttpServletRequest request) {
-        String id = request.getParameter("node");
-        if (StringUtils.isEmpty(id)) {
-            id = "0";
-        }
-        return manageService.getResearchGroupTree(Integer.parseInt(id));
+    public Object getResearchGroupTree(String name, Integer status) {
+        return manageService.getResearchGroupTree(name, status);
     }
 
     /**
@@ -97,13 +94,8 @@ public class CustomResearchManageController extends BaseController {
      */
     @RequestMapping("/getCustomResearchs")
     @ResponseBody
-    public Object getCustomResearchs(HttpServletRequest request) {
-        String id = request.getParameter("id");
-        if (StringUtils.isEmpty(id)) {
-            return null;
-        }
-        List<CustomResearchEntity> list = researchService.getCustomResearchsByGroupId(Integer.parseInt(id));
-        return list;
+    public Page getCustomResearchs(Page page, Integer id, String name, boolean includeDownLevel) {
+        return manageService.getCustomResearchsByGroups(page, id, name, includeDownLevel);
     }
 
     /**

@@ -82,7 +82,11 @@ public class BasicChartConfigController extends BaseController {
             EsiJsonParamUtil<AnalysisChartGroup> paramUtil = new EsiJsonParamUtil<>();
             datas = paramUtil.parseObjToList(request, AnalysisChartGroup.class);
             datas = basicChartConfigService.updateAnalysisChartGroup(datas);
-            result = genSuccessMsg(datas, "操作成功", null);
+            if(datas.size()>0) {
+                result = genSuccessMsg(datas, "操作成功", null);
+            }else{
+                result = genSuccessMsg(null, "操作失败", null);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             EsiLogUtil.error(getLog(), e.getMessage());

@@ -112,8 +112,11 @@ public class BasicChartConfigService {
                     result.add(data);
                 }
             } else {
-                analysisChartGroupDao.insert(tmpChartGroup, true);
-                result.add(tmpChartGroup);
+                List<AnalysisChartGroup> analysisChartGroupList = analysisChartGroupDao.getByAllName(tmpChartGroup.getName());
+                if(analysisChartGroupList.size()==0) {
+                    analysisChartGroupDao.insert(tmpChartGroup, true);
+                    result.add(tmpChartGroup);
+                }
             }
         }
         return result;

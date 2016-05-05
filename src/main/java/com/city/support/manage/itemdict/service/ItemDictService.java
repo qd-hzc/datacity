@@ -109,22 +109,22 @@ public class ItemDictService extends PackageListToTree<SptMgrItemDictEntity> {
      */
     public boolean saveItemDict(SptMgrItemDictEntity entity) {
         String name = entity.getName();
-//        List<SptMgrItemDictEntity> dicts = itemDictDao.getItemDictByName(name);
+        List<SptMgrItemDictEntity> dicts = itemDictDao.getItemDictByName(name);
         Integer parentId = entity.getParentId();
         List sorts = itemDictDao.getMaxSort(parentId);
         entity.setSort(getIndex(sorts));
-//        if (null == dicts || dicts.size() < 1) {
-        //保存的指标分组目录有父，则获取所有同级，并添加该指标分组目录排序，同时添加指标分组目录等级
-        SptMgrItemDictEntity itemDictParent = getItemDictById(parentId);
-        if (null != itemDictParent) {
-            itemDictParent.setLeaf(false);
-            itemDictDao.saveOrUpdate(itemDictParent, Boolean.FALSE);
+        if (null == dicts || dicts.size() < 1) {
+            //保存的指标分组目录有父，则获取所有同级，并添加该指标分组目录排序，同时添加指标分组目录等级
+            SptMgrItemDictEntity itemDictParent = getItemDictById(parentId);
+            if (null != itemDictParent) {
+                itemDictParent.setLeaf(false);
+                itemDictDao.saveOrUpdate(itemDictParent, Boolean.FALSE);
+            }
+            itemDictDao.saveOrUpdate(entity, Boolean.FALSE);
+            return Boolean.TRUE;
+        } else {
+            return Boolean.FALSE;
         }
-        itemDictDao.saveOrUpdate(entity, Boolean.FALSE);
-        return Boolean.TRUE;
-//        } else {
-//            return Boolean.FALSE;
-//        }
     }
 
     /**

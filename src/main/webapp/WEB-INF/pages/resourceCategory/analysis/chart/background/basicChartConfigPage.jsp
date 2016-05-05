@@ -95,6 +95,8 @@
                                 }
                             })
                         }, groupId);
+                    }else{
+                        Ext.Msg.alert('提示', "请选择分组！");
                     }
                 }
             }, {
@@ -109,6 +111,8 @@
                             selected.set(data);
                             chartBaseStore.sync();
                         }, groupId, selected);
+                    }else{
+                        Ext.Msg.alert('提示', "请选择图表！");
                     }
 
                 }
@@ -119,9 +123,15 @@
                     var selModel = chartBaseGrid.getSelectionModel();
                     var selected = selModel.getSelection();
                     var groupId = chartBaseStore.groupId;
-                    if (selected) {
-                        chartBaseStore.remove(selected);
-                        chartBaseStore.sync();
+                    if (selected&&selected.length>0) {
+                        Ext.Msg.confirm('警告', '确定删除选中的图表？', function (btn) {
+                            if ('yes' == btn) {
+                                chartBaseStore.remove(selected);
+                                chartBaseStore.sync();
+                            }
+                        });
+                    }else{
+                        Ext.Msg.alert('提示', "请选择图表！");
                     }
                 }
             }],
@@ -224,13 +234,16 @@
                                 jsonData: data,
                                 success: function (response, opts) {
                                     var result = Ext.JSON.decode(response.responseText);
-                                    if (data.level == '0') {
-                                        result.datas[0].loaded = true;
-                                        selected.parentNode.appendChild(result.datas[0]);
-                                    } else {
-                                        result.datas[0].loaded = true;
-                                        selected.appendChild(result.datas[0]);
+                                    if(result.datas) {
+                                        if (data.level == '0') {
+                                            result.datas[0].loaded = true;
+                                            selected.parentNode.appendChild(result.datas[0]);
+                                        } else {
+                                            result.datas[0].loaded = true;
+                                            selected.appendChild(result.datas[0]);
+                                        }
                                     }
+                                    Ext.Msg.alert("提示",result.msg);
                                 }
                             })
                             win.close();
@@ -248,8 +261,11 @@
                                 success: function (response, opts) {
 
                                     var result = Ext.JSON.decode(response.responseText);
-                                    result.datas[0].loaded = true;
-                                    selected.appendChild(result.datas[0]);
+                                    if(result.datas) {
+                                        result.datas[0].loaded = true;
+                                        selected.appendChild(result.datas[0]);
+                                    }
+                                    Ext.Msg.alert("提示",result.msg);
                                 }
                             });
                             win.close();

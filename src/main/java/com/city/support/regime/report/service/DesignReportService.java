@@ -90,7 +90,7 @@ public class DesignReportService {
         List<Map<String, Object>> result = new ArrayList<>();
         //时间框架
         Map<String, Object> tf = new HashMap<>();
-        tf.put("dataName", "时间框架");
+        tf.put("text", "时间框架");
         tf.put("dataType", Constant.MetadataType.SYSTEM_DESCRIBE_TYPE);
         tf.put("dataValue", 0);
         tf.put("allowDrag", false);
@@ -99,7 +99,7 @@ public class DesignReportService {
         result.add(tf);
         //指标目录
         Map<String, Object> itemMenu = new HashMap<>();
-        itemMenu.put("dataName", "指标分组目录");
+        itemMenu.put("text", "指标分组目录");
         itemMenu.put("dataType", Constant.MetadataType.SYSTEM_DESCRIBE_TYPE);
         itemMenu.put("dataValue", 0);
         itemMenu.put("allowDrag", false);
@@ -108,7 +108,7 @@ public class DesignReportService {
         result.add(itemMenu);
         //统计对象
         Map<String, Object> objMap = new HashMap<>();
-        objMap.put("dataName", "统计对象");
+        objMap.put("text", "统计对象");
         objMap.put("dataType", Constant.MetadataType.RESEARCH_OBJ_GROUP);
         objMap.put("dataValue", 0);
         objMap.put("allowDrag", false);
@@ -429,6 +429,7 @@ public class DesignReportService {
     private Map<String, Object> genInfoMap(ReportTemplateBarInfo barInfo) {
         Map<String, Object> infoMap = new HashMap<>();
         infoMap.put("dataName", barInfo.getDataName());
+        infoMap.put("text", barInfo.getDataName());
         infoMap.put("dataValue", barInfo.getDataValue());
         infoMap.put("dataType", barInfo.getDataType());
         infoMap.put("dataInfo1", barInfo.getDataInfo1());

@@ -482,12 +482,12 @@
                 listeners: {
                     load: function (store, records, successful, eOpts) {
                         var _this = store;
-                        var root = records[0];
+                        var root = _this.getRoot();
                         if (root) {
                             root.findChildBy(function (node) {
                                 _this.byIdMap[node.getId()] = node;
                                 return false;
-                            }, true);
+                            },root, true);
                         }
                     }
                 }

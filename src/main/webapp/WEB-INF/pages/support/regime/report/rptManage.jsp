@@ -88,6 +88,7 @@
             flex: 1,
             height: '100%',
             store: groupStore,
+            rootVisible: true,
             viewConfig: {
                 plugins: {
                     ptype: 'treeviewdragdrop',
@@ -136,7 +137,6 @@
                     }
                 }
             },
-            rootVisible: true,
             tbar: [{
                 xtype: 'textfield',
                 fieldLabel: '查询',
@@ -442,9 +442,9 @@
                 handler: function () {
                     addRptTmpStyle(false);
                 }
-            }, {//TODO 导入表样等表样设计做完后在家上
-                text: '从库导入表样',
-                iconCls: 'Basketput'
+//            }, {//TODO 导入表样等表样设计做完后在家上
+//                text: '从库导入表样',
+//                iconCls: 'Basketput'
             }]
         });
         var tmpGrid = new Ext.grid.Panel({
@@ -540,14 +540,13 @@
             }],
             tbar: [{
                 xtype: 'textfield',
-                fieldLabel: '搜索',
+//                fieldLabel: '搜索',
                 labelWidth: 50,
                 width: 150,
                 labelAlign: 'right',
                 listeners: {
                     change: function (_this, n, o) {
                         commonParams.tmpParams.name = n;
-                        tmpStore.reload({params: commonParams.tmpParams});
                     }
                 }
             }, {
@@ -566,8 +565,13 @@
                 listeners: {
                     change: function (_this, n, o) {
                         commonParams.tmpParams.status = n;
-                        tmpStore.reload({params: commonParams.tmpParams});
                     }
+                }
+            }, {
+                xtype: 'button',
+                text: '搜索',
+                handler: function () {
+                    tmpStore.reload({params: commonParams.tmpParams});
                 }
             }, '->', {
                 xtype: 'button',
@@ -649,9 +653,9 @@
                 handler: function () {
                     addRptTmpStyle(false);
                 }
-            }, {
-                text: '从库导入',
-                iconCls: 'Basketput'
+//            }, {
+//                text: '从库导入',
+//                iconCls: 'Basketput'
             }]
         });
         var styleMenu = new Ext.menu.Menu({
@@ -720,9 +724,9 @@
                         });
                     }
                 }
-            }, '-', {
-                text: '加入到库',
-                iconCls: 'Basketadd'
+//            }, '-', {
+//                text: '加入到库',
+//                iconCls: 'Basketadd'
             }]
         });
         var styleGrid = new Ext.grid.Panel({

@@ -19,6 +19,7 @@ Ext.fillAnalysisChartGroup.init = function (fnt, record) {
         fieldLabel: '分组名称',
         labelWidth: 80,
         margin: '5 15',
+        maxLength:50,
         allowBlank: false
     });
 

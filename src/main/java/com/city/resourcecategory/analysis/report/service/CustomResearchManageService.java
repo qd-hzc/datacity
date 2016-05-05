@@ -1,14 +1,19 @@
 package com.city.resourcecategory.analysis.report.service;
 
+import com.city.common.pojo.Page;
 import com.city.common.util.ConvertUtil;
 import com.city.common.util.ListUtil;
+import com.city.resourcecategory.analysis.report.dao.CustomResearchDao;
 import com.city.resourcecategory.analysis.report.dao.ResearchGroupDao;
+import com.city.resourcecategory.analysis.report.entity.CustomResearchEntity;
 import com.city.resourcecategory.analysis.report.entity.ResearchGroupEntity;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.LinkedList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * 自定义查询管理
@@ -18,6 +23,12 @@ import java.util.List;
 public class CustomResearchManageService {
     @Autowired
     private ResearchGroupDao groupDao;
+
+    @Autowired
+    private CustomResearchGroupTree groupTree;
+
+    @Autowired
+    private CustomResearchDao researchDao;
 
     /**
      * 返回自定义查询
@@ -55,6 +66,24 @@ public class CustomResearchManageService {
      */
     public List<ResearchGroupEntity> getResearchGroupTree(int i) {
         return groupDao.selectResearchGroupByParentId(i);
+    }
+
+    /**
+     * 获取分组
+     * <pre>
+     *     根据分组名称和状态查询，如果参数为空，则查询所有
+     * </pre>
+     *
+     * @param name
+     * @param status
+     * @return
+     * @author hzc
+     * @createDate 2016-5-5
+     */
+    public List<Map<String, Object>> getResearchGroupTree(String name, Integer status) {
+        boolean isNeedColor = name != null && name.trim().length() > 0;
+        List<ResearchGroupEntity> groups = groupDao.selectGroups(name, status);
+        return groupTree.packageListToTree(groups, isNeedColor);
     }
 
     /**
@@ -180,5 +209,44 @@ public class CustomResearchManageService {
                 }
             }
         }
+    }
+
+    public Page getCustomResearchsByGroups(Page page, Integer groupId, String name, boolean includeDownLevel) {
+        if (null == groupId) {
+            groupId = 0;
+        }
+        String groups;
+        if (includeDownLevel) {
+            List<Integer> downGroups = getDownGroups(groupId);
+            String groupStrs = downGroups.toString();
+            groups = groupStrs.substring(1, groupStrs.length() - 1);
+        } else {
+            groups = groupId.toString();
+        }
+
+        List<CustomResearchEntity> tmps = researchDao.getRptTmpsByCondition(page, groups, name);
+        page.setDatas(tmps);
+        page.setTotal(researchDao.getTmpCountByCondition(name, groups));
+        return page;
+    }
+
+    /**
+     * 返回所有下级分组id，包括本groupId
+     *
+     * @param groupId 分组id
+     * @return
+     * @author hzc
+     * @createDate 2016-5-5
+     */
+    private List<Integer> getDownGroups(Integer groupId) {
+        List<Integer> itemGroups = new ArrayList<>();
+        List<ResearchGroupEntity> groups = groupDao.selectGroupsByParentId(groupId);
+        itemGroups.add(groupId);
+        if (groups != null && groups.size() > 0) {
+            for (ResearchGroupEntity group : groups) {
+                itemGroups.addAll(getDownGroups(group.getId()));
+            }
+        }
+        return itemGroups;
     }
 }

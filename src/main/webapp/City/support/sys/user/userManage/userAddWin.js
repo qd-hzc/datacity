@@ -96,6 +96,7 @@ Ext.userAddWin.show = function(fnt,rec){//两个参数，fnt是回调函数，re
         rootVisible: false,
         forceSelection : true,
         editable : true, //选框可输入
+        allowBlank:false,
         //value : rec.get('id'),
         //定义部门下拉列表数据源
         store: Ext.create('Ext.data.TreeStore',{

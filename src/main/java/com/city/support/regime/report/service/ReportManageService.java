@@ -127,6 +127,9 @@ public class ReportManageService {
      */
     public Page getRptTmpsByCondition(Page page, Integer groupId, String name, boolean includeDownLevel, Integer status) {
 
+        if (null == groupId) {
+            groupId = 0;
+        }
         String groups;
         if (includeDownLevel) {
             List<Integer> downGroups = groupService.getDownGroups(groupId);
@@ -457,7 +460,7 @@ public class ReportManageService {
             int endYear = rptTmpStyle.getEndYear();
             int beginPeriod = rptTmpStyle.getBeginPeriod();
             int endPeriod = rptTmpStyle.getEndPeriod();
-            boolean isStylePeriod = getRptPeriod(reportInfo.getYear(),reportInfo.getMonth(), beginYear, endYear, beginPeriod, endPeriod);
+            boolean isStylePeriod = getRptPeriod(reportInfo.getYear(), reportInfo.getMonth(), beginYear, endYear, beginPeriod, endPeriod);
             if (isStylePeriod) {
                 reportTemplateStyle = rptTmpStyle;
                 return reportTemplateStyle;
@@ -622,6 +625,7 @@ public class ReportManageService {
                 SystemLogUtils.createLogList(currentUser.getUser(), SystemLog.UPDATE, rptTmpById, SystemLog.REPORT_GROUP, "saveReportForGroup"));
         eventWatchedLog.notifyAllListener(esiEvent);
     }
+
     /**
      * 判断报表模板和表样的有效期
      *

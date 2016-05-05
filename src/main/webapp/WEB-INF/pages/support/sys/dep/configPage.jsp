@@ -359,9 +359,9 @@
             title: '部门人员',
             store: personStore,
             columns: [
-                {text: '人员姓名', dataIndex: 'name'},
-                {text: 'Email', dataIndex: 'email', flex: 1},
-                {text: '联系电话', dataIndex: 'tel'}
+                {text: '人员姓名', dataIndex: 'name', flex: 1},
+//                {text: 'Email', dataIndex: 'email', flex: 1},
+                {text: '联系电话', dataIndex: 'tel', flex: 1}
             ],
         });
 

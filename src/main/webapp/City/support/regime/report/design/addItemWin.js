@@ -127,6 +127,7 @@ function showAddItemWindow(record, root, callback) {
                     addItemResult.dataName = name;
                     if (target != 'property') {
                         record.set('dataName', displayName);
+                        record.set('text', displayName);
                         record.set('dataValue', null);
                         record.set('dataInfo1', null);
                         record.set('dataInfo2', null);
@@ -152,6 +153,7 @@ function showAddItemWindow(record, root, callback) {
     function getSimpleObj(obj) {
         return {
             dataName: obj.dataName,
+            text: obj.dataName,
             dataValue: obj.dataValue,
             dataType: obj.dataType,
             dataInfo1: obj.dataInfo1,

@@ -285,7 +285,7 @@
             columnWidth: .8,
             height: 100,
             anchor: '80%',
-            maxLength: 255,
+            maxLength: 250,
             maxLengthText: '超过长度限制',
             border: false,
             enforceMaxLength: true

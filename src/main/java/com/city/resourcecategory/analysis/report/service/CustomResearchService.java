@@ -1,5 +1,6 @@
 package com.city.resourcecategory.analysis.report.service;
 
+import com.city.common.pojo.Page;
 import com.city.common.util.ConvertUtil;
 import com.city.resourcecategory.analysis.common.service.TimeRangeService;
 import com.city.resourcecategory.analysis.report.dao.CustomResearchBarInfoDao;
@@ -167,5 +168,6 @@ public class CustomResearchService {
     public List<CustomResearchEntity> getAllCustomResearch() {
         return researchDao.selectAll();
     }
+
 }
 

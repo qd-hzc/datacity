@@ -218,6 +218,10 @@
                 text: '清空数据集',
                 iconCls: 'Cart',
                 handler: clearDataSetDatas
+            }, {
+                text: '添加指标详细数据',
+                iconCls: 'Pageadd',
+                handler: addItemInfoDatas
             }]
         });
         var itemMenu = new Ext.menu.Menu({
@@ -285,6 +289,10 @@
                 text: '清空数据集',
                 iconCls: 'Cart',
                 handler: clearDataSetDatas
+            }, '-', {
+                text: '添加指标详细数据',
+                iconCls: 'Pageadd',
+                handler: addItemInfoDatas
             }],
             listeners: {
                 containerclick: function () {//点击空白处
@@ -518,6 +526,7 @@
             }
         }
 
+        //清除数据集
         function clearDataSetDatas() {
             Ext.Msg.confirm('警告', '确定要清空该数据集的数据么?', function (btn) {
                 if (btn == 'yes') {
@@ -542,6 +551,31 @@
                     });
                 }
             });
+        }
+
+        //添加指标详细数据
+        function addItemInfoDatas() {
+            var dataSetId = commonParams.dataSetDataParams.dataSetId;
+            if (dataSetId) {
+                //先获取指标
+                var sel = itemGrid.getSelectionModel().getSelection();
+                if (sel.length) {
+                    var itemIds = [];
+                    for (var i = 0; i < sel.length; i++) {
+                        itemIds.push(sel[i].get('dataValue'));
+                    }
+                    //弹出窗口来添加数据
+                    Ext.dataSet.AddItemInfoDataWin.init(dataSetId, itemIds.join(','), function () {
+                        reloadDataSetData();
+                        //重新计算数据集flag
+                        dataSetStore.reload({params: commonParams.dataSetParams});
+                    });
+                } else {
+                    Ext.Msg.alert('提示', '请选中指标来添加!');
+                }
+            } else {
+                Ext.Msg.alert('提示', '需要选一个数据集来添加!');
+            }
         }
 
         //刷新数据及数据表格
@@ -674,6 +708,7 @@
 </script>
 <script src="<%=request.getContextPath()%>/City/support/dataSet/saveDataSetWin.js"></script>
 <script src="<%=request.getContextPath()%>/City/support/dataSet/addDataSetDataWin.js"></script>
+<script src="<%=request.getContextPath()%>/City/support/dataSet/addItemInfoDataWin.js"></script>
 <script src="<%=request.getContextPath()%>/City/support/dataSet/editItemWin.js"></script>
 <script src="<%=request.getContextPath()%>/City/common/arrFuns.js"></script>
 </body>

@@ -12,6 +12,7 @@ public class MetaDataPojo implements Serializable {
     private Integer dataType;
     //数据名
     private String dataName;
+    private String text;
     //数据值
     private Integer dataValue;
     //扩充字段
@@ -41,6 +42,11 @@ public class MetaDataPojo implements Serializable {
 
     public void setDataName(String dataName) {
         this.dataName = dataName;
+        this.text = dataName;
+    }
+
+    public String getText() {
+        return dataName;
     }
 
     public Integer getDataValue() {

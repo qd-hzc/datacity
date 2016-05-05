@@ -65,7 +65,19 @@
                     destroy: APP_DATADICT_PATH + '/deleteDictMenus'
                 }
             },
-            autoLoad: true
+            autoLoad: true,
+            listeners: {
+                load: function (store, records, successful, eOpts) {
+                    var _this = store;
+                    var root = _this.getRoot();
+                    if (root) {
+                        root.findChildBy(function (node) {
+                            _this.byIdMap[node.getId()] = node;
+                            return false;
+                        },root, true);
+                    }
+                }
+            }
         });
         var menu;//目录
         var menuTree = new Ext.tree.Panel({

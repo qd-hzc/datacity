@@ -43,6 +43,13 @@ public class ResearchGroupEntity {
     @Column(name = "UPDATER_ID")
     private Integer updaterId;
 
+    @Transient
+    private String text;
+
+    public String getText() {
+        return name;
+    }
+
     /**
      * Getter for property 'id'.
      *
@@ -131,6 +138,7 @@ public class ResearchGroupEntity {
      */
     public void setName(String name) {
         this.name = name;
+        this.text = name;
     }
 
     /**

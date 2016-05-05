@@ -59,6 +59,11 @@ public class CommonController extends BaseController {
         User user = CurrentUser.getCurrentUser(request).getUser();
         ModelAndView mv = new ModelAndView();
         ThemePage page = commonService.getIndex();
+        if (null == page) {
+            String viewName = "/common/noConfig";
+            mv.setViewName(viewName);
+            return mv;
+        }
         mv.setViewName(COMMONPATH + page.getModulePath());
         Gson gson = new Gson();
         mv.addObject("page", gson.toJson(page));

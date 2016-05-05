@@ -606,7 +606,7 @@ var funFlag = false;
         id : 'roleAdd_3',
         layout : "form",
         height : 400,
-        padding: "150 0 0 350",
+        //padding: "150 0 0 350",
         items : [{
             xtype : "checkbox",
             boxLabel : "添加信息",

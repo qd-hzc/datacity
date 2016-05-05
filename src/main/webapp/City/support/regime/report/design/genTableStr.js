@@ -193,6 +193,7 @@ function unique(arr) {
  */
 function EsiNode(nodeData) {
     this.dataName = nodeData.dataName;
+    this.text = nodeData.dataName;
     this.dataType = nodeData.dataType;
     this.isRealNode = !!nodeData.isRealNode;
     this.properties = getProps(nodeData.properties, false);
@@ -227,6 +228,7 @@ function getProps(props, extend) {
             properties.push({
                 dataType: prop.dataType,
                 dataName: prop.dataName,
+                text: prop.dataName,
                 dataValue: prop.dataValue,
                 dataInfo1: prop.dataInfo1,
                 dataInfo2: prop.dataInfo2,

@@ -17,4 +17,9 @@ public class AnalysisChartGroupDao extends BaseDao<AnalysisChartGroup>{
         Object[] param = {pid};
         return queryWithParamsByHQL(hql,param);
     }
+
+    public List<AnalysisChartGroup> getByAllName(String name) {
+        String hql = "from AnalysisChartGroup t where t.name ='" + name + "'";
+        return super.queryByHQL(hql);
+    }
 }

@@ -113,6 +113,11 @@
             width: 200,
             listeners: {
                 specialkey: function (field, e) {
+                    if (e.getKey() == e.ENTER || e.getKey() == e.TAB) {
+                        userStore.loadPage(1, {
+                            params: {start: 0, limit: userStore.pageSize}
+                        });
+                    }
                 }
             }
         });

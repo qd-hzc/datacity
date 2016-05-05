@@ -26,11 +26,22 @@
 <script>
     var contextPath = "<%=contextPath%>";
     var MARGIN_ROW_SPACE = '8 0 0 0';
+    var commonParams = {
+        group: {
+            name: '',
+            status: 1
+        },
+        research: {
+            id: '',
+            name: '',
+            includeDownLevel: true
+        }
+    }
     Ext.onReady(function () {
         var __RESEARCH_GROUP_ID;
 //    自定义查询分组树
         var researchGroupTreeStore = Ext.create('Ext.data.TreeStore', {
-            fields: ['id', 'parentId', 'name', 'leaf'],
+            fields: ['id', 'parentId', 'name', 'text', 'leaf'],
             proxy: {
                 type: 'ajax',
                 api: {
@@ -41,7 +52,12 @@
             root: {
                 expanded: true,
                 id: 0,
-                name: '自定义查询分组'
+                text: '自定义查询分组'
+            },
+            listeners: {
+                beforeload: function (_this, operation) {
+                    operation.params = commonParams.group;
+                }
             }
         });
 //        自定义查询分组树
@@ -50,7 +66,6 @@
             height: '100%',
             store: researchGroupTreeStore,
             rootVisible: true,
-            displayField: 'name',
             region: 'west',
             viewConfig: {
                 plugins: {
@@ -68,6 +83,38 @@
                     }
                 }
             },
+            tbar: [
+                {
+                    xtype: 'textfield',
+                    fieldLabel: '查询',
+                    labelWidth: 50,
+                    width: 150,
+                    labelAlign: 'right',
+                    listeners: {
+                        change: function (_this, n, o) {
+                            commonParams.group.name = n;
+                            researchGroupTreeStore.reload({
+                                params: commonParams.group, callback: function () {
+                                    if (n) {
+                                        researchGroupTree.expandAll();
+                                    }
+                                }
+                            });
+                        }
+                    }
+                }, {
+                    xtype: 'checkbox',
+                    fieldLabel: '包含下级',
+                    labelWidth: 70,
+                    labelAlign: 'right',
+                    value: !!commonParams.research.includeDownLevel,
+                    listeners: {
+                        change: function (_this, n, o) {
+                            commonParams.research.includeDownLevel = n;
+                            customResearchStore.reload({params: commonParams.research});
+                        }
+                    }
+                }],
             listeners: {
                 itemcontextmenu: function (_this, record, item, index, e) {
                     e.preventDefault();
@@ -78,9 +125,8 @@
                 },
                 itemclick: function (_this, record, item, index, e, eOpts) {
                     __RESEARCH_GROUP_ID = record.get('id');
-                    if (__RESEARCH_GROUP_ID != 0) {
-                        customResearchStore.load({params: {id: record.get('id')}})
-                    }
+                    commonParams.research.id = __RESEARCH_GROUP_ID;
+                    customResearchStore.load({params: commonParams.research});
                 }
             }
         });
@@ -131,6 +177,7 @@
                                 var parent = selection.parentNode;
                                 Ext.researchGroupContextMenuWin.init(parent, selection, function (model) {
                                     selection.set('name', model.name);
+                                    selection.set('text', model.name);
                                 });
                             }
                         }
@@ -194,7 +241,10 @@
             },
             autoLoad: false
         });
-
+// 重新加载参数
+        customResearchStore.on('beforeload', function (s) {
+            s.getProxy().extraParams = commonParams.research;
+        });
 //        自定义查询表格
         var customResearchGrid = new Ext.grid.Panel({
             width: '80%',
@@ -244,22 +294,43 @@
                     flex: 1
                 }
             ],
-            tbar: ['自定义查询', '->',
-                {
-                    xtype: 'button',
-                    text: '新建模板',
-                    handler: function () {
-//                        显示新建模板页面
-                        if (!__RESEARCH_GROUP_ID) {
-                            Ext.Msg.alert('提示', '请选择添加到的自定义查询分组');
-                            return;
-                        }
-                        Ext.customResearchAddWin.init(__RESEARCH_GROUP_ID, null, function (model) {
-                            customResearchStore.load({params: {id: __RESEARCH_GROUP_ID}});
-                        });
+            tbar: [{
+                xtype: 'textfield',
+//                fieldLabel: '搜索',
+                labelWidth: 50,
+                width: 150,
+                labelAlign: 'right',
+                listeners: {
+                    change: function (_this, n, o) {
+                        commonParams.research.name = n;
                     }
                 }
-            ],
+            }, {
+                xtype: 'button',
+                text: '搜索',
+                handler: function () {
+                    customResearchStore.reload({params: commonParams.research});
+                }
+            }, '->', {
+                xtype: 'button',
+                text: '新建模板',
+                handler: function () {
+//                        显示新建模板页面
+                    if (!__RESEARCH_GROUP_ID) {
+                        Ext.Msg.alert('提示', '请选择添加到的自定义查询分组');
+                        return;
+                    }
+                    Ext.customResearchAddWin.init(__RESEARCH_GROUP_ID, null, function (model) {
+                        commonParams.research.id = __RESEARCH_GROUP_ID;
+                        customResearchStore.load({params: commonParams.research});
+                    });
+                }
+            }],
+            bbar: {
+                xtype: 'pagingtoolbar',
+                store: customResearchStore,
+                displayInfo: true
+            },
             listeners: {
                 itemcontextmenu: function (_this, record, item, index, e) {
                     e.preventDefault();
@@ -284,7 +355,7 @@
                     handler: function () {
                         var selection = customResearchGrid.getSelectionModel().getSelection()[0];
                         Ext.customResearchAddWin.init(selection.get('researchGroupId'), selection, function (model) {
-                            customResearchStore.load({params: {id: __RESEARCH_GROUP_ID}});
+                            customResearchStore.load({params: commonParams.research});
                         });
                     }
                 }, {
@@ -337,6 +408,7 @@
                         }
                         this.on('reDR', function (obj) {
                             if (obj) {
+                                obj.height = obj.height - 40;
                                 this.updateBox(obj);
                             }
                         });

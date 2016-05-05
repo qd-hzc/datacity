@@ -39,6 +39,7 @@ public class AnalysisService {
 
         HashMap<String, Object> time = new HashMap<>();
         time.put("dataName", "时间");
+        time.put("text", "时间");
         time.put("dataType", Constant.MetadataType.TIME);
         time.put("dataValue", 0);
         time.put("allowDrag", true);

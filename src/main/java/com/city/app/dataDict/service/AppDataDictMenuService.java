@@ -396,20 +396,23 @@ public class AppDataDictMenuService {
             result = new ArrayList<>();
             Map<String, Object> info = null;
             for (DataSetData tf : tfs) {
+                Integer tfId = Integer.parseInt(tf.getDataValue());
+                String value = null;
+                //获取数值
                 for (ReportData data : datas) {
-                    Integer tfId = Integer.parseInt(tf.getDataValue());
                     if (data.getReportDataId().getTimeFrame().equals(tfId)) {//同一时间框架
-                        info = new HashMap<>();
-                        //若有备注名,使用备注!
-                        TimeFrame timeFrame = timeFrameDao.queryById(tfId);
-                        String comments = timeFrame.getComments();
-                        info.put("name", StringUtil.trimNotEmpty(comments) ? comments : tf.getDataName());
-                        info.put("id", tfId);
-                        info.put("value", data.getItemValue());
-                        result.add(info);
+                        value = data.getItemValue();
                         break;
                     }
                 }
+                info = new HashMap<>();
+                //若有备注名,使用备注!
+                TimeFrame timeFrame = timeFrameDao.queryById(tfId);
+                String comments = timeFrame.getComments();
+                info.put("name", StringUtil.trimNotEmpty(comments) ? comments : tf.getDataName());
+                info.put("id", tfId);
+                info.put("value", value);
+                result.add(info);
             }
         }
         return result;

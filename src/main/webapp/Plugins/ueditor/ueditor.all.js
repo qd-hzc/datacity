@@ -1,7 +1,7 @@
 /*!
  * UEditor
  * version: ueditor
- * build: Tue Apr 26 2016 17:55:25 GMT+0800 (中国标准时间)
+ * build: Tue May 03 2016 17:28:59 GMT+0800 (中国标准时间)
  */
 
 (function(){
@@ -18686,10 +18686,17 @@ UE.plugins['video'] = function (){
                 }
             }
 
+            var esiCell = this.table.rows[1].cells[0];
+            if (!esiCell) {
+                esiCell = this.table.rows[2].cells[0];
+            }
             //首行直接插入,无需考虑部分单元格被rowspan的情况
             if (rowIndex == 0 || rowIndex == this.rowsNum) {
                 for (var colIndex = 0; colIndex < numCols; colIndex++) {
                     cell = this.cloneCellWithoutPropertiesHzc(sourceCell, true);
+                    if (colIndex == 0 && esiCell) {
+                        cell.setAttribute('class', esiCell.getAttribute('class'));
+                    }
                     this.setCellContent(cell);
                     cell.getAttribute('vAlign') && cell.setAttribute('vAlign', cell.getAttribute('vAlign'));
                     row.appendChild(cell);
@@ -18707,6 +18714,9 @@ UE.plugins['video'] = function (){
                     } else {
                         cell = this.cloneCellWithoutPropertiesHzc(sourceCell, true);
                         this.setCellContent(cell);
+                        if (colIndex == 0 && esiCell) {
+                            cell.setAttribute('class', esiCell.getAttribute('class'));
+                        }
                         row.appendChild(cell);
                     }
                     if (!isInsertTitle) replaceTdToTh(colIndex, cell, row);
@@ -18814,7 +18824,12 @@ UE.plugins['video'] = function (){
                     cell = this.cloneCellWithoutPropertiesHzc(sourceCell, true); //tableRow.insertCell(colIndex == 0 ? colIndex : tableRow.cells.length);
                     this.setCellContent(cell);
                     cell.setAttribute('vAlign', cell.getAttribute('vAlign'));
-                    preCell && cell.setAttribute('width', preCell.getAttribute('width'));
+                    var esiCell = this.table.rows[1].cells[0];
+                    esiCell = esiCell ? esiCell : this.table.rows[2].cells[0];
+                    if (esiCell && colIndex == 0) {
+                        cell.setAttribute('class', esiCell.getAttribute('class'));
+                    }
+                    cell.setAttribute('width', 10);
                     if (!colIndex) {
                         tableRow.insertBefore(cell, tableRow.cells[0]);
                     } else {
@@ -18836,7 +18851,7 @@ UE.plugins['video'] = function (){
                         cell = this.cloneCellWithoutPropertiesHzc(sourceCell, true);//tableRow.insertCell(cellInfo.cellIndex);
                         this.setCellContent(cell);
                         cell.setAttribute('vAlign', cell.getAttribute('vAlign'));
-                        preCell && cell.setAttribute('width', preCell.getAttribute('width'));
+                        cell.setAttribute('width', 10);
                         //防止IE下报错
                         preCell ? tableRow.insertBefore(cell, preCell) : tableRow.appendChild(cell);
                     }

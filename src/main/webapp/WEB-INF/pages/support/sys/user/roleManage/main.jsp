@@ -4,10 +4,10 @@
   <title>角色权限管理</title>
   <style type="text/css">
     .prev {
-      background-image:url(<%=request.getContextPath()%>/Plugins/extjs/resources/icons/prev.gif) !important;
+      background-image:url(<%=request.getContextPath()%>/Plugins/extjs/resources/icons/arrow_left.png) !important;
     }
     .next {
-      background-image:url(<%=request.getContextPath()%>/Plugins/extjs/resources/icons/next.gif) !important;
+      background-image:url(<%=request.getContextPath()%>/Plugins/extjs/resources/icons/arrow_right.png) !important;
     }
 
   </style>

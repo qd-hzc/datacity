@@ -105,6 +105,7 @@ function showAddTimeFrameWindow(record, root, callback) {
     function getSimpleObj(obj) {
         return {
             dataName: obj.dataName,
+            text: obj.dataName,
             dataValue: obj.dataValue,
             dataType: obj.dataType,
             dataInfo1: obj.dataInfo1,

@@ -29,9 +29,9 @@
             }
             if (node != null) {
                 var win = Ext.addModuleWin.init(node.data.id, function (data) {
-                    if (node.lastChild){
+                    if (node.lastChild) {
                         data.moduleSort = node.lastChild.data.index + 1;
-                    }else{
+                    } else {
                         data.moduleSort = 0
                     }
                     Ext.Ajax.request({
@@ -81,6 +81,7 @@
                 Ext.Msg.alert('注意', '请选择要删除的模块');
             }
         }
+
         //model
         var moduleModel = createModel('ModuleModel', function () {
             Ext.define('ModuleModel', {
@@ -92,12 +93,15 @@
                     name: 'moduleName',
                     type: 'string'
                 }, {
+                    name: 'text',
+                    type: 'string'
+                }, {
                     name: 'moduleShortName',
                     type: 'string'
                 }, {
                     name: 'moduleType',
                     type: 'string'
-                },{
+                }, {
                     name: 'moduleIndex',
                     type: 'string'
                 }, {
@@ -223,24 +227,24 @@
                         moduleStore.sync();
                     }
                     /*drop: function (nodeView, dragEvent, overModel, dropPosition, eOpts) {
-                        var node = dragEvent.records[0];
-                        var isLeaf = !overModel.hasChildNodes();
-                        var isRoot = overModel.isRoot();
-                        var bnodes = null;
-                        var pId = null;
-                        if (isLeaf) {
-                            bnodes = overModel.parentNode.childNodes;
-                            pId = overModel.parentNode.getId();
-                        } else {
-                            bnodes = overModel.childNodes;
-                            pId = overModel.getId();
-                        }
-                        node.set('modulePid', pId);
-                        Ext.Array.each(bnodes, function (cnode) {
-                            cnode.set('moduleSort', cnode.data.index);
-                        });
-                        moduleStore.sync();
-                    }*/
+                     var node = dragEvent.records[0];
+                     var isLeaf = !overModel.hasChildNodes();
+                     var isRoot = overModel.isRoot();
+                     var bnodes = null;
+                     var pId = null;
+                     if (isLeaf) {
+                     bnodes = overModel.parentNode.childNodes;
+                     pId = overModel.parentNode.getId();
+                     } else {
+                     bnodes = overModel.childNodes;
+                     pId = overModel.getId();
+                     }
+                     node.set('modulePid', pId);
+                     Ext.Array.each(bnodes, function (cnode) {
+                     cnode.set('moduleSort', cnode.data.index);
+                     });
+                     moduleStore.sync();
+                     }*/
                 }
             },
             tbar: [
@@ -321,18 +325,19 @@
         //模块修改表单
         var moduleForm = new Ext.form.Panel({
             region: 'center',
+            frame: false,
+            autoWidth: true,
             height: '100%',
             layout: {
                 type: 'vbox',
                 align: 'right'
             },
-            bodyPadding: '5 5 0',
-            width: '80%',
+            width: '100%',
             items: [{
                 xtype: 'fieldset',
-                flex: 2,
                 width: '100%',
-                height: 200,
+                margin: '10 10 0 10',
+                padding: '0 0 20 0',
                 title: '模块信息', // title or checkboxToggle creates fieldset header
                 defaults: {
                     border: false,
@@ -360,7 +365,7 @@
                         fieldLabel: '模块简称',
                         name: 'moduleShortName'
                     }]
-                },{
+                }, {
                     xtype: 'panel',
                     defaults: {
                         columnWidth: 1 / 2,
@@ -368,35 +373,35 @@
                         labelAlign: 'right',
                         labelWidth: 80
                     },
-                    items: [moduleStateGroup,{
+                    items: [moduleStateGroup, {
                         xtype: 'combobox',
                         name: 'moduleType',
                         fieldLabel: '模块类型',
                         displayField: 'text',
                         valueField: 'value',
                         store: new Ext.data.Store({
-                            fields: ['text','value'],
+                            fields: ['text', 'value'],
                             data: [{
-                                text:'系统',
-                                value:MODULE_TYPE.SYSMOD
-                            },{
-                                text:'模块',
-                                value:MODULE_TYPE.MODMOD
-                            },{
-                                text:'功能',
-                                value:MODULE_TYPE.FUNMOD
-                            },{
-                                text:'操作',
-                                value:MODULE_TYPE.OPMOD
-                            },{
+                                text: '系统',
+                                value: MODULE_TYPE.SYSMOD
+                            }, {
+                                text: '模块',
+                                value: MODULE_TYPE.MODMOD
+                            }, {
+                                text: '功能',
+                                value: MODULE_TYPE.FUNMOD
+                            }, {
+                                text: '操作',
+                                value: MODULE_TYPE.OPMOD
+                            }, {
                                 text: '目录',
-                                value:MODULE_TYPE.DIRMOD
+                                value: MODULE_TYPE.DIRMOD
                             }]
                         }),
                         value: MODULE_TYPE.MODMOD,
                         columnWidth: 0.5,
                     }]
-                },{
+                }, {
                     xtype: 'panel',
                     defaults: {
                         xtype: 'textfield',
@@ -449,37 +454,48 @@
                     }]
                 }]
             }, {
-                xtype: 'button',
-                width: 100,
-                margin: '0 0 10',
-                text: '保存',
-                handler: function () {
-                    var nodeModel = moduleTree.getSelectionModel();
-                    var nodes = nodeModel.getSelection();
-                    var node = null;
-                    if (nodes != null && nodes.length > 0) {
-                        var datas = moduleForm.getValues();
-                        node = nodes[0];
-                        if (node.id != 0) {
-                            node.set('moduleName', datas.moduleName);
-                            node.set('moduleShortName', datas.moduleShortName);
-                            node.set("moduleState",datas.moduleState);
-                            node.set("moduleType",datas.moduleType);
+                xtype: 'panel',
+                frame: false,
+                border: false,
+                padding: '0 10 0 0',
+                items: [{
+                    xtype: 'displayfield',
+                    border: false,
+                    columnWidth: .92
+                }, {
+                    xtype: 'button',
+                    width: 100,
+                    columnWith: .08,
+                    text: '保存',
+                    handler: function () {
+                        var nodeModel = moduleTree.getSelectionModel();
+                        var nodes = nodeModel.getSelection();
+                        var node = null;
+                        if (nodes != null && nodes.length > 0) {
+                            var datas = moduleForm.getValues();
+                            node = nodes[0];
+                            if (node.id != 0) {
+                                node.set('moduleName', datas.moduleName);
+                                node.set('moduleShortName', datas.moduleShortName);
+                                node.set("moduleState", datas.moduleState);
+                                node.set("moduleType", datas.moduleType);
 
-                            node.set('moduleIndex', datas.moduleIndex);
-                            node.set("moduleConfig",datas.moduleConfig);
-                            node.set("moduleParams",datas.moduleParams);
-                            node.set("moduleDesc",datas.moduleDesc);
+                                node.set('moduleIndex', datas.moduleIndex);
+                                node.set("moduleConfig", datas.moduleConfig);
+                                node.set("moduleParams", datas.moduleParams);
+                                node.set("moduleDesc", datas.moduleDesc);
 
-                            node.set("moduleIcon",datas.moduleIcon);
-                            node.set("modulePic",datas.modulePic);
-                            node.set("moduleComment",datas.moduleComment);
-                            moduleStore.sync();
-                        } else {
-                            Ext.Msg.alert('注意', '该节点不能修改');
+                                node.set("moduleIcon", datas.moduleIcon);
+                                node.set("modulePic", datas.modulePic);
+                                node.set("moduleComment", datas.moduleComment);
+                                moduleStore.sync();
+                            } else {
+                                Ext.Msg.alert('注意', '该节点不能修改');
+                            }
                         }
                     }
                 }
+                ]
             }]
         });
         var modulePanel = new Ext.panel.Panel({
@@ -509,8 +525,8 @@
                     if (this.hasListener('reDR'))
                         this.un('reDR');
                     this.on('reDR', function (Obj) {
-                        if (Obj){
-                            Obj.height = Obj.height-40;
+                        if (Obj) {
+                            Obj.height = Obj.height - 40;
                             this.updateBox(Obj)
                         }
 

@@ -60,7 +60,7 @@ Ext.addNodeInfoWin.init = function (node, fn) {
             labelAlign: 'right',
             displayField: 'depName',
             valueField: 'id',
-            allowBlank: false,
+            allowBlank: rptDesignType == RPT_DESIGN_TYPE.SYNTHESIS || (node ? node.get('dataType') != METADATA_TYPE.ITEM : true),
             store: Ext.create('Ext.data.Store', {
                 fields: ['id', 'depName'],
                 proxy: {
@@ -116,6 +116,7 @@ Ext.addNodeInfoWin.init = function (node, fn) {
                     }
                     if (node) {
                         node.set('dataName', datas.dataName);
+                        node.set('text', datas.dataName);
                         node.set('isRealNode', datas.isRealNode);
                         node.set('dataInfo1', datas.dataInfo1);
                         node.set('dataInfo2', datas.dataInfo2);

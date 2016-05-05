@@ -78,6 +78,8 @@ public class Module {
      */
     private Integer moduleState;
 
+    private String text;
+
     @Id
     @GeneratedValue(generator = "na")
     @GenericGenerator(name = "na", strategy = "native", parameters = {@Parameter(name = "sequence", value = "MODULE_SEQ")})
@@ -141,6 +143,7 @@ public class Module {
 
     public void setModuleName(String moduleName) {
         this.moduleName = moduleName;
+        this.text = moduleName;
     }
 
     @Column(name = "MODULE_PARAMS")
@@ -205,6 +208,11 @@ public class Module {
 
     public void setModuleState(Integer moduleState) {
         this.moduleState = moduleState;
+    }
+
+    @Transient
+    public String getText() {
+        return this.text;
     }
 
     @Override
