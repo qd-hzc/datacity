@@ -207,7 +207,7 @@
         // group tree
         var rptGroupTree = new Ext.tree.Panel({
             region: 'west',
-            width: 300,
+            width: 250,
             //flex: 1,
             height: '100%',
             //rootVisible: false,
@@ -215,7 +215,7 @@
             store: rptGroupStore,
             tbar: [' ',{
                 xtype: 'textfield',
-                width: 150,
+                width: 120,
                 emptyText: '输入名称查询',
                 triggerCls: 'x-form-clear-trigger',
                 onTriggerClick: function () {
@@ -231,6 +231,7 @@
                 xtype: 'checkbox',
                 fieldLabel: '包含下级',
                 labelWidth: 60,
+                width: 80,
                 labelAlign: 'right',
                 checked: true,
                 listeners: {
@@ -349,7 +350,7 @@
         var rptInfoGrid = new Ext.grid.Panel({
             region: 'center',
             //width: '100%',//
-            //flex: 3,
+            flex: 1,
             store: rptInfoStore,
             selType: 'checkboxmodel',
             features: [{
@@ -706,7 +707,7 @@
             }
         });
         //
-        new Ext.panel.Panel({
+        new Ext.resizablePanel({
             width: '100%',
             height: '100%',
             layout: 'border',

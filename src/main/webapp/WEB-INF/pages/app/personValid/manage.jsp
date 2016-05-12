@@ -21,24 +21,24 @@
 <div id="app_staffValid_container"></div>
 <script>
     var personContextPath = '<%=request.getContextPath()%>/app/personValid';
-    var GLOBAL_PATH='<%=request.getContextPath()%>';//项目路径
+    var GLOBAL_PATH = '<%=request.getContextPath()%>';//项目路径
     Ext.onReady(function () {
-        var personParams={
+        var personParams = {
             name: '',
-            validCode:'',
-            depId:'',
-            includeDownLevel:false
+            validCode: '',
+            depId: '',
+            includeDownLevel: false
 
         };
         //表格
         var personStore = new Ext.data.Store({
-            fields: ['id', 'name', 'phone', 'email', 'department', 'duty', 'comments', 'validCode','role'],
+            fields: ['id', 'name', 'phone', 'email', 'department', 'duty', 'comments', 'validCode', 'role'],
             proxy: {
                 type: 'ajax',
                 api: {
                     read: personContextPath + '/queryStaffs',
-                    update : personContextPath + '/saveStaff',
-                    destroy:personContextPath+'/deleteStaffs'
+                    update: personContextPath + '/saveStaff',
+                    destroy: personContextPath + '/deleteStaffs'
                 }
             },
             autoLoad: true
@@ -55,12 +55,27 @@
         var personMenu = new Ext.menu.Menu({
             renderTo: Ext.getBody(),
             items: [{
-                text:'删除人员',
+                text: '修改人员',
+                iconCls: 'Pageedit',
+                handler: function (_this, n, o) {
+                    var selModel = personGrid.getSelectionModel();
+                    var sels = selModel.getSelection();
+                    if (sels.length == 1) {
+                        Ext.personValid.EditPersonWin.init(sels[0], function () {
+                            personStore.reload({params: personParams});
+                        });
+                    } else {
+                        Ext.Msg.alert("提示", "请选择一位人员");
+                        return;
+                    }
+                }
+            }, {
+                text: '删除人员',
                 iconCls: 'Delete',
                 handler: function (_this, n, o) {
                     var selModel = personGrid.getSelectionModel();
                     var sels = selModel.getSelection();
-                    if (sels.length >0) {
+                    if (sels.length > 0) {
                         Ext.Msg.confirm('警告', '确定要删除么?', function (btn) {
                             if (btn == 'yes') {
                                 personStore.remove(sels);
@@ -86,21 +101,8 @@
 
                             }
                         });
-                    }else{
-                        Ext.Msg.alert("提示","请选择一位人员");
-                        return;
-                    }
-                }
-            }, {
-                text:'修改人员',
-                iconCls: 'Pageedit',
-                handler: function (_this, n, o) {
-                    var selModel = personGrid.getSelectionModel();
-                    var sels = selModel.getSelection();
-                    if (sels.length ==1) {
-                        Ext.personValid.EditPersonWin.init(sels[0], function(){ personStore.reload({params: personParams});});
-                    }else{
-                        Ext.Msg.alert("提示","请选择一位人员");
+                    } else {
+                        Ext.Msg.alert("提示", "请选择一位人员");
                         return;
                     }
                 }
@@ -152,7 +154,7 @@
                     }
                     return '';
                 }
-            },{
+            }, {
                 text: '说明',
                 dataIndex: 'comments',
                 flex: 1
@@ -195,41 +197,41 @@
                         }
                     }
                 }, {
-                xtype: 'triggertext',
+                    xtype: 'triggertext',
                     fieldLabel: '人员情况',
                     labelWidth: 60,
                     labelAlign: 'right',
-                handler: function (_this, n, o) {
-                    personParams.name=n;
-                }
-            },{
+                    handler: function (_this, n, o) {
+                        personParams.name = n;
+                    }
+                }, {
                     xtype: 'button',
                     text: '查询',
                     iconCls: 'Find',
                     handler: function () {
                         personStore.reload({params: personParams});
                     }
-                },'->', {
-                text:'添加人员',
-                iconCls: 'Add',
-                xtype: 'button',
-                handler: addPerson
-            },{
-                     xtype: 'button',
+                }, '->', {
+                    text: '添加人员',
+                    iconCls: 'Add',
+                    xtype: 'button',
+                    handler: addPerson
+                }, {
+                    xtype: 'button',
                     text: '导出人员',
-                    handler:function(){
-                        var sels=personGrid.getSelectionModel().getSelection();
-                       if(sels.length==0){
-                           var staffs="";
-                           for(var i=0;i<personStore.getData().items.length;i++){
-                               if(i==personStore.getData().items.length-1){
-                                   staffs+=personStore.getData().items[i].getData().id;
-                               }else{
-                                   staffs+=personStore.getData().items[i].getData().id+",";
-                               }
-                           }
-                           location.href=GLOBAL_PATH + '/app/staffValid/excel/batchExportToExcel?staffs='+staffs;
-                           //发送请求,下载文件
+                    handler: function () {
+                        var sels = personGrid.getSelectionModel().getSelection();
+                        if (sels.length == 0) {
+                            var staffs = "";
+                            for (var i = 0; i < personStore.getData().items.length; i++) {
+                                if (i == personStore.getData().items.length - 1) {
+                                    staffs += personStore.getData().items[i].getData().id;
+                                } else {
+                                    staffs += personStore.getData().items[i].getData().id + ",";
+                                }
+                            }
+                            location.href = GLOBAL_PATH + '/app/staffValid/excel/batchExportToExcel?staffs=' + staffs;
+                            //发送请求,下载文件
 //                           Ext.Ajax.request({
 //                               url: GLOBAL_PATH + '/app/staffValid/excel/batchExportToExcel',
 //                               params:{
@@ -242,19 +244,19 @@
 //                                   Ext.Msg.alert("失败","失败");
 //                               }
 //                           })
-                        }else{
-                            var staffs="";
-                            for(var i=0;i<sels.length;i++){
-                                if(i==sels.length-1){
-                                    staffs+=sels[i].getData().id;
-                                }else{
-                                    staffs+=sels[i].getData().id+",";
+                        } else {
+                            var staffs = "";
+                            for (var i = 0; i < sels.length; i++) {
+                                if (i == sels.length - 1) {
+                                    staffs += sels[i].getData().id;
+                                } else {
+                                    staffs += sels[i].getData().id + ",";
                                 }
 
 
                             }
-                            location.href=GLOBAL_PATH + '/app/staffValid/excel/batchExportToExcel?staffs='+staffs;
-                           //发送请求,下载文件
+                            location.href = GLOBAL_PATH + '/app/staffValid/excel/batchExportToExcel?staffs=' + staffs;
+                            //发送请求,下载文件
 //                           Ext.Ajax.request({
 //                               url: GLOBAL_PATH + '/app/staffValid/excel/batchExportToExcel',
 //                               params:{
@@ -271,8 +273,8 @@
                         }
 
                     }
-        }],
-            listeners:{
+                }],
+            listeners: {
                 containercontextmenu: function (_this, e) {
                     e.preventDefault();
                     personMenu.hide();
@@ -287,7 +289,7 @@
                     personContainerMenu.hide();
                     personMenu.hide();
                 },
-                containerclick: function ( _this, e, eOpts) {
+                containerclick: function (_this, e, eOpts) {
                     personContainerMenu.hide();
                     personMenu.hide();
                 }
@@ -296,7 +298,9 @@
         //添加人员
         function addPerson() {
 
-            Ext.personValid.EditPersonWin.init(null,function(){ personStore.reload({params: personParams});});
+            Ext.personValid.EditPersonWin.init(null, function () {
+                personStore.reload({params: personParams});
+            });
 
 
         }

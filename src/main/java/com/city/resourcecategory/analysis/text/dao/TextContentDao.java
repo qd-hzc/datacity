@@ -5,6 +5,7 @@ import com.city.common.pojo.Page;
 import com.city.common.util.ListUtil;
 import com.city.common.util.StringUtil;
 import com.city.resourcecategory.analysis.text.entity.TextContent;
+import com.city.resourcecategory.analysis.text.entity.TextTheme;
 import com.city.resourcecategory.analysis.text.pojo.TimeSpan;
 import com.city.support.dataSet.query.pojo.TimePojo;
 import com.city.support.dataSet.query.pojo.TimeRangePojo;
@@ -35,7 +36,7 @@ public class TextContentDao extends BaseDao<TextContent> {
         q.executeUpdate();
     }
 
-    public List<TextContent> queryByThemeId(User user,Integer themeId, String contentSortType, String name, Integer status) {
+    public List<TextContent> queryByThemeId(User user, Integer themeId, String contentSortType, String name, Integer status) {
         StringBuilder sb = new StringBuilder("from TextContent where 1=1");
         if (name != null && !"".equals(name)) {
             sb.append(" and( name like '%").append(name).append("%' or infos like '%").append(name).append("%')");
@@ -51,7 +52,7 @@ public class TextContentDao extends BaseDao<TextContent> {
         }
         sb.append(" order by ");
         if (contentSortType != null && !"".equals(contentSortType)) {
-            sb.append(contentSortType);
+            sb.append(contentSortType).append(" desc");
         } else {
             sb.append("sortIndex");
         }
@@ -164,5 +165,16 @@ public class TextContentDao extends BaseDao<TextContent> {
     public List<TextContent> queryByIds(String ids) {
         StringBuilder sb = new StringBuilder("from TextContent where 1=1 and id in (").append(ids).append(") order by sortIndex");
         return queryByHQL(sb.toString());
+    }
+
+    public List<TextContent> queryByName(String name, Integer themeId) {
+        String hql = "from TextContent t where t.name ='" + name + "' and t.theme.id = '" + themeId + "'";
+        return super.queryByHQL(hql);
+    }
+
+    /**/
+    public List<TextContent> queryByNameAndId(String name, Integer themeId, Integer id) {
+        String hql = "from TextContent t where t.name ='" + name + "' and t.theme.id = '" + themeId + "' and t.id <>" + id;
+        return super.queryByHQL(hql);
     }
 }

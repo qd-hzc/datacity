@@ -96,7 +96,7 @@ Ext.addItemGroupWin.init = function (isAdd, node) {
                             }
                         },
                         failure: function (form, action) {
-                            Ext.Msg.alert('失败', "保存失败");
+                            Ext.Msg.alert('失败', action.result.msg);
                         }
                     })
                 } else {

@@ -105,4 +105,9 @@ public class TimeFrameDao extends BaseDao<TimeFrame> {
     public List<TimeFrame> selectByIds(String ids) {
         return queryByHQL("from TimeFrame where id in(" + ids + ")");
     }
+
+    public List<TimeFrame> getByNameAndId(String name, Integer id) {
+        String hql = "from TimeFrame tf where tf.name ='" + name + "' and tf.id <>" + id;
+        return super.queryByHQL(hql);
+    }
 }

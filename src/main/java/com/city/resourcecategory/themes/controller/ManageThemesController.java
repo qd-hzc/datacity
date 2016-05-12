@@ -8,7 +8,6 @@ import com.city.resourcecategory.themes.pojo.EsiTheme;
 import com.city.resourcecategory.themes.service.ManageThemesQueryService;
 import com.city.resourcecategory.themes.service.ManageThemesService;
 import com.city.resourcecategory.themes.util.FormatThemeUtil;
-import com.city.support.manage.pojo.DragAndDropVO;
 import com.city.support.sys.user.entity.Role;
 import com.city.support.sys.user.service.RoleManagerService;
 import com.google.gson.Gson;
@@ -81,8 +80,21 @@ public class ManageThemesController extends BaseController {
     @RequestMapping("/saveOrUpdateManageTheme")
     @ResponseBody
     public Object saveOrUpdateManageTheme(ThemePage page) {
-        ThemePage themePage = themesService.saveOrUpdateManageTheme(page);
-        return genSuccessMsg(themePage, "请求成功", null);
+        String name = page.getName().trim();
+        if (StringUtils.isEmpty(name)) {
+            return genFaultMsg("请求失败", "名称不能为空", null);
+        }
+        page.setName(name);
+        Integer parentId = page.getParentId();
+//        判断是否名称重复
+        List<ThemePage> list = themesService.getThemePagesByNameAndPId(name, parentId);
+        if (list.size()==0){
+            ThemePage themePage = themesService.saveOrUpdateManageTheme(page);
+            return genSuccessMsg(themePage, "请求成功", null);
+
+        }else {
+            return  genFaultMsg("请求失败", "名称重复", null);
+        }
     }
 
     /**

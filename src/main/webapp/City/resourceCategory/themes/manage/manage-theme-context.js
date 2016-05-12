@@ -63,7 +63,7 @@ Ext.manageThemeContextMenuWin.init = function (parentId, record, fn) {
                                 }
                             },
                             failure: function (form, action) {
-                                Ext.Msg.alert('提示', '系统繁忙，请稍候再试');
+                                Ext.Msg.alert('提示', action.result.msg);
                             }
                         });
                     }

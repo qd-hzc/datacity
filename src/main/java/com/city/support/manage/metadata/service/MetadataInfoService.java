@@ -4,6 +4,7 @@ import com.city.common.event.EsiEvent;
 import com.city.common.event.listener.EsiListenerAdapter;
 import com.city.common.event.watcher.EsiEventWatched;
 import com.city.common.event.watcher.MetadataWatched;
+import com.city.common.pojo.Constant;
 import com.city.common.pojo.Page;
 import com.city.common.util.ConvertUtil;
 import com.city.support.manage.metadata.dao.MetadataInfoDao;
@@ -79,7 +80,7 @@ public class MetadataInfoService {
      */
     public List<Map<String, Object>> getAllYears(Integer sortType,Integer beginItem){
         List<Map<String,Object>> result=new ArrayList<>();
-        List<MetadataInfo> years = metadataInfoDao.getByType(MetadataType.TIME_YEAR);
+        List<MetadataInfo> years = metadataInfoDao.getByType(Constant.systemConfigPojo.getYearType());
         if(years!=null&&years.size()>0){
             Map<String,Object> yearStr=null;
             if(sortType!=null&&sortType<0){//倒叙排列
@@ -126,15 +127,32 @@ public class MetadataInfoService {
      * 修改系统元数据
      * @param metadataInfoList
      */
-    public void update(List<MetadataInfo> metadataInfoList) {
+    public int update(List<MetadataInfo> metadataInfoList) {
+        int integer = 0;
+        boolean nameRepeat = false;
         ConvertUtil<MetadataInfo> convertUtil = new ConvertUtil<>();
         MetadataInfo mf =null;
         for(MetadataInfo metadataInfo:metadataInfoList){
             mf = metadataInfoDao.queryById(metadataInfo.getId());
-            convertUtil.replication(metadataInfo,mf,MetadataInfo.class.getName());
-            metadataInfoDao.update(mf);
+            List<MetadataInfo> metadataInfos = null;
+            if(metadataInfo.getName()!=null) {
+                metadataInfos = metadataInfoDao.getByTypeAndName(metadataInfo.getType(), metadataInfo.getName());
+            }
+            if(metadataInfos==null||metadataInfos.size()==0) {
+                convertUtil.replication(metadataInfo, mf, MetadataInfo.class.getName());
+                metadataInfoDao.update(mf);
+                integer++;
+            }else{
+                nameRepeat = true;
+            }
         }
         metadataInfoDao.flush();
+        if(integer==0&&nameRepeat){
+            return Constant.RequestResult.EXIST;
+        }else if(integer>0){
+            return Constant.RequestResult.SUCCESS;
+        }
+        return Constant.RequestResult.FAIL;
     }
     /**
      * 删除系统元数据
@@ -177,4 +195,7 @@ public class MetadataInfoService {
         return metadataInfoDao.getByName(name);
     }
 
+    public List<MetadataInfo> getByTypeAndName(Integer type, String name) {
+        return metadataInfoDao.getByTypeAndName(type,name);
+    }
 }

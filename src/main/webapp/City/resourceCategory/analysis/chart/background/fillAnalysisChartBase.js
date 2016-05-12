@@ -110,14 +110,29 @@ Ext.fillAnalysisChartBase.init = function (fnt, groupId, record) {
                 labelWidth: 80
             },
             items: [{
-                fieldLabel: '标题',
+                fieldLabel: '标题<b style="color:red">*</b>',
                 name: 'title',
                 columnWidth: 0.5,
-                allowBlank: false
+                allowBlank: false,
+                maxLength:50,
+                validator:function(text){
+                    if(text.length && text.replace(/\s+/g, "").length<text.length){
+                        return "不允许输入空格！";
+                    }else {
+                        return true;
+                    }
+                }
             }, {
                 fieldLabel: '副标题',
                 name: 'subTitle',
-                columnWidth: 0.5
+                columnWidth: 0.5,
+                validator:function(text){
+                    if(text.length && text.replace(/\s+/g, "").length<text.length){
+                        return "不允许输入空格！";
+                    }else {
+                        return true;
+                    }
+                }
 
             }]
         }, {

@@ -38,7 +38,7 @@
                         }
                     } else if (datas == null) {
                         Ext.Msg.alert("提示", result.msg, function () {
-                            var fun = datas.callback ? datas.callback : "";
+                            var fun = result.callback ? result.callback : "";
                             eval(fun);
                         });
                     }

@@ -40,6 +40,7 @@
                 fields: [
                     {name: 'id', type: 'int'},
                     {name: 'name', type: 'string'},
+                    {name: 'text', type: 'string'},
                     {name: 'parentId', type: 'int'},
                     {name: 'roleId', type: 'int'},
                     {name: 'status', type: 'int'},

@@ -95,4 +95,19 @@ public class ResearchGroupDao extends BaseDao<ResearchGroupEntity> {
         String hql = "from ResearchGroupEntity where parentId=? order by sort";
         return queryWithParamsByHQL(hql, new Object[]{groupId});
     }
+
+    /**
+     * 返回分析报表分组
+     * <pre>
+     *     根据分组名称，查询报表分组
+     * </pre>
+     *
+     * @param name 分组名字
+     * @return
+     * @author hzc
+     * @createDate 2016-5-6
+     */
+    public List<ResearchGroupEntity> selectGroupByName(String name) {
+        return queryByHQL("from ResearchGroupEntity where name = '" + name+"'");
+    }
 }

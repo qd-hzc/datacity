@@ -249,4 +249,19 @@ public class CustomResearchManageService {
         }
         return itemGroups;
     }
+
+    /**
+     * 返回分析报表分组
+     * <pre>
+     *     根据分组名称，查询报表分组
+     * </pre>
+     *
+     * @param name 分组名字
+     * @return
+     * @author hzc
+     * @createDate 2016-5-6
+     */
+    public List<ResearchGroupEntity> getResearchGroupByName(String name) {
+        return groupDao.selectGroupByName(name);
+    }
 }

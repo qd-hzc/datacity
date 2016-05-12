@@ -35,4 +35,9 @@ public class GenRCStrUtil extends GenTableStrUtil<CustomResearchEntity> {
     protected String getTFootText() {
         return null;
     }
+
+    @Override
+    protected String getDepByItem(EsiProperty property) {
+        return property.getDataInfo2();
+    }
 }

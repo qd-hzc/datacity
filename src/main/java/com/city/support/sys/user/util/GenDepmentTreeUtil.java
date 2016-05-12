@@ -19,6 +19,7 @@ public class GenDepmentTreeUtil extends GenTreeUtil<Department> {
         result.put("depLevel",entity.getDepLevel());
         result.put("pDep",entity.getpDep());
         result.put("sort",entity.getSort());
+        result.put("text",entity.getText());
         return result;
     }
 

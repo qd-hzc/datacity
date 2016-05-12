@@ -57,15 +57,17 @@
          * 删除时间框架
          */
         function deleteTimeFrame() {
-            Ext.Msg.confirm('警告', '确定要删除么?', function (btn) {
-                if (btn == 'yes') {
-                    var sel = timeFrameGrid.getSelectionModel().getSelection();
-                    if (sel) {
+            var sel = timeFrameGrid.getSelectionModel().getSelection();
+            if (sel && sel.length) {
+                Ext.Msg.confirm('警告', '确定要删除么?', function (btn) {
+                    if (btn == 'yes') {
                         timeFrameStore.remove(sel);
                         timeFrameStore.sync();
                     }
-                }
-            });
+                });
+            } else {
+                Ext.Msg.alert('提示', '未选中时间框架');
+            }
         }
 
         //时间框架model

@@ -275,6 +275,7 @@ Ext.catRoleWin.show = function(fnt,rec){//两个参数，fnt是回调函数，re
         title : '查看角色权限信息 ',
         frame : false,
         border : false,
+        layout:'fit',
         items : [tabPanel],
         bbar : ['->',{
             text : "关闭",

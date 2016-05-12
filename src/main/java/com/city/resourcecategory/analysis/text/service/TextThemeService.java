@@ -12,9 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.Date;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by wgx on 2016/3/16.
@@ -37,7 +35,9 @@ public class TextThemeService {
      * @param datas
      * @return
      */
-    public List<TextTheme> updateTextTheme(List<TextTheme> datas,User user) {
+    public Map<String, Object> updateTextTheme(List<TextTheme> datas,User user) {
+        Map<String, Object> map = new HashMap<>();
+        boolean nameRepeat = false;
         Integer dataId = null;
         List<TextTheme> result = new ArrayList<>();
         for (TextTheme data : datas) {
@@ -47,21 +47,36 @@ public class TextThemeService {
                     data.setCreator(user.getId());
                     data.setCreateTime(new Date());
                 }
-                textThemeDao.insert(data, true);
-                result.add(data);
-            } else {
-                ConvertUtil<TextTheme> cu = new ConvertUtil<>();
-                TextTheme textTheme = textThemeDao.queryById(dataId);
-                cu.replication(data, textTheme, TextTheme.class.getName());
-                if(user!=null) {
-                    textTheme.setUpdator(user.getId());
-                    textTheme.setUpdateTime(new Date());
+                List<TextTheme> textThemeList = textThemeDao.queryByName(data.getName());
+                if(textThemeList.size()==0) {
+                    textThemeDao.insert(data, true);
+                    result.add(data);
+                }else{
+                    nameRepeat = true;
                 }
-                textThemeDao.update(textTheme, true);
-                result.add(textTheme);
+            } else {
+                List<TextTheme> textThemeList =null;
+                if(data.getName()!=null) {
+                    textThemeList = textThemeDao.queryByNameAndId(data.getName(), dataId);
+                }
+                if(textThemeList ==null||textThemeList.size()==0) {
+                    ConvertUtil<TextTheme> cu = new ConvertUtil<>();
+                    TextTheme textTheme = textThemeDao.queryById(dataId);
+                    cu.replication(data, textTheme, TextTheme.class.getName());
+                    if (user != null) {
+                        textTheme.setUpdator(user.getId());
+                        textTheme.setUpdateTime(new Date());
+                    }
+                    textThemeDao.update(textTheme, true);
+                    result.add(textTheme);
+                }else{
+                    nameRepeat = true;
+                }
             }
         }
-        return result;
+        map.put("datas", result);
+        map.put("nameRepeat", nameRepeat);
+        return map;
     }
 
     /**

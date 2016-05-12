@@ -19,11 +19,7 @@ public class RptTmpWatched extends EsiEventWatched {
     //修改报表模板前的事件
     public static final String BEFOREUPDATETMP = "beforeUpdateTmp";
     //修改前所需的参数
-    public static final String PARAMS_TMPID = "tmpId";
-
-    public static final String PARAMS_TMPPERIOD = "tmpPeriod";
-
-    public static final String PARAMS_TMPDALAY = "tmpDalay";
+    public static final String PARAMS_TMP = "tmp";
     // 用户信息
     public static final String PARAMS_USER = "user";
 }

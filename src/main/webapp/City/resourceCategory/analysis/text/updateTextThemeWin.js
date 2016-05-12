@@ -25,12 +25,21 @@ Ext.updateTextThemeWin.init = function(record,fn){
             labelWidth: 70,
             labelAlign: 'right',
             columnWidth: 0.45,
-            margin: '20 0 0 0'
+            margin: '20 0 0 0',
+            maxLength:50,
+            validator:function(text){
+                if(text.length && text.replace(/\s+/g, "").length<text.length){
+                    return "不允许输入空格！";
+                }else {
+                    return true;
+                }
+            }
         },{
             xtype: 'combobox',
             name: 'modelId',
             fieldLabel: '选择模板',
             labelWidth: 70,
+            editable: false,
             labelAlign: 'right',
             displayField: 'name',
             valueField: 'id',
@@ -49,6 +58,7 @@ Ext.updateTextThemeWin.init = function(record,fn){
             xtype: 'numberfield',
             name: 'sortIndex',
             labelWidth: 70,
+            minValue: 0,
             labelAlign: 'right',
             columnWidth: 0.45,
             margin: '20 0 0 0'
@@ -58,6 +68,7 @@ Ext.updateTextThemeWin.init = function(record,fn){
             fieldLabel: '内容排序',
             labelWidth: 70,
             labelAlign: 'right',
+            editable: false,
             displayField: 'text',
             valueField: 'value',
             store: new Ext.data.Store({

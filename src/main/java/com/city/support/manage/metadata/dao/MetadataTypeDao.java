@@ -78,4 +78,8 @@ public class MetadataTypeDao extends BaseDao<MetadataType> {
         String hql = "from MetadataType mt where mt.name like '%" + name + "%'";
         return super.queryByHQL(hql);
     }
+    public List<MetadataType> getMetadataTypeByName(String name) {
+        String hql = "from MetadataType mt where mt.name ='" + name + "'";
+        return super.queryByHQL(hql);
+    }
 }

@@ -136,10 +136,15 @@ public class ImportUtils {
         } else {
             reportDataId.setSurobjType(Constant.DEFAULT_ITEM_MENU);
         }
-        if (map.get(GenTableStrUtil.ProAttrName.DEP) != null && !"".equals(map.get(GenTableStrUtil.ProAttrName.DEP))) {
+        /*if (map.get(GenTableStrUtil.ProAttrName.DEP) != null && !"".equals(map.get(GenTableStrUtil.ProAttrName.DEP))) {
             reportDataId.setDepId((int) (double) Double.valueOf(map.get(GenTableStrUtil.ProAttrName.DEP)));
         } else {
             reportDataId.setDepId(depId);
+        }*/
+        if(depId!=null){
+            reportDataId.setDepId(depId);
+        }else{
+            reportDataId.setDepId(Constant.DEFAULT_ITEM_MENU);
         }
         if (map.get(GenTableStrUtil.ProAttrName.AREA) != null && !"".equals(map.get(GenTableStrUtil.ProAttrName.AREA))) {
             reportDataId.setAreaId((int) (double) Double.valueOf(map.get(GenTableStrUtil.ProAttrName.AREA)));

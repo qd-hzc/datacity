@@ -159,6 +159,26 @@ Ext.dataDict.EditDataDictInfoWin.init = function (menuId, record, fn) {
     var win = new Ext.dataDict.EditDataDictInfoWin({
         items: [form],
         buttons: [{
+            text: '保存并新增',
+            handler: function () {
+                if (form.isValid()) {
+                    form.submit({
+                        url: APP_DATADICT_PATH + '/saveDict',
+                        success: function (form, action) {
+                            win.close();
+                            Ext.dataDict.EditDataDictInfoWin.init(menuId, record, fn);
+                            if (fn) {
+                                fn(Ext.decode(action.result.datas));
+
+                            }
+                        },
+                        failure: function () {
+                            Ext.Msg.alert('提示', '请求发送失败!');
+                        }
+                    });
+                }
+            }
+        }, {
             text: '保存',
             handler: function () {
                 if (form.isValid()) {

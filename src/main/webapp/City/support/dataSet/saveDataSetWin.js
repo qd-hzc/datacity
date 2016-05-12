@@ -53,14 +53,14 @@ Ext.saveDataSetWin.init = function (record, fn) {
                 if (form.isValid() && (nameValue.trim().length > 0)) {
                     form.submit({
                         url: baseUrl + '/saveDataSet',
-                        success: function (form, action) {
+                        success: function () {
                             win.close();
                             if (fn) {
                                 fn();
                             }
                         },
                         failure: function (form, action) {
-                            Ext.Msg.alert('失败', '保存失败');
+                            Ext.Msg.alert('失败', action.result.msg || '请求发送失败!');
                         }
                     });
                 } else {

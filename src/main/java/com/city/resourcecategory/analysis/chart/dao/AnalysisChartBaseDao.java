@@ -22,4 +22,13 @@ public class AnalysisChartBaseDao extends BaseDao<AnalysisChartBase> {
         return queryByHQL(sb.toString());
     }
 
+    public List<AnalysisChartBase> getByNameAndId(String title, Integer groupId, Integer id) {
+        String hql = "from AnalysisChartBase t where t.title ='" + title + "' and t.groupId ='" + groupId + "' and t.id <>'" + id + "'";
+        return super.queryByHQL(hql);
+    }
+
+    public List<AnalysisChartBase> getByAllNameAndGroupId(String title, Integer groupId) {
+        String hql = "from AnalysisChartBase t where t.title ='" + title + "' and t.groupId ='" + groupId + "'";
+        return super.queryByHQL(hql);
+    }
 }

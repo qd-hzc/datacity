@@ -71,7 +71,7 @@ public class ReportInfoService {
     private SystemLogWatched systemLogWatched;
 
     @Autowired
-    public ReportInfoService(RptTmpWatched rptTmpWatched,SystemLogWatched systemLogWatched) {
+    public ReportInfoService(RptTmpWatched rptTmpWatched, SystemLogWatched systemLogWatched) {
         esiEventWatched = rptTmpWatched;
         esiEventWatched1 = systemLogWatched;
         esiEventWatched.addListener(new EsiListenerAdapter() {
@@ -83,14 +83,12 @@ public class ReportInfoService {
                     case RptTmpWatched.BEFOREDELETETMP://报表模板删除前
                         String tmpIds = (String) args.get(RptTmpWatched.PARAMS_TMPIDS);
                         user = (User) args.get(RptTmpWatched.PARAMS_USER);
-                        removeRptInfos(user,tmpIds);
+                        removeRptInfos(user, tmpIds);
                         break;
                     case RptTmpWatched.BEFOREUPDATETMP://报表模板修改前
-                        Integer tmpId = (Integer) args.get(RptTmpWatched.PARAMS_TMPID);
-                        Integer period = (Integer) args.get(RptTmpWatched.PARAMS_TMPPERIOD);
-                        Integer dalay = (Integer) args.get(RptTmpWatched.PARAMS_TMPDALAY);
+                        ReportTemplate tmp = (ReportTemplate) args.get(RptTmpWatched.PARAMS_TMP);
                         user = (User) args.get(RptTmpWatched.PARAMS_USER);
-                        updatePeriodAndDalay(user,tmpId, period, dalay);
+                        updatePeriodAndDalay(user, tmp);
                         break;
                 }
                 return true;
@@ -101,7 +99,7 @@ public class ReportInfoService {
     /**
      * 根据条件查询所有报表
      */
-    public Page getReportInfosByCondition(Page page,HttpServletRequest request, Integer groupId, boolean includeGroupChildren, LinkedList<Integer> rptTmpIds, String name, Integer depId, boolean includeDownLevel, Integer rptStatus, String periods, Integer rptType, Integer beginYear, Integer endYear) {
+    public Page getReportInfosByCondition(Page page, HttpServletRequest request, Integer groupId, boolean includeGroupChildren, LinkedList<Integer> rptTmpIds, String name, Integer depId, boolean includeDownLevel, Integer rptStatus, String periods, Integer rptType, Integer beginYear, Integer endYear) {
 
         //获取所要查询的部门id
         String depIds = null;
@@ -131,32 +129,36 @@ public class ReportInfoService {
         page.setTotal(reportInfoDao.getReportInfoCountByCondition(reportTemplateList, groupId, rptTmpIds, name, depIds, rptStatus, periods, rptType, beginYear, endYear));
         return page;
     }
+
     private void sendListener(User user, Integer operateType, ReportInfo reportInfo, String method) {
         SystemLog sysLog = null;
         sysLog = SystemLogUtils.createReportInfoLog(user, operateType, reportInfo, method);
         //添加并触发事件
         EsiEvent esiEvent = new EsiEvent();
         esiEvent.setEventName(SystemLogWatched.SYS_LOG);
-        esiEvent.getArgs().put(SystemLogWatched.SYS_LOG,sysLog);
+        esiEvent.getArgs().put(SystemLogWatched.SYS_LOG, sysLog);
         esiEventWatched1.notifyAllListener(esiEvent);
     }
-    private void sendListener(User user, Integer operateType, ReportInfo reportInfo, String method,List<ReportData> reportDataList) {
+
+    private void sendListener(User user, Integer operateType, ReportInfo reportInfo, String method, List<ReportData> reportDataList) {
         List<SystemLog> systemLogList = null;
-        systemLogList = SystemLogUtils.createReportDataLog(user, operateType, reportInfo, method,reportDataList);
+        systemLogList = SystemLogUtils.createReportDataLog(user, operateType, reportInfo, method, reportDataList);
         //添加并触发事件
         EsiEvent esiEvent = new EsiEvent();
         esiEvent.setEventName(SystemLogWatched.SYS_LOG_LIST);
-        esiEvent.getArgs().put(SystemLogWatched.SYS_LOG_LIST,systemLogList);
+        esiEvent.getArgs().put(SystemLogWatched.SYS_LOG_LIST, systemLogList);
         esiEventWatched1.notifyAllListener(esiEvent);
     }
+
     private void sendListener(User user, Integer operateType, List<ReportInfo> reportInfoList, String method) {
         List<SystemLog> sysLogList = SystemLogUtils.createReportInfoLog(user, operateType, reportInfoList, method);
         //添加并触发事件
         EsiEvent esiEvent = new EsiEvent();
         esiEvent.setEventName(SystemLogWatched.SYS_LOG_LIST);
-        esiEvent.getArgs().put(SystemLogWatched.SYS_LOG_LIST,sysLogList);
+        esiEvent.getArgs().put(SystemLogWatched.SYS_LOG_LIST, sysLogList);
         esiEventWatched1.notifyAllListener(esiEvent);
     }
+
     /**
      * 根据模板id查询
      */
@@ -196,14 +198,14 @@ public class ReportInfoService {
     /**
      * 生成当期报表
      */
-    public int createReportInfos(User user,List<ReportTemplate> reportTemplateList) {
+    public int createReportInfos(User user, List<ReportTemplate> reportTemplateList) {
         int result = ReportInfo.EXIST;
         //获取当前年月；
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH) + 1;
         try {
-            result = createRptInfo(user,reportTemplateList, year, month, true);
+            result = createRptInfo(user, reportTemplateList, year, month, true);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -211,21 +213,22 @@ public class ReportInfoService {
         }
         return result;
     }
+
     /**
      * 生成上月报表
      */
-    public int createLastMonthReportInfos(User user,List<ReportTemplate> reportTemplateList) {
+    public int createLastMonthReportInfos(User user, List<ReportTemplate> reportTemplateList) {
         int result = ReportInfo.EXIST;
         //获取当前年月；
         Calendar calendar = Calendar.getInstance();
         int year = calendar.get(Calendar.YEAR);
         int month = calendar.get(Calendar.MONTH);
-        if(month==0){
-            year -=1;
+        if (month == 0) {
+            year -= 1;
             month = 12;
         }
         try {
-            result = createRptInfo(user,reportTemplateList, year, month, true);
+            result = createRptInfo(user, reportTemplateList, year, month, true);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -233,15 +236,16 @@ public class ReportInfoService {
         }
         return result;
     }
+
     /**
      * 生成往期报表
      */
-    public int createAllReportInfos(User user,ReportTemplate reportTemplate, int year, int month) {
+    public int createAllReportInfos(User user, ReportTemplate reportTemplate, int year, int month) {
         int result = ReportInfo.EXIST;
         try {
             List<ReportTemplate> reportTemplateList = new ArrayList<ReportTemplate>();
             reportTemplateList.add(reportTemplate);
-            result = createRptInfo(user,reportTemplateList, year, month, false);
+            result = createRptInfo(user, reportTemplateList, year, month, false);
 
         } catch (Exception e) {
             e.printStackTrace();
@@ -258,7 +262,7 @@ public class ReportInfoService {
      * @param month              月
      * @return
      */
-    private int createRptInfo(User user,List<ReportTemplate> reportTemplateList, int year, int month, boolean isAuto) {
+    private int createRptInfo(User user, List<ReportTemplate> reportTemplateList, int year, int month, boolean isAuto) {
         int result = ReportInfo.SUCCESS;
         boolean styleValid = false;
         try {
@@ -301,7 +305,7 @@ public class ReportInfoService {
                         boolean isStylePeriod = getRptPeriod(year, month, beginYear, endYear, beginPeriod, endPeriod);
                         if (isStylePeriod) {
                             styleValid = true;
-                            int count = createReportInfo(user,reportTemplate, reportTemplateStyle, nowDate, year, rptmonth);
+                            int count = createReportInfo(user, reportTemplate, reportTemplateStyle, nowDate, year, rptmonth);
                             if ((count == ReportInfo.EXIST && isAuto) || count == ReportInfo.FAIL) {//生成失败
                                 result++;
                             } else if (count == ReportInfo.EXIST && !isAuto) {//生成往期报表时只有一个模板id，直接返回
@@ -312,7 +316,7 @@ public class ReportInfoService {
 
                     }
                 }
-                if(!styleValid){
+                if (!styleValid) {
                     result++;
                 }
 
@@ -327,7 +331,7 @@ public class ReportInfoService {
     /**
      * 生成单个报表
      */
-    public int createReportInfo(User user,ReportTemplate reportTemplate, ReportTemplateStyle reportTemplateStyle, String time, Integer year, Integer month) {
+    public int createReportInfo(User user, ReportTemplate reportTemplate, ReportTemplateStyle reportTemplateStyle, String time, Integer year, Integer month) {
 
         try {
             int count = reportInfoDao.getRptInfoCount(time, reportTemplate.getId());
@@ -349,7 +353,7 @@ public class ReportInfoService {
             reportInfo.setSubmitDaysDelay(reportTemplate.getSubmitDaysDelay());
             reportInfoDao.saveOrUpdate(reportInfo, true);
             // 添加触发事件
-            sendListener(user,SystemLog.INSERT,reportInfo,Thread.currentThread() .getStackTrace()[1].getMethodName());
+            sendListener(user, SystemLog.INSERT, reportInfo, Thread.currentThread().getStackTrace()[1].getMethodName());
             return ReportInfo.SUCCESS;
         } catch (Exception e) {
             e.printStackTrace();
@@ -363,13 +367,13 @@ public class ReportInfoService {
      *
      * @param tmpIds
      */
-    public void removeRptInfos(User user,String tmpIds) {
+    public void removeRptInfos(User user, String tmpIds) {
         List<ReportInfo> reportInfoList = getReportInfosByRptInfoAndTmpIds(tmpIds, null);
         // 添加触发事件
-        sendListener(user,SystemLog.DELETE,reportInfoList,Thread.currentThread() .getStackTrace()[1].getMethodName());
-        for(ReportInfo reportInfo: reportInfoList ){
+        sendListener(user, SystemLog.DELETE, reportInfoList, Thread.currentThread().getStackTrace()[1].getMethodName());
+        for (ReportInfo reportInfo : reportInfoList) {
             List<ReportData> reportDataList = reportDataDao.queryByRptId(reportInfo.getId());
-            sendListener(user,SystemLog.DELETE,reportInfo,Thread.currentThread() .getStackTrace()[1].getMethodName(),reportDataList);
+            sendListener(user, SystemLog.DELETE, reportInfo, Thread.currentThread().getStackTrace()[1].getMethodName(), reportDataList);
         }
         reportDataDao.removeRptDatasByTmpIds(tmpIds);
         reportInfoDao.removeRptInfo(tmpIds);
@@ -380,7 +384,7 @@ public class ReportInfoService {
      *
      * @param reportInfoList
      */
-    public void remove(User user,List<ReportInfo> reportInfoList, String rptTmpIds) {
+    public void remove(User user, List<ReportInfo> reportInfoList, String rptTmpIds) {
         StringBuilder sb = new StringBuilder();
         for (ReportInfo reportInfo : reportInfoList) {
             sb.append(reportInfo.getId()).append(",");
@@ -388,10 +392,10 @@ public class ReportInfoService {
         sb.append("-1");
         List<ReportInfo> newReportInfoList = getReportInfosByRptInfoIds(sb.toString());
         // 添加触发事件
-        sendListener(user,SystemLog.DELETE,newReportInfoList,Thread.currentThread() .getStackTrace()[1].getMethodName());
+        sendListener(user, SystemLog.DELETE, newReportInfoList, Thread.currentThread().getStackTrace()[1].getMethodName());
         for (ReportInfo reportInfo : newReportInfoList) {
             List<ReportData> reportDataList = reportDataDao.queryByRptId(reportInfo.getId());
-            sendListener(user,SystemLog.DELETE,reportInfo,Thread.currentThread() .getStackTrace()[1].getMethodName(),reportDataList);
+            sendListener(user, SystemLog.DELETE, reportInfo, Thread.currentThread().getStackTrace()[1].getMethodName(), reportDataList);
             reportDataDao.removeRptDatasByInfoId(reportInfo.getId(), rptTmpIds);
             reportInfoDao.removeById(reportInfo.getId(), rptTmpIds);
         }
@@ -518,37 +522,56 @@ public class ReportInfoService {
     /**
      * 修改报表状态
      *
-     * @param rptTmpId
-     * @param period
+     * @param rptTmp
+     * @param user
      */
-    public void updatePeriodAndDalay(User user,Integer rptTmpId, Integer period, Integer dalay) {
-        List<ReportInfo> reportInfoList = reportInfoDao.queryByTimeAndTmpId(null, null, rptTmpId);
+    public void updatePeriodAndDalay(User user, ReportTemplate rptTmp) {
+        List<ReportInfo> reportInfoList = reportInfoDao.queryByTimeAndTmpId(null, null, rptTmp.getId());
+        boolean isChange;
         for (ReportInfo reportInfo : reportInfoList) {
-            reportInfo.setPeriod(period);
-            reportInfo.setSubmitDaysDelay(dalay);
-            reportInfoDao.saveOrUpdate(reportInfo, true);
-            // 添加触发事件
-            sendListener(user,SystemLog.UPDATE,reportInfo,Thread.currentThread() .getStackTrace()[1].getMethodName());
+            isChange = false;
+            if (!reportInfo.getDptId().equals(rptTmp.getDepartment().getId())) {
+                reportInfo.setDptId(rptTmp.getDepartment().getId());
+                reportDataDao.updateDepId(reportInfo.getId(),rptTmp.getDepartment().getId());
+                // 添加触发事件
+                List<ReportData> reportDataList = reportDataDao.queryByRptId(reportInfo.getId());
+                sendListener(user, SystemLog.UPDATE, reportInfo, Thread.currentThread().getStackTrace()[1].getMethodName(), reportDataList);
+                isChange = true;
+            }
+            if (!reportInfo.getPeriod().equals(rptTmp.getPeriod())) {
+                reportInfo.setPeriod(rptTmp.getPeriod());
+                isChange = true;
+            }
+            if (!reportInfo.getSubmitDaysDelay().equals(rptTmp.getSubmitDaysDelay())) {
+                reportInfo.setSubmitDaysDelay(rptTmp.getSubmitDaysDelay());
+                isChange = true;
+            }
+            if (isChange) {
+                reportInfoDao.saveOrUpdate(reportInfo, true);
+                // 添加触发事件
+                sendListener(user, SystemLog.UPDATE, reportInfo, Thread.currentThread().getStackTrace()[1].getMethodName());
+            }
         }
     }
 
-    /**
-     * 修改报表状态
-     *
-     * @param reportId
-     * @param rptStatus
-     */
-    public void updateStatus(User user,Integer reportId, Integer rptStatus, HttpServletRequest request) {
+        /**
+         * 修改报表状态
+         *
+         * @param reportId
+         * @param rptStatus
+         */
+
+    public void updateStatus(User user, Integer reportId, Integer rptStatus, HttpServletRequest request) {
         ReportInfo reportInfo = reportInfoDao.queryById(reportId);
         //判断当前用户的报表的权限
         boolean isWrite = CurrentUser.hasWritePermission(request, reportInfo.getTmpId());
         boolean isApproval = CurrentUser.hasApprovalPermission(request, reportInfo.getTmpId());
         if ((isApproval && (rptStatus.equals(Constant.RPT_STATUS.PASS) || rptStatus.equals(Constant.RPT_STATUS.REJECT))) || (isWrite && (rptStatus.equals(Constant.RPT_STATUS.DRAFT) || rptStatus.equals(Constant.RPT_STATUS.WAITING_PASS)))) {
             reportInfo.setRptStatus(rptStatus);
-            updateDataStatus(user,rptStatus, reportInfo);
+            updateDataStatus(user, rptStatus, reportInfo);
             reportInfoDao.saveOrUpdate(reportInfo, true);
             // 添加触发事件
-            sendListener(user,rptStatus,reportInfo,Thread.currentThread() .getStackTrace()[1].getMethodName());
+            sendListener(user, rptStatus, reportInfo, Thread.currentThread().getStackTrace()[1].getMethodName());
         }
     }
 
@@ -558,11 +581,11 @@ public class ReportInfoService {
      * @param reportIds
      * @param rptStatus
      */
-    public void batchUpdateRptInfoStatus(User user,String reportIds, Integer rptStatus, HttpServletRequest request) {
+    public void batchUpdateRptInfoStatus(User user, String reportIds, Integer rptStatus, HttpServletRequest request) {
         List<ReportInfo> reportInfoList = reportInfoDao.queryByIds(reportIds);
-        String  rejectInfo = "";
-        if(request.getParameter("info")!=null){
-            rejectInfo=(String)request.getParameter("info");
+        String rejectInfo = "";
+        if (request.getParameter("info") != null) {
+            rejectInfo = (String) request.getParameter("info");
         }
         for (ReportInfo reportInfo : reportInfoList) {
             //判断当前用户的报表的权限
@@ -574,12 +597,12 @@ public class ReportInfoService {
                 updateDataStatus(user, rptStatus, reportInfo);
                 reportInfoDao.saveOrUpdate(reportInfo, true);
                 // 添加触发事件
-                sendListener(user,rptStatus,reportInfo,Thread.currentThread() .getStackTrace()[1].getMethodName());
+                sendListener(user, rptStatus, reportInfo, Thread.currentThread().getStackTrace()[1].getMethodName());
             }
         }
     }
 
-    private void updateDataStatus(User user,Integer rptStatus, ReportInfo reportInfo) {
+    private void updateDataStatus(User user, Integer rptStatus, ReportInfo reportInfo) {
         if (rptStatus.equals(Constant.RPT_STATUS.PASS)) {//审核通过后修改数据状态
             List<ReportData> reportDataList = reportDataDao.queryByRptId(reportInfo.getId());
             for (ReportData reportData : reportDataList) {
@@ -587,7 +610,7 @@ public class ReportInfoService {
                 reportDataDao.saveOrUpdate(reportData, true);
             }
             // 添加触发事件
-            sendListener(user,SystemLog.UPDATE,reportInfo,Thread.currentThread() .getStackTrace()[1].getMethodName(),reportDataList);
+            sendListener(user, SystemLog.UPDATE, reportInfo, Thread.currentThread().getStackTrace()[1].getMethodName(), reportDataList);
         } else if (rptStatus.equals(Constant.RPT_STATUS.REJECT)) {//驳回后通过后修改数据状态
             List<ReportData> reportDataList = reportDataDao.queryByRptId(reportInfo.getId());
             for (ReportData reportData : reportDataList) {
@@ -596,7 +619,7 @@ public class ReportInfoService {
 
             }
             // 添加触发事件
-            sendListener(user,SystemLog.UPDATE,reportInfo,Thread.currentThread() .getStackTrace()[1].getMethodName(),reportDataList);
+            sendListener(user, SystemLog.UPDATE, reportInfo, Thread.currentThread().getStackTrace()[1].getMethodName(), reportDataList);
         }
     }
 
@@ -723,14 +746,21 @@ public class ReportInfoService {
                     }
                 }
                 if (reportData != null) {//数据库有数据插入数据
-                    if (reportData.getItemValue() != null && !"".equals(reportData.getItemValue())) {
-                        td.html("<input value='" + reportData.getItemValue() + "'/>");
-                    } else {
-                        td.html("<input value=''/>");
-                    }
                     if (rptStatus == Constant.RPT_STATUS.WAITING_PASS || rptStatus == Constant.RPT_STATUS.PASS) {
-                        td.select("input").first().attr("readonly", "readonly");
+                        if (reportData.getItemValue() != null && !"".equals(reportData.getItemValue())) {
+                            td.html(reportData.getItemValue());
+                        } else {
+                            td.html("");
+                        }
+                    } else {
+                        if (reportData.getItemValue() != null && !"".equals(reportData.getItemValue())) {
+                            td.html("<input value='" + reportData.getItemValue() + "'/>");
+                        } else {
+                            td.html("<input value=''/>");
+                        }
                     }
+
+
                 } else {
                     td.html("<input value=''/>");
                 }

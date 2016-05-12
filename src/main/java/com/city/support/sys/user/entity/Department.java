@@ -52,6 +52,13 @@ public class Department {
      */
     private Integer sort;
 
+    private String text;
+
+    @Transient
+    public String getText() {
+        return text;
+    }
+
     @Id
     @GeneratedValue(generator = "na")
     @GenericGenerator(name = "na", strategy = "native", parameters = {@Parameter(name = "sequence", value = "DEP_SEQ")})
@@ -97,6 +104,7 @@ public class Department {
 
     public void setDepName(String depName) {
         this.depName = depName;
+        this.text = depName;
     }
 
     @Column(name = "DEP_PHONE")

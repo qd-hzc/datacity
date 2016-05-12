@@ -33,7 +33,14 @@ Ext.addMetadataTypeWin.init=function(record,fn){
             labelAlign: 'right',
             columnWidth: 0.45,
             maxLength:50,
-            margin: '20 0 0 0'
+            margin: '20 0 0 0',
+            validator:function(text){
+                if(text.length && text.replace(/\s+/g, "").length<text.length){
+                    return "不允许输入空格！";
+                }else {
+                    return true;
+                }
+            }
         },{
             xtype: 'combobox',
             name: 'infoPage',

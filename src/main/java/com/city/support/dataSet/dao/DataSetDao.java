@@ -3,7 +3,6 @@ package com.city.support.dataSet.dao;
 import com.city.common.dao.BaseDao;
 import com.city.common.pojo.Page;
 import com.city.support.dataSet.entity.DataSet;
-import com.city.support.regime.collection.entity.ReportData;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -26,6 +25,16 @@ public class DataSetDao extends BaseDao<DataSet> {
     }
 
     /**
+     * 根据名字全部匹配
+     *
+     * @param name
+     * @return
+     */
+    public List<DataSet> queryByName(String name) {
+        return queryByHQL("from DataSet where name=" + name);
+    }
+
+    /**
      * 查询总数
      */
     public List queryTotal(String name) {
@@ -38,8 +47,10 @@ public class DataSetDao extends BaseDao<DataSet> {
     public void removeDataSets(String ids) {
         updateByHQL(new StringBuilder("delete from DataSet where id in (").append(ids).append(")").toString());
     }
+
     /**
      * 查找所有数据集
+     *
      * @return
      * @author crx
      * @createDate 2016-3-22

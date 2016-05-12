@@ -14,6 +14,7 @@ import java.util.List;
 public class ReportDataDao extends BaseDao<ReportData> {
     /**
      * 根据报表id查询
+     *
      * @param rptId
      * @return
      */
@@ -24,8 +25,10 @@ public class ReportDataDao extends BaseDao<ReportData> {
         }
         return queryByHQL(sb.toString());
     }
+
     /**
      * 根据模板id查询
+     *
      * @param tmpIds
      * @return
      */
@@ -36,17 +39,24 @@ public class ReportDataDao extends BaseDao<ReportData> {
         }
         return queryByHQL(sb.toString());
     }
+
     public void removeRptDatasByTmpIds(String tmpIds) {
         String hql = "delete from ReportData t where t.rptTmpId in (" + tmpIds + ")";
         updateByHQL(hql);
     }
-    public void removeRptDatasByInfoId(Integer id,String rptTmpIds) {
-        String hql = "delete from ReportData t where t.reportDataId.rptId = " + id +" and t.dataStatus = "+ Constant.DATA_STATUS.UNUSABLE+" and t.rptTmpId in (" + rptTmpIds + ")";
+
+    public void removeRptDatasByInfoId(Integer id, String rptTmpIds) {
+        String hql = "delete from ReportData t where t.reportDataId.rptId = " + id + " and t.dataStatus = " + Constant.DATA_STATUS.UNUSABLE + " and t.rptTmpId in (" + rptTmpIds + ")";
         updateByHQL(hql);
     }
 
     public void removeRptDatasByRptIds(String rptIds) {
         String hql = "delete from ReportData t where t.reportDataId.rptId in (" + rptIds + ")";
         updateByHQL(hql);
+    }
+
+    public void updateDepId(Integer rptId, Integer depId) {
+        String hql = "update ReportData t set t.reportDataId.depId= " + depId + " where t.reportDataId.rptId=?";
+        updateWithParamsByHQL(hql, new Object[]{rptId});
     }
 }

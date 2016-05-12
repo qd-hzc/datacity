@@ -63,10 +63,13 @@
                 if (!data.sortIndex || data.sortIndex <= 0) {
                     data.sortIndex = contentStore.data.length + 1;
                 }
+                var isDefault = false;
                 if (!commonParams.contentParams.themeId || !commonParams.contentParams.contentSortType) {
                     commonParams.contentParams.themeId = themeStore.getAt(0).getId();
                     commonParams.contentParams.contentSortType = themeStore.getAt(0).get("contentSortType");
+                    isDefault = true;
                 }
+                console.log(commonParams.contentParams)
                 Ext.Ajax.request({
                     url: GLOBAL_PATH + "/support/resourceCategory/analysis/text/updateTextContent",
                     method: 'POST',
@@ -76,8 +79,12 @@
                         var result = Ext.JSON.decode(response.responseText);
                         if (result.success) {
                             contentStore.add(result.datas[0]);
+                            if(isDefault){
+                                contentStore.reload({params: commonParams.contentParams});
+                            }
                             themeStore.reload({params: commonParams.themeParams});
                         }
+                        Ext.Msg.alert("提示",result.msg)
                     }
                 });
                 win.close();
@@ -169,7 +176,11 @@
                             selected.set('sortIndex', data.sortIndex);
                             selected.set('contentSortType', data.contentSortType);
                             selected.set('infos', data.infos);
-                            themeStore.sync();
+                            themeStore.sync({
+                                failure:function(){
+                                    themeStore.reload({params: commonParams.themeParams});
+                                }
+                            });
                             win.close();
                         });
                     }
@@ -263,6 +274,7 @@
                                     //console.log(result.datas[0])
                                     themeStore.add(result.datas[0]);
                                 }
+                                Ext.Msg.alert("提示",result.msg)
                             }
                         });
                         win.close();
@@ -411,6 +423,11 @@
                 }*/
             }
         });
+        // 重新加载参数
+        contentStore.on('beforeload', function (s) {
+            console.log(commonParams.contentParams)
+            s.getProxy().extraParams = commonParams.contentParams;
+        });
         this.contentStore =contentStore;
         var contentMenu = new Ext.menu.Menu({
             renderTo: Ext.getBody(),
@@ -420,20 +437,25 @@
                 iconCls: 'Pageedit',
                 handler: function () {
                     var selModel = contentGrid.getSelectionModel();
-                    var selected = selModel.getSelection()[0];
-                    if (selected) {
-                        var win = Ext.updateTextContentWin.init(selected, function (data) {
-                            commonParams.contentParams.themeId = selected.get("theme").id;
-                            selected.set('name', data.name);
-                            selected.set('type', data.type);
-                            selected.set('sortIndex', data.sortIndex);
-                            selected.set('infos', data.infos);
-                            selected.set('labelIds', data.labelIds);
-                            //console.log(data.analysisDate)
-                            //selected.set('analysisDate', data.analysisDate);
-                            contentStore.sync();
+                    var selected = selModel.getSelection();
+                    if (selected&&selected.length==1) {
+                        var win = Ext.updateTextContentWin.init(selected[0], function (data) {
+                            commonParams.contentParams.themeId = selected[0].get("theme").id;
+                            selected[0].set('name', data.name);
+                            selected[0].set('type', data.type);
+                            selected[0].set('sortIndex', data.sortIndex);
+                            selected[0].set('infos', data.infos);
+                            selected[0].set('labelIds', data.labelIds);
+                            selected[0].set('analysisDate', data.analysisDate);
+                            contentStore.sync({
+                                failure:function(){
+                                    contentStore.reload({params: commonParams.contentParams});
+                                }
+                            });
                             win.close();
                         });
+                    }else{
+                        Ext.Msg.alert("提示","请选中一个文字分析！");
                     }
                 }
             }, {
@@ -483,6 +505,8 @@
             flex: 1,
             width: '100%',
             border: false,
+            multiSelect: true,
+            //allowDeselect: true,
             store: contentStore,
             columns: [{
                 text: '名称',
@@ -562,7 +586,7 @@
                     //取消冒泡
                     e.preventDefault();
                     hideMenu();
-                    contentMenu.showAt(e.getPoint());
+                    contentMenu.showAt(e.getPoint(),record);
                     commonParams.dataParams.foreignId = record.getId();
                     commonParams.dataParams.foreignType = TEXT_TYPE.CONTENT;
                     dataStore.load({params: commonParams.dataParams});

@@ -1,4 +1,7 @@
 package com.city.support.manage.metadata.entity;
+
+import com.city.common.pojo.Constant;
+
 import javax.persistence.*;
 import java.io.Serializable;
 
@@ -10,10 +13,6 @@ import java.io.Serializable;
 @Table(name = "SPT_MGR_METADATA_TYPE")
 public class MetadataType implements Serializable {
 
-    public final static Integer UNITDATA=1;   //数据类型
-    public final static Integer AREA=21;      //地区等级
-    public final static Integer TIME_YEAR=49;      //时间类型-年
-
     Integer id;              //id
     String name;            //名称
     String infoPage;       //数据格式
@@ -22,7 +21,7 @@ public class MetadataType implements Serializable {
 
     @Id
     @Column(name = "ID", unique = true, nullable = false)
-    @SequenceGenerator(name = "matadatatTypeGenerator",sequenceName = "METADATATYPE_SEQ")
+    @SequenceGenerator(name = "matadatatTypeGenerator", sequenceName = "METADATATYPE_SEQ")
     @GeneratedValue(generator = "matadatatTypeGenerator")
     public Integer getId() {
         return id;
@@ -32,7 +31,7 @@ public class MetadataType implements Serializable {
         this.id = id;
     }
 
-    @Column(name = "NAME", length=200)
+    @Column(name = "NAME", length = 200)
     public String getName() {
         return name;
     }
@@ -50,7 +49,7 @@ public class MetadataType implements Serializable {
         this.infoPage = infoPage;
     }
 
-    @Column(name = "COMMENTS",length = 1000)
+    @Column(name = "COMMENTS", length = 1000)
     public String getComments() {
         return comments;
     }

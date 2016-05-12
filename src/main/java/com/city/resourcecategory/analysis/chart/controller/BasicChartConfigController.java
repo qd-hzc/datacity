@@ -81,11 +81,16 @@ public class BasicChartConfigController extends BaseController {
         try {
             EsiJsonParamUtil<AnalysisChartGroup> paramUtil = new EsiJsonParamUtil<>();
             datas = paramUtil.parseObjToList(request, AnalysisChartGroup.class);
-            datas = basicChartConfigService.updateAnalysisChartGroup(datas);
+            Map map = basicChartConfigService.updateAnalysisChartGroup(datas);
+            datas = (List<AnalysisChartGroup>)map.get("datas");
             if(datas.size()>0) {
                 result = genSuccessMsg(datas, "操作成功", null);
             }else{
-                result = genSuccessMsg(null, "操作失败", null);
+                if((boolean)map.get("nameRepeat")){
+                    result = genFaultMsg(null, "同一级分组名称不能重复！", null);
+                }else {
+                    result = genFaultMsg(null, "操作失败", null);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -153,6 +158,12 @@ public class BasicChartConfigController extends BaseController {
     public List<AnalysisChartBase> queryAllMap() {
         return basicChartConfigService.queryAllMap();
     }
+
+    /**
+     *
+     * @param request
+     * @return
+     */
     @RequestMapping("/updateAnalysisChartBase")
     @ResponseBody
     public Map<String, Object> updateAnalysisChartBase(HttpServletRequest request) {
@@ -161,8 +172,17 @@ public class BasicChartConfigController extends BaseController {
         try {
             EsiJsonParamUtil<AnalysisChartBase> paramUtil = new EsiJsonParamUtil<>();
             datas = paramUtil.parseObjToList(request, AnalysisChartBase.class);
-            datas = basicChartConfigService.updateAnalysisChartBase(datas);
-            result = genSuccessMsg(datas, "操作成功", null);
+            Map map = basicChartConfigService.updateAnalysisChartBase(datas);
+            datas = (List<AnalysisChartBase>)map.get("datas");
+            if(datas.size()>0) {
+                result = genSuccessMsg(datas, "操作成功", null);
+            }else{
+                if((boolean)map.get("nameRepeat")){
+                    result = genFaultMsg(null, "同一分组下的分析图表名称不能重复！", null);
+                }else {
+                    result = genFaultMsg(null, "操作失败", null);
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
             EsiLogUtil.error(getLog(), e.getMessage());

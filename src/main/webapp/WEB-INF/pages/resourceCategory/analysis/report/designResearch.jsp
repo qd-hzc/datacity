@@ -91,7 +91,7 @@
         });
         //分组store
         var groupStore = Ext.create('Ext.data.TreeStore', {
-            fields: ['dataType', 'dataName','text', 'dataValue', 'dataInfo1', 'dataInfo2', 'children', 'leaf'],
+            fields: ['dataType', 'dataName', 'text', 'dataValue', 'dataInfo1', 'dataInfo2', 'children', 'leaf'],
             proxy: {
                 type: 'ajax',
                 api: {
@@ -200,7 +200,7 @@
         });
         //宾栏store
         var guestBarStore = Ext.create('Ext.data.TreeStore', {
-            fields: ['dataName', 'dataValue','text', 'dataInfo1', 'dataInfo2', 'dataType', 'isRealNode', 'isProperty', 'leaf', 'expanded', 'children'],
+            fields: ['dataName', 'dataValue', 'text', 'dataInfo1', 'dataInfo2', 'dataType', 'isRealNode', 'isProperty', 'leaf', 'expanded', 'children'],
             proxy: {
                 type: 'ajax',
                 api: {
@@ -721,7 +721,17 @@
             valueField: 'id',
             displayField: 'name',
             width: 100,
-            margin: MARGIN_LEFT
+            margin: MARGIN_LEFT,
+            listeners: {
+                change: function (_this, nv, ov) {
+                    var b = parseInt(lianxuBeginPeriodCombobox.getValue());
+                    var e = parseInt(lianxuEndPeriodCombobox.getValue());
+                    if (e < b) {
+                        Ext.Msg.alert('提示', '开始期度不能大于结束期度');
+                        _this.setValue('');
+                    }
+                }
+            }
         });
 //        时间范围：连续：结束频度
         var lianxuEndPeriodCombobox = Ext.create('Ext.form.ComboBox', {
@@ -730,7 +740,17 @@
             valueField: 'id',
             displayField: 'name',
             width: 100,
-            margin: MARGIN_LEFT
+            margin: MARGIN_LEFT,
+            listeners: {
+                change: function (_this, nv, ov) {
+                    var b = parseInt(lianxuBeginPeriodCombobox.getValue());
+                    var e = parseInt(lianxuEndPeriodCombobox.getValue());
+                    if (e < b) {
+                        Ext.Msg.alert('提示', '开始期度不能大于结束期度');
+                        _this.setValue('');
+                    }
+                }
+            }
         });
 //        时间范围：选择：开始频度
         var xuanzeYearMultyCombobox = Ext.create('Ext.form.field.ComboBox', {
@@ -1025,6 +1045,8 @@
                 change: function (_this, newValue, oldValue, eOpts) {
                     var frequencyId = newValue.frequency;
                     _setFrequence(frequencyId);
+                    lianxuBeginPeriodCombobox.setValue('');
+                    lianxuEndPeriodCombobox.setValue('');
                 }
             }
         });
@@ -1458,7 +1480,7 @@
             }
             var nodeInfo = {
                 dataName: obj.dataName,
-                text:obj.dataName,
+                text: obj.dataName,
                 dataType: METADATA_TYPE.SYSTEM_DESCRIBE_TYPE,
                 isRealNode: obj.isRealNode || 0,
                 isProperty: 1,

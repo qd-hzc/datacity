@@ -33,6 +33,10 @@ public class InitConfigLoader extends ContextLoaderListener {
             systemConfigPojo.setDepParentId(Integer.valueOf(pro.getProperty("depParentId", "0")));
             systemConfigPojo.setDefaultAreaId(Integer.valueOf(pro.getProperty("defaultAreaId", "0")));
             systemConfigPojo.setMainFocusSpan(Integer.valueOf(pro.getProperty("mainFocusSpan", "8")));
+            systemConfigPojo.setUnitDataType(Integer.valueOf(pro.getProperty("unitDataType", "1")));
+            systemConfigPojo.setAreaType(Integer.valueOf(pro.getProperty("areaType", "21")));
+            systemConfigPojo.setYearType(Integer.valueOf(pro.getProperty("yearType", "49")));
+            systemConfigPojo.setDutyType(Integer.valueOf(pro.getProperty("dutyType", "2")));
         } catch (Exception e) {
             e.printStackTrace();
         } finally {

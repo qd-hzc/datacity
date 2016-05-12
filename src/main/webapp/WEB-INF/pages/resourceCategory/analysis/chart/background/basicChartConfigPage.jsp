@@ -92,10 +92,11 @@
                                     if (result.success) {
                                         chartBaseStore.add(result.datas[0]);
                                     }
+                                    Ext.Msg.alert("提示", result.msg);
                                 }
                             })
                         }, groupId);
-                    }else{
+                    } else {
                         Ext.Msg.alert('提示', "请选择分组！");
                     }
                 }
@@ -109,9 +110,13 @@
                     if (selected) {
                         var win = Ext.fillAnalysisChartBase.init(function (data) {
                             selected.set(data);
-                            chartBaseStore.sync();
+                            chartBaseStore.sync({
+                                failure: function () {
+                                    chartBaseStore.reload();
+                                }
+                            });
                         }, groupId, selected);
-                    }else{
+                    } else {
                         Ext.Msg.alert('提示', "请选择图表！");
                     }
 
@@ -123,14 +128,14 @@
                     var selModel = chartBaseGrid.getSelectionModel();
                     var selected = selModel.getSelection();
                     var groupId = chartBaseStore.groupId;
-                    if (selected&&selected.length>0) {
+                    if (selected && selected.length > 0) {
                         Ext.Msg.confirm('警告', '确定删除选中的图表？', function (btn) {
                             if ('yes' == btn) {
                                 chartBaseStore.remove(selected);
                                 chartBaseStore.sync();
                             }
                         });
-                    }else{
+                    } else {
                         Ext.Msg.alert('提示', "请选择图表！");
                     }
                 }
@@ -165,6 +170,14 @@
                         open(GLOBAL_PATH + '/support/resourcecategory/analysis/chart/chartDesign?chartId=' + record.get('id'));
                     }
 
+                },
+                containercontextmenu: function (_this, e) {
+                    //取消冒泡
+                    e.preventDefault();
+                },
+                itemcontextmenu: function (_this, record, itemId, index, e) {
+                    //取消冒泡
+                    e.preventDefault();
                 }
             }
         });
@@ -177,6 +190,7 @@
                 fields: [
                     {name: 'id', type: 'int'},
                     {name: 'name', type: 'string'},
+                    {name: 'text', type: 'string'},
                     {name: 'groupSort', type: 'int'},
                     {name: 'pId', type: 'int'}
                 ]
@@ -204,6 +218,16 @@
             root: {
                 id: 0,
                 expanded: true
+            },
+            listeners: {
+                /*endupdate:function(e){
+                    if(chartGroupStore)
+                    chartGroupStore.reload();
+                }*/
+                write: function (store, operate, callback) {
+                    console.log(operate);
+                    //Ext.Msg.alert('提示', operate._resultSet.message);
+                }
             }
 
         });
@@ -234,16 +258,18 @@
                                 jsonData: data,
                                 success: function (response, opts) {
                                     var result = Ext.JSON.decode(response.responseText);
-                                    if(result.datas) {
+                                    if (result.datas) {
                                         if (data.level == '0') {
                                             result.datas[0].loaded = true;
+                                            result.datas[0].leaf = true;
                                             selected.parentNode.appendChild(result.datas[0]);
                                         } else {
                                             result.datas[0].loaded = true;
+                                            result.datas[0].leaf = true;
                                             selected.appendChild(result.datas[0]);
                                         }
                                     }
-                                    Ext.Msg.alert("提示",result.msg);
+                                    Ext.Msg.alert("提示", result.msg);
                                 }
                             })
                             win.close();
@@ -261,11 +287,12 @@
                                 success: function (response, opts) {
 
                                     var result = Ext.JSON.decode(response.responseText);
-                                    if(result.datas) {
+                                    if (result.datas) {
                                         result.datas[0].loaded = true;
+                                        result.datas[0].leaf = true;
                                         selected.appendChild(result.datas[0]);
                                     }
-                                    Ext.Msg.alert("提示",result.msg);
+                                    Ext.Msg.alert("提示", result.msg);
                                 }
                             });
                             win.close();
@@ -285,10 +312,15 @@
                         var selected = rec[0];
                         win = Ext.fillAnalysisChartGroup.init(function (data) {
                             selected.set(data);
-                            chartGroupStore.sync();
+                            chartGroupStore.sync({
+                                failure: function () {
+                                    chartGroupStore.reload();
+                                }
+                            });
                         }, selected);
                     } else {
                         //TODO未选择分组
+                        Ext.Msg.alert("提示","请选择分组！")
                     }
                 }
             }, {
@@ -299,13 +331,19 @@
                     var win = null;
                     if (rec && rec.length > 0) {
 //                        chartGroupStore.remove(rec);
-                        Ext.Array.each(rec, function (node) {
-                            node.remove();
-                        })
-                        chartGroupStore.sync();
+                        Ext.Msg.confirm('警告', '确定要删除么?', function (btn) {
+                            if (btn == 'yes') {
+                                Ext.Array.each(rec, function (node) {
+                                    node.remove();
+                                })
+                                chartGroupStore.sync();
+                            }
+                        });
+
 
                     } else {
                         //TODO未选择分组
+                        Ext.Msg.alert("提示","请选择分组！")
                     }
                 }
             }],
@@ -318,14 +356,16 @@
             viewConfig: {
                 plugins: {
                     ptype: 'treeviewdragdrop',
+                    dragGroup: 'structure',
+                    dropGroup: 'structure',
                     dragZone: {
                         afterDragOver: function (zone) {
                             var rec = zone.overRecord;
-                            if(zone.curRecoder){
-                                if(rec != zone.curRecoder){
+                            if (zone.curRecoder) {
+                                if (rec != zone.curRecoder) {
 //                                    zone.curRecoder.reject();
-                                    if(!zone.curRecoder.hasChildNodes())
-                                        zone.curRecoder.set('leaf',true);
+                                    if (!zone.curRecoder.hasChildNodes())
+                                        zone.curRecoder.set('leaf', true);
                                 }
                             }
                             zone.curRecoder = rec;
@@ -345,14 +385,27 @@
                         Ext.Array.each(pNode.childNodes, function (child) {
                             child.set('groupSort', child.data.index);
                         });
-                        chartGroupTree.getRootNode().findChildBy(function(tmpNode){
-                            if(!tmpNode.hasChildNodes()){
-                                tmpNode.set('leaf',true);
+                        chartGroupTree.getRootNode().findChildBy(function (tmpNode) {
+                            if (!tmpNode.hasChildNodes()) {
+                                tmpNode.set('leaf', true);
                             }
                             return false;
-                        },null,true);
-                        chartGroupStore.sync();
+                        }, null, true);
+                        chartGroupStore.sync({
+                            failure: function () {
+                                chartGroupStore.reload();
+                            }
+                        });
+                    },
+                    containercontextmenu: function (_this, e) {
+                        //取消冒泡
+                        e.preventDefault();
+                    },
+                    itemcontextmenu: function (_this, record, itemId, index, e) {
+                        //取消冒泡
+                        e.preventDefault();
                     }
+
                 }
             }
         });

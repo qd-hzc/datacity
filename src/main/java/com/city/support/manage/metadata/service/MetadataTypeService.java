@@ -5,6 +5,7 @@ import com.city.common.event.listener.EsiListenerAdapter;
 import com.city.common.event.watcher.DepWatched;
 import com.city.common.event.watcher.EsiEventWatched;
 import com.city.common.event.watcher.MetadataWatched;
+import com.city.common.pojo.Constant;
 import com.city.common.util.ConvertUtil;
 import com.city.support.manage.metadata.entity.MetadataType;
 import com.city.support.manage.metadata.dao.*;
@@ -37,16 +38,16 @@ public class MetadataTypeService {
             @Override
             public boolean handlerEvent(EsiEvent eEvent) {
                 //删除前
-                if(MetadataWatched.BEFOREDELETE.equals(eEvent.getEventName())){
+                if (MetadataWatched.BEFOREDELETE.equals(eEvent.getEventName())) {
                     //清空指标的
-                    List<MetadataType> mts = (List)eEvent.getArgs().get(MetadataWatched.PARAM_TYPE);
+                    List<MetadataType> mts = (List) eEvent.getArgs().get(MetadataWatched.PARAM_TYPE);
                     StringBuilder sb = new StringBuilder("");
-                    if(CollectionUtils.isNotEmpty(mts)){
-                        for(MetadataType mt : mts) {
+                    if (CollectionUtils.isNotEmpty(mts)) {
+                        for (MetadataType mt : mts) {
                             sb.append(mt.getId())
                                     .append(",");
                         }
-                        if(StringUtils.contains(sb, ",")){
+                        if (StringUtils.contains(sb, ",")) {
                             String ids = sb.toString();
                             ids = ids.substring(0, ids.lastIndexOf(","));
                             metadataInfoDao.batchDeleteByType(ids);//删除子项
@@ -57,6 +58,7 @@ public class MetadataTypeService {
             }
         }, null);
     }
+
     /**
      * 获取所有的系统元数据类型
      *
@@ -83,21 +85,38 @@ public class MetadataTypeService {
     public void update(MetadataType metadataType) {
         metadataTypeDao.update(metadataType);
     }
+
     /**
      * 修改系统元数据类型
      *
      * @param metadataTypeList
      */
-    public void update(List<MetadataType> metadataTypeList) {
+    public int update(List<MetadataType> metadataTypeList) {
+        int integer = 0;
+        boolean nameRepeat = false;
         ConvertUtil<MetadataType> convertUtil = new ConvertUtil<>();
-        MetadataType mt=null;
-        for(MetadataType metadataType: metadataTypeList){
+        MetadataType mt = null;
+        for (MetadataType metadataType : metadataTypeList) {
             mt = metadataTypeDao.queryById(metadataType.getId());
-            convertUtil.replication(metadataType,mt,MetadataType.class.getName());
-            metadataTypeDao.update(mt);
+            List<MetadataType> metadataTypes = null;
+            if (metadataType.getName() != null) {
+                metadataTypes = metadataTypeDao.getMetadataTypeByName(metadataType.getName());
+            }
+            if (metadataTypes == null || metadataTypes.size() == 0) {
+                convertUtil.replication(metadataType, mt, MetadataType.class.getName());
+                metadataTypeDao.update(mt);
+                integer++;
+            } else {
+                nameRepeat = true;
+            }
         }
         metadataTypeDao.flush();
-
+        if (integer == 0 && nameRepeat) {
+            return Constant.RequestResult.EXIST;
+        } else if (integer > 0) {
+            return Constant.RequestResult.SUCCESS;
+        }
+        return Constant.RequestResult.FAIL;
     }
 
     /**
@@ -111,21 +130,22 @@ public class MetadataTypeService {
 
     /**
      * 批量删除
-     * @param mts   系统元数据类型list集合
+     *
+     * @param mts 系统元数据类型list集合
      */
-    public void batchDelete(List<MetadataType> mts){
+    public void batchDelete(List<MetadataType> mts) {
         StringBuilder sb = new StringBuilder("");
         //发送删除事件
         EsiEvent e = new EsiEvent();
         e.setEventName(MetadataWatched.BEFOREDELETE);
-        e.getArgs().put(MetadataWatched.PARAM_TYPE,mts);
+        e.getArgs().put(MetadataWatched.PARAM_TYPE, mts);
         esiEventWatched.notifyAllListener(e);
-        if(CollectionUtils.isNotEmpty(mts)){
-            for(MetadataType mt : mts) {
+        if (CollectionUtils.isNotEmpty(mts)) {
+            for (MetadataType mt : mts) {
                 sb.append(mt.getId())
                         .append(",");
             }
-            if(StringUtils.contains(sb, ",")){
+            if (StringUtils.contains(sb, ",")) {
                 String ids = sb.toString();
                 ids = ids.substring(0, ids.lastIndexOf(","));
                 metadataTypeDao.batchDelete(ids);//批量删除
@@ -135,10 +155,11 @@ public class MetadataTypeService {
 
     /**
      * 根据id获取元数据类型
+     *
      * @param id
      * @return
      */
-    public MetadataType findById(Integer id){
+    public MetadataType findById(Integer id) {
         return metadataTypeDao.getById(id);
     }
 
@@ -150,5 +171,9 @@ public class MetadataTypeService {
      */
     public List<MetadataType> findByName(String name) {
         return metadataTypeDao.getByName(name);
+    }
+
+    public List<MetadataType> findMetadataTypeByName(String name) {
+        return metadataTypeDao.getMetadataTypeByName(name);
     }
 }

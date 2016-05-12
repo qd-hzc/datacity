@@ -123,6 +123,11 @@ public class TextManageController extends BaseController {
         return result;
     }
 
+    /**
+     * 添加、更新分析主题
+     * @param request
+     * @return
+     */
     @RequestMapping("/updateTextTheme")
     @ResponseBody
     public Map<String, Object> updateTextTheme(HttpServletRequest request) {
@@ -133,12 +138,21 @@ public class TextManageController extends BaseController {
             User user = SessionUtil.getUser(request.getSession());
             EsiJsonParamUtil<TextTheme> paramUtil = new EsiJsonParamUtil<>();
             datas = paramUtil.parseObjToList(request, TextTheme.class);
-            datas = textThemeService.updateTextTheme(datas, user);
-            result = genSuccessMsg(datas, "更新成功", null);
+            Map map = textThemeService.updateTextTheme(datas, user);
+            datas = (List<TextTheme>)map.get("datas");
+            if(datas.size()>0) {
+                result = genSuccessMsg(datas, "保存成功", null);
+            }else{
+                if((boolean)map.get("nameRepeat")){
+                    result = genFaultMsg(null, "分析主题名称不能重复！", null);
+                }else {
+                    result = genFaultMsg(null, "保存失败", null);
+                }
+            }
         } catch (Exception e) {
             e.printStackTrace();
             EsiLogUtil.error(getLog(), e.getMessage());
-            result = genFaultMsg(null, "更新失败", null);
+            result = genFaultMsg(null, "保存失败", null);
         }
         return result;
     }
@@ -206,17 +220,21 @@ public class TextManageController extends BaseController {
             //获取当前用户
             User user = SessionUtil.getUser(request.getSession());
             datas = paramUtil.parseObjToList(request, TextContent.class);
-            datas = textContentService.updateTextContent(datas, user, themeId);
-            if (datas.size() > 0) {
-                result = genSuccessMsg(datas, "更新成功", null);
-            } else {
-                result = genFaultMsg(null, "更新失败", null);
+            Map map = textContentService.updateTextContent(datas, user, themeId);
+            datas = (List<TextContent>)map.get("datas");
+            if(datas.size()>0) {
+                result = genSuccessMsg(datas, "保存成功", null);
+            }else{
+                if((boolean)map.get("nameRepeat")){
+                    result = genFaultMsg(null, "同一分析主题的文字分析名称不能重复！", null);
+                }else {
+                    result = genFaultMsg(null, "保存失败", null);
+                }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             EsiLogUtil.error(getLog(), e.getMessage());
-            result = genFaultMsg(null, "更新失败", null);
+            result = genFaultMsg(null, "保存失败", null);
         }
         return result;
     }
@@ -253,7 +271,7 @@ public class TextManageController extends BaseController {
         } catch (Exception e) {
             e.printStackTrace();
             EsiLogUtil.error(getLog(), e.getMessage());
-            result = genFaultMsg(null, "更新失败!", null);
+            result = genFaultMsg(null, "保存失败!", null);
         }
         return result;
     }

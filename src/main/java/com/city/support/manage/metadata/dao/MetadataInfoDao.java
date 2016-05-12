@@ -119,4 +119,9 @@ public class MetadataInfoDao extends BaseDao<MetadataInfo> {
         String hql = "from MetadataInfo mi where mi.name like '%" + name + "%'";
         return super.queryByHQL(hql);
     }
+
+    public List<MetadataInfo> getByTypeAndName(Integer type, String name) {
+        String hql = "from MetadataInfo mi where mi.name ='" + name + "' and mi.type ='" + type + "'";
+        return super.queryByHQL(hql);
+    }
 }

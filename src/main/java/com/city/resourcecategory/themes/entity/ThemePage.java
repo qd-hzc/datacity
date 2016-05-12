@@ -56,6 +56,13 @@ public class ThemePage implements Serializable {
     @Transient
     private boolean title = false;
 
+    @Transient
+    private String text;
+
+    public String getText() {
+        return name;
+    }
+
     public boolean isTitle() {
         return title;
     }
@@ -94,6 +101,7 @@ public class ThemePage implements Serializable {
 
     public void setName(String name) {
         this.name = name;
+        this.text = name;
     }
 
     public Integer getParentId() {

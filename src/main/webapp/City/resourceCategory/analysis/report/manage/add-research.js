@@ -120,8 +120,8 @@ Ext.customResearchAddWin.init = function (researchGroupId, rc, fn) {
                                     }
                                 });
                             },
-                            failure: function (form, acction) {
-                                Ext.Msg.alert('提示', '系统繁忙，请稍候再试');
+                            failure: function (form, action) {
+                                Ext.Msg.alert('提示', action.result.msg);
                             }
                         });
                     }

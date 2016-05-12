@@ -45,7 +45,7 @@ function showAddStructureWindow(record, callback) {
             labelAlign: 'right',
             displayField: 'name',
             valueField: 'id',
-            value: commonObj.initParams.caliber?commonObj.initParams.caliber:null,
+            value: commonObj.initParams.caliber ? commonObj.initParams.caliber : null,
             store: Ext.create('Ext.data.Store', {
                 fields: ['id', 'name'],
                 proxy: {
@@ -69,7 +69,7 @@ function showAddStructureWindow(record, callback) {
             displayField: 'depName',
             valueField: 'id',
             allowBlank: false,
-            value: commonObj.initParams.dep?commonObj.initParams.dep:null,
+            value: commonObj.initParams.dep ? commonObj.initParams.dep : null,
             store: Ext.create('Ext.data.Store', {
                 fields: ['id', 'depName'],
                 proxy: {
@@ -92,7 +92,7 @@ function showAddStructureWindow(record, callback) {
             labelAlign: 'right',
             displayField: 'name',
             valueField: 'id',
-            value: commonObj.initParams.rptTmp?commonObj.initParams.rptTmp:null,
+            value: commonObj.initParams.rptTmp ? commonObj.initParams.rptTmp : null,
             store: Ext.create('Ext.data.Store', {
                 fields: ['id', 'name'],
                 proxy: {
@@ -136,15 +136,13 @@ function showAddStructureWindow(record, callback) {
     mw.show();
     /** 获取meatExt*/
     function getMeatExtObj(obj) {
-        console.log(Ext.getCmp('caliber').displayTplData);
-        console.log(Ext.getCmp('caliber'));
         return {
             caliber: obj.caliber,
-            caliberName: Ext.getCmp('caliber').displayTplData[0] ? Ext.getCmp('caliber').displayTplData[0].name : "0",
+            caliberName: Ext.getCmp('caliber').displayTplData && Ext.getCmp('caliber').displayTplData[0] ? Ext.getCmp('caliber').displayTplData[0].name : "0",
             dep: obj.dep,
             depName: Ext.getCmp('dep').displayTplData[0].depName,
             rptTmp: obj.rptTmp,
-            rptName: Ext.getCmp('rptTmp').displayTplData[0] ? Ext.getCmp('rptTmp').displayTplData[0].name : "",
+            rptName: Ext.getCmp('rptTmp').displayTplData && Ext.getCmp('rptTmp').displayTplData[0] ? Ext.getCmp('rptTmp').displayTplData[0].name : "",
         };
     }
 }

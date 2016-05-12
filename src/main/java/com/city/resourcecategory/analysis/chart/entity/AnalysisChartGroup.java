@@ -19,6 +19,8 @@ public class AnalysisChartGroup {
     private List<AnalysisChartBase> analysisChartBases;
     private Boolean leaf;
 
+    private String text;
+
     @Id
     @Column(name = "ID")
     @SequenceGenerator(name = "analysisChart", sequenceName = "RC_ANALYSIS_CHART_SEQ")
@@ -31,13 +33,21 @@ public class AnalysisChartGroup {
         this.id = id;
     }
 
-    @Column(name = "NAME",unique = true,length=200)
+    @Column(name = "NAME", length = 200)
     public String getName() {
         return name;
     }
 
+
+
+    @Transient
+    public String getText() {
+        return text;
+    }
+
     public void setName(String name) {
         this.name = name;
+        this.text = name;
     }
 
     @Column(name = "GROUP_SORT")
@@ -59,8 +69,8 @@ public class AnalysisChartGroup {
     }
 
     @OneToMany()
-    @JoinColumn(name="GROUP_ID")
-    @IndexColumn(name="CHART_SORT")
+    @JoinColumn(name = "GROUP_ID")
+    @IndexColumn(name = "CHART_SORT")
     public List<AnalysisChartBase> getAnalysisChartBases() {
         return analysisChartBases;
     }

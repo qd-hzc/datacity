@@ -189,7 +189,15 @@ Ext.text.ManageLabelWin.editContentWin = function (fn, record) {
             labelAlign: 'right',
             columnWidth: 0.9,
             alignBlank: false,
-            margin: '20 0 0 0'
+            maxLength:50,
+            margin: '20 0 0 0',
+            validator:function(text){
+                if(text.length && text.replace(/\s+/g, "").length<text.length){
+                    return "不允许输入空格！";
+                }else {
+                    return true;
+                }
+            }
         }, {
             xtype: 'numberfield',
             name: 'tier',

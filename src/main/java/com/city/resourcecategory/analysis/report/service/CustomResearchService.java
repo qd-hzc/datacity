@@ -169,5 +169,19 @@ public class CustomResearchService {
         return researchDao.selectAll();
     }
 
+    /**
+     * 返回分析报表模板
+     * <pre>
+     *     根据分析报表名字，查询分析报表
+     * </pre>
+     *
+     * @param name 分析报表名字
+     * @return
+     * @author hzc
+     * @createDate 2016-5-6
+     */
+    public List<CustomResearchEntity> getCustomResearchByName(String name) {
+        return researchDao.selectResearchByName(name);
+    }
 }
 

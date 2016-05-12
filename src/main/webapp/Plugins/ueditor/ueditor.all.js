@@ -1,7 +1,7 @@
 /*!
  * UEditor
  * version: ueditor
- * build: Tue May 03 2016 17:28:59 GMT+0800 (中国标准时间)
+ * build: Fri May 06 2016 15:39:43 GMT+0800 (中国标准时间)
  */
 
 (function(){
@@ -18225,26 +18225,26 @@ UE.plugins['video'] = function (){
                 }
             }
             //修复残缺td
-            for (j = 0; j < rowsNum; j++) {
-                for (k = 0; k < colsNum; k++) {
-                    if (this.indexTable[j][k] === undefined) {
-                        row = rows[j];
-                        cell = row.cells[row.cells.length - 1];
-                        cell = cell ? cell.cloneNode(true) : this.table.ownerDocument.createElement("td");
-                        this.setCellContent(cell);
-                        if (cell.colSpan !== 1)cell.colSpan = 1;
-                        if (cell.rowSpan !== 1)cell.rowSpan = 1;
-                        row.appendChild(cell);
-                        this.indexTable[j][k] = {
-                            rowIndex: j,
-                            cellIndex: cell.cellIndex,
-                            colIndex: k,
-                            rowSpan: 1,
-                            colSpan: 1
-                        }
-                    }
-                }
-            }
+            //for (j = 0; j < rowsNum; j++) {
+            //    for (k = 0; k < colsNum; k++) {
+            //        if (this.indexTable[j][k] === undefined) {
+            //            row = rows[j];
+            //            cell = row.cells[row.cells.length - 1];
+            //            cell = cell ? cell.cloneNode(true) : this.table.ownerDocument.createElement("td");
+            //            this.setCellContent(cell);
+            //            if (cell.colSpan !== 1)cell.colSpan = 1;
+            //            if (cell.rowSpan !== 1)cell.rowSpan = 1;
+            //            row.appendChild(cell);
+            //            this.indexTable[j][k] = {
+            //                rowIndex: j,
+            //                cellIndex: cell.cellIndex,
+            //                colIndex: k,
+            //                rowSpan: 1,
+            //                colSpan: 1
+            //            }
+            //        }
+            //    }
+            //}
             //当框选后删除行或者列后撤销，需要重建选区。
             var tds = domUtils.getElementsByTagName(this.table, "td"),
                 selectTds = [];
@@ -18736,8 +18736,12 @@ UE.plugins['video'] = function (){
                 colsNum = this.colsNum,
                 count = 0;     //处理计数
             for (var colIndex = 0; colIndex < colsNum;) {
-                var cellInfo = infoRow[colIndex],
-                    cell = this.getCell(cellInfo.rowIndex, cellInfo.cellIndex);
+                var cellInfo = infoRow[colIndex];
+                if (!cellInfo) {
+                    colIndex += 1;
+                    continue;
+                }
+                var cell = this.getCell(cellInfo.rowIndex, cellInfo.cellIndex);
                 if (cell.rowSpan > 1) {
                     if (cellInfo.rowIndex == rowIndex) {
                         var clone = cell.cloneNode(true);
@@ -18763,7 +18767,11 @@ UE.plugins['video'] = function (){
             }
             var deleteTds = [], cacheMap = {};
             for (colIndex = 0; colIndex < colsNum; colIndex++) {
-                var tmpRowIndex = infoRow[colIndex].rowIndex,
+                var infoRow2 = infoRow[colIndex];
+                if (!infoRow2) {
+                    continue;
+                }
+                var tmpRowIndex = infoRow2.rowIndex,
                     tmpCellIndex = infoRow[colIndex].cellIndex,
                     key = tmpRowIndex + "_" + tmpCellIndex;
                 if (cacheMap[key])continue;
@@ -18841,6 +18849,9 @@ UE.plugins['video'] = function (){
             } else {
                 for (; rowIndex < rowsNum; rowIndex++) {
                     var cellInfo = this.indexTable[rowIndex][colIndex];
+                    if (!cellInfo) {
+                        continue;
+                    }
                     if (cellInfo.colIndex < colIndex) {
                         cell = this.getCell(cellInfo.rowIndex, cellInfo.cellIndex);
                         cell.colSpan = cellInfo.colSpan + 1;
@@ -18891,8 +18902,12 @@ UE.plugins['video'] = function (){
                 cacheMap = {};
             for (var rowIndex = 0; rowIndex < rowsNum;) {
                 var infoRow = indexTable[rowIndex],
-                    cellInfo = infoRow[colIndex],
-                    key = cellInfo.rowIndex + '_' + cellInfo.colIndex;
+                    cellInfo = infoRow[colIndex];
+                if (!cellInfo) {
+                    rowIndex += 1;
+                    continue;
+                }
+                var key = cellInfo.rowIndex + '_' + cellInfo.colIndex;
                 // 跳过已经处理过的Cell
                 if (cacheMap[key])continue;
                 cacheMap[key] = 1;
@@ -19060,7 +19075,7 @@ UE.plugins['video'] = function (){
 
     };
     function showError(e) {
-        console.log(e);
+        //console.log(e);
     }
 })();
 
@@ -19335,12 +19350,18 @@ UE.plugins['video'] = function (){
                 rightColIndex = cellInfo.colIndex + cellInfo.colSpan;
             if (rightColIndex >= ut.colsNum) return -1; // 如果处于最右边则不能向右合并
 
-            var rightCellInfo = ut.indexTable[cellInfo.rowIndex][rightColIndex],
-                rightCell = table.rows[rightCellInfo.rowIndex].cells[rightCellInfo.cellIndex];
-            if (!rightCell || cell.tagName != rightCell.tagName) return -1; // TH和TD不能相互合并
+            var rightCellInfo = ut.indexTable[cellInfo.rowIndex][rightColIndex];
+            if (rightCellInfo) {
+                //如果有右侧单元格
+                var rightCell = table.rows[rightCellInfo.rowIndex].cells[rightCellInfo.cellIndex];
+                if (!rightCell || cell.tagName != rightCell.tagName) return -1; // TH和TD不能相互合并
 
-            // 当且仅当两个Cell的开始列号和结束列号一致时能进行合并
-            return (rightCellInfo.rowIndex == cellInfo.rowIndex && rightCellInfo.rowSpan == cellInfo.rowSpan) ? 0 : -1;
+                // 当且仅当两个Cell的开始列号和结束列号一致时能进行合并
+                return (rightCellInfo.rowIndex == cellInfo.rowIndex && rightCellInfo.rowSpan == cellInfo.rowSpan) ? 0 : -1;
+            } else {
+                //没有右侧单元格
+                return -1;
+            }
         },
         execCommand: function (cmd) {
             var rng = this.selection.getRange(),
@@ -19514,12 +19535,18 @@ UE.plugins['video'] = function (){
                 upRowIndex = cellInfo.rowIndex - 1;
             if (upRowIndex == -1) return -1; // 如果处于最上边则不能向上合并
 
-            var upCellInfo = ut.indexTable[upRowIndex][cellInfo.colIndex],
-                downCell = table.rows[upCellInfo.rowIndex].cells[upCellInfo.cellIndex];
-            if (!downCell || cell.tagName != downCell.tagName) return -1; // TH和TD不能相互合并
+            var upCellInfo = ut.indexTable[upRowIndex][cellInfo.colIndex]
+            if (upCellInfo) {
+                //如果有上一行同列单元格
+                var downCell = table.rows[upCellInfo.rowIndex].cells[upCellInfo.cellIndex];
+                if (!downCell || cell.tagName != downCell.tagName) return -1; // TH和TD不能相互合并
 
-            // 当且仅当两个Cell的开始列号和结束列号一致时能进行合并
-            return (upCellInfo.colIndex == cellInfo.colIndex && upCellInfo.colSpan == cellInfo.colSpan) ? 0 : -1;
+                // 当且仅当两个Cell的开始列号和结束列号一致时能进行合并
+                return (upCellInfo.colIndex == cellInfo.colIndex && upCellInfo.colSpan == cellInfo.colSpan) ? 0 : -1;
+            } else {
+                //没有上一行同列单元格
+                return -1;
+            }
         },
         execCommand: function () {
             var rng = this.selection.getRange(),
@@ -19544,12 +19571,18 @@ UE.plugins['video'] = function (){
                 downRowIndex = cellInfo.rowIndex + cellInfo.rowSpan;
             if (downRowIndex >= ut.rowsNum) return -1; // 如果处于最下边则不能向下合并
 
-            var downCellInfo = ut.indexTable[downRowIndex][cellInfo.colIndex],
-                downCell = table.rows[downCellInfo.rowIndex].cells[downCellInfo.cellIndex];
-            if (!downCell || cell.tagName != downCell.tagName) return -1; // TH和TD不能相互合并
+            var downCellInfo = ut.indexTable[downRowIndex][cellInfo.colIndex];
+            if (downCellInfo) {
+                //如果有下一行的同列单元格
+                var downCell = table.rows[downCellInfo.rowIndex].cells[downCellInfo.cellIndex];
+                if (!downCell || cell.tagName != downCell.tagName) return -1; // TH和TD不能相互合并
 
-            // 当且仅当两个Cell的开始列号和结束列号一致时能进行合并
-            return (downCellInfo.colIndex == cellInfo.colIndex && downCellInfo.colSpan == cellInfo.colSpan) ? 0 : -1;
+                // 当且仅当两个Cell的开始列号和结束列号一致时能进行合并
+                return (downCellInfo.colIndex == cellInfo.colIndex && downCellInfo.colSpan == cellInfo.colSpan) ? 0 : -1;
+            } else {
+                //没有下一行单元格
+                return -1;
+            }
         },
         execCommand: function () {
             var rng = this.selection.getRange(),
@@ -19673,6 +19706,21 @@ UE.plugins['video'] = function (){
                 }
             }
             if (table.getAttribute("interlaced") === "enabled")this.fireEvent("interlacetable", table);
+        }
+    };
+    UE.commands["deletecell"] = {
+        queryCommandState: function () {
+            var tableItems = getTableItemsByRange(this);
+            return tableItems.cell ? 0 : -1;
+        },
+        execCommand: function () {
+            var cell = getTableItemsByRange(this).cell,
+                ut = getUETable(cell);
+            var tds = ut.selectedTds;
+            tds.push(cell);
+            utils.each(tds, function (c) {
+                c.remove();
+            });
         }
     };
     UE.commands["insertcol"] = {
@@ -20373,6 +20421,7 @@ UE.plugins['table'] = function () {
         "mergecells": 1,
         "insertrow": 1,
         "insertrownext": 1,
+        "deletecell": 1,
         "deleterow": 1,
         "insertcol": 1,
         "insertcolnext": 1,
@@ -22421,6 +22470,10 @@ UE.plugins['contextmenu'] = function () {
                             cmdName:'deletetable'
                         },
                         '-',
+                        {
+                            label:lang.deletecell,
+                            cmdName:'deletecell'
+                        },
                         {
                             label:lang.deleterow,
                             cmdName:'deleterow'

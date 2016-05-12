@@ -249,4 +249,15 @@ public class ManageThemesService {
         }
     }
 
+    /**
+     * 查询名称是否重复  根据名称及父id
+     * @param name
+     * @param parentId
+     * @return
+     * @author CRX
+     * @createDate 2016-5-10
+     */
+    public List<ThemePage> getThemePagesByNameAndPId(String name, Integer parentId) {
+        return pageDao.queryByNameAndParentId(name, parentId);
+    }
 }

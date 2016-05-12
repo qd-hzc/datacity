@@ -51,11 +51,15 @@ public class DataSetController extends BaseController {
     public Map<String, Object> saveDataSet(DataSet dataSet) {
         Map<String, Object> result = null;
         try {
-            dataSetService.saveDataSet(dataSet);
-            result = genSuccessMsg(null, "保存成功", 200);
+            String msg = dataSetService.saveDataSet(dataSet);
+            if (msg != null) {
+                result = genFaultMsg(msg);
+            } else {
+                result = genSuccessMsg(null, "保存成功", 200);
+            }
         } catch (Exception e) {
             e.printStackTrace();
-            result = genFaultMsg(null, "保存失败", 500);
+            result = genFaultMsg(null, "保存失败,服务端运行异常!", 500);
         }
         return result;
     }
@@ -79,13 +83,14 @@ public class DataSetController extends BaseController {
 
     /**
      * 返回所有数据集
+     *
      * @return
      * @author crx
      * @createDate 2016-3-22
      */
     @RequestMapping("/getAllDataSet")
     @ResponseBody
-    public Object getAllDataSet(){
-        return  dataSetService.getAlldataSet();
+    public Object getAllDataSet() {
+        return dataSetService.getAlldataSet();
     }
 }

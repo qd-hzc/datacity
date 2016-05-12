@@ -76,7 +76,11 @@
                     datas.set('name', rec.name);
                     datas.set('infoPage', rec.infoPage);
                     datas.set('comments', rec.comments);
-                    metadataTypeStore.sync();
+                    metadataTypeStore.sync({
+                        failure:function(){
+                            metadataTypeStore.reload();
+                        }
+                    });
                     win.close();
                 });
             } else {

@@ -92,6 +92,7 @@
                     {name: 'depFax', type: 'string'},
                     {name: 'depEmail', type: 'string'},
                     {name: 'pDep', type: 'int'},
+                    {name: 'text', type: 'string'},
                     {name: 'sort', type: 'int'}
                 ]
             });

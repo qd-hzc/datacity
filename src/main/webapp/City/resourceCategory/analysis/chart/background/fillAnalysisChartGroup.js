@@ -16,11 +16,18 @@ Ext.fillAnalysisChartGroup.init = function (fnt, record) {
     }
     var textField = new Ext.form.field.Text({
         name: 'name',
-        fieldLabel: '分组名称',
+        fieldLabel: '分组名称<b style="color:red">*</b>',
         labelWidth: 80,
         margin: '5 15',
         maxLength:50,
-        allowBlank: false
+        allowBlank: false,
+        validator:function(text){
+            if(text.length && text.replace(/\s+/g, "").length<text.length){
+                return "不允许输入空格！";
+            }else {
+                return true;
+            }
+        }
     });
 
     var textContainer = new Ext.form.FieldContainer({

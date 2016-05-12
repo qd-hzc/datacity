@@ -35,6 +35,7 @@ UE.I18N['en'] = {
         'insertcol': 'InsertCol',
         'mergeright': 'MergeRight',
         'mergedown': 'MergeDown',
+        'deletecell': 'DeleteCell',
         'deleterow': 'DeleteRow',
         'deletecol': 'DeleteCol',
         'splittorows': 'SplitToRows',

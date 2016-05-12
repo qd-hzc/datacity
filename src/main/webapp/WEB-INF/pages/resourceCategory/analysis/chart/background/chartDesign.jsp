@@ -37,22 +37,24 @@
                         var result = Ext.JSON.decode(response.responseText);
                         var node = pNode.createNode(result.datas[0]);
                         pNode.appendChild(node);
+                        createChartInfo(node);
+
                         if (fn) {
                             fn(node);
                         }
-                        if(node.get("metaType")==METADATA_TYPE.TIME)
-                        Ext.Ajax.request({
-                            url: GLOBAL_PATH + '/support/resourcecategory/analysis/chart/updateChartStructureTimeData',
-                            method: 'POST',
-                            jsonData: Ext.JSON.decode(result.datas[0].metaExt).timeRange,
-                            params: {
-                                foreignType: 2,// 图表
-                                foreignId: result.datas[0].id// 图表结构id
-                            },
-                            success: function (response, opts) {
-                                var result = Ext.JSON.decode(response.responseText);
-                            }
-                        })
+                        if (node.get("metaType") == METADATA_TYPE.TIME)
+                            Ext.Ajax.request({
+                                url: GLOBAL_PATH + '/support/resourcecategory/analysis/chart/updateChartStructureTimeData',
+                                method: 'POST',
+                                jsonData: Ext.JSON.decode(result.datas[0].metaExt).timeRange,
+                                params: {
+                                    foreignType: 2,// 图表
+                                    foreignId: result.datas[0].id// 图表结构id
+                                },
+                                success: function (response, opts) {
+                                    var result = Ext.JSON.decode(response.responseText);
+                                }
+                            })
                     }
                 })
             }
@@ -157,6 +159,7 @@
                     fields: [
                         /*{name: 'id', type: 'int'},*/
                         {name: 'dataName', type: 'string'},
+                        {name: 'text', type: 'string'},
                         {name: 'dataValue', type: 'int'},
                         {name: 'dataType', type: 'int'},
                         {name: 'dataInfo1', type: 'string'},
@@ -198,8 +201,8 @@
                     actionMethods: {create: 'POST', read: 'POST', update: 'POST', destroy: 'POST'},
 //                    url: GLOBAL_PATH + '/resourcecategory/analysis/common/analysis/getItemGroupTree',
                     url: GLOBAL_PATH + '/resourcecategory/analysis/common/analysis/getGroupInfoTreeForChart',
-                    extraParams:{
-                        isDynamic:isDynamic
+                    extraParams: {
+                        isDynamic: isDynamic
                     },
                     /*api: {
                      create: GLOBAL_PATH + '/support/resourcecategory/analysis/chart/updateAnalysisChartBase',
@@ -222,10 +225,10 @@
                 width: '100%',
                 autoScroll: true,
                 flex: 1,
-                tbar: ['<b>指标元数据</b>','->',{
+                tbar: ['<b>指标元数据</b>', '->', {
                     xtype: 'triggertext',
-                    handler: function (_this,n) {
-                        queryTreeByLocal(metaItem,itemDataStore,'dataName',n);
+                    handler: function (_this, n) {
+                        queryTreeByLocal(metaItem, itemDataStore, 'dataName', n);
                     }
                 }],
                 viewConfig: {
@@ -264,10 +267,10 @@
                 width: '100%',
                 flex: 1,
                 store: groupDataStore,
-                tbar: ['<b>其他元数据</b>','->',{
+                tbar: ['<b>其他元数据</b>', '->', {
                     xtype: 'triggertext',
-                    handler: function (_this,n) {
-                        queryTreeByLocal(metaDict,groupDataStore,'dataName',n);
+                    handler: function (_this, n) {
+                        queryTreeByLocal(metaDict, groupDataStore, 'dataName', n);
                     }
                 }],
                 viewConfig: {
@@ -385,8 +388,48 @@
                         break;
                 }
             }
+            /**
+             * 根据单个节点生成分类轴或序列
+             */
+            function createChartInfo(node) {
+                var infoNodeList = [];
+                var _type = node.get('structureType');
+                if (node.isLeaf() || node.get('realNode') == ANALYSISCHART_INFO.REALNODE) {
+                    var tmp = {
+                        name: node.get('metaName'),
+                        chartId: chartId,
+                        infoType: _type,
+                        chartType: ANALYSISCHART_INFO.CHART_LINE,
+                        isShow: ANALYSISCHART_INFO.SERIES_SHOW,
+                        axis: ANALYSISCHART_INFO.LEFTAXIS,
+                        structureId: node.get('id'),
+                        infoSort: node.get('structureSort'),
+                        metaType: node.get('metaType')
+                    };
+                    infoNodeList.push(tmp);
+                }
 
-            function createChartInfo(root) {
+                Ext.Ajax.request({
+                    url: GLOBAL_PATH + '/support/resourcecategory/analysis/chart/updateChartInfo',
+                    method: 'POST',
+                    jsonData: infoNodeList,
+                    success: function (response, opts) {
+                        var result = Ext.JSON.decode(response.responseText);
+                        if (result.success) {
+                            if (_type == ANALYSISCHART_INFO.TYPE_CATEGORY) {
+                                infoCategoryStore.add(result.datas);
+                                infoCategoryStore.reload();
+                            } else if (_type == ANALYSISCHART_INFO.TYPE_SERIES) {
+                                infoSeriesStore.add(result.datas);
+                                infoSeriesStore.reload();
+                            }
+                        }
+                    }
+                });
+
+            }
+
+            function createChartInfos(root) {
                 var nodeList = [];
                 var infoNodeList = [];
                 var _type = root.get('structureType');
@@ -421,8 +464,10 @@
                         if (result.success) {
                             if (_type == ANALYSISCHART_INFO.TYPE_CATEGORY) {
                                 infoCategoryStore.add(result.datas);
+                                infoCategoryStore.reload();
                             } else if (_type == ANALYSISCHART_INFO.TYPE_SERIES) {
                                 infoSeriesStore.add(result.datas);
+                                infoSeriesStore.reload();
                             }
                         }
                     }
@@ -439,6 +484,7 @@
                         {name: 'id', type: 'int'},
                         {name: 'chartId', type: 'int'},
                         {name: 'metaName', type: 'string'},
+                        {name: 'text', type: 'string'},
                         {name: 'metaId', type: 'int'},
                         {name: 'metaType', type: 'int'},
                         {name: 'metaExt', type: 'string'},
@@ -487,7 +533,7 @@
                             root.findChildBy(function (node) {
                                 _this.byIdMap[node.getId()] = node;
                                 return false;
-                            },root, true);
+                            }, root, true);
                         }
                     }
                 }
@@ -588,7 +634,7 @@
                         editType = NODE_TYPE.EMPTY;
                     }
                     var isHidden = true;
-                    if(record.get('metaType')==METADATA_TYPE.TIME||record.get('metaType')==METADATA_TYPE.ITEM){
+                    if (record.get('metaType') == METADATA_TYPE.TIME || record.get('metaType') == METADATA_TYPE.ITEM) {
                         isHidden = false;
                     }
                     structureMenu = new Ext.menu.Menu({
@@ -597,27 +643,30 @@
                             text: '修改',
                             name: "editInfo",
                             iconCls: 'Pageedit',
-                            hidden:isHidden,
+                            hidden: isHidden,
                             handler: function () {
-                                if(record.get('metaType')==METADATA_TYPE.TIME){
+                                if (record.get('metaType') == METADATA_TYPE.TIME) {
                                     var win = Ext.addStructureTimeDataWin.init(fres, chartId, function (data) {
                                         var metaExt = {
                                             timeRange: data.timeRange,
                                             periodType: periodType
                                         };
-                                        record.set("metaExt",Ext.encode(metaExt));
+                                        record.set("metaExt", Ext.encode(metaExt));
                                         refresh(record);
                                         setPropertyGrid(record);
                                         win.close();
-                                    },record);
+                                    }, record);
                                 }
-                                if(record.get('metaType')==METADATA_TYPE.ITEM){
+                                if (record.get('metaType') == METADATA_TYPE.ITEM) {
                                     showAddStructureWindow(record, function (metaExt) {
+                                        record.set("metaExt", Ext.encode(metaExt));
+                                        refresh(record);
+                                        setPropertyGrid(record);
                                     })
                                 }
                             }
 
-                        },{
+                        }, {
                             text: '修改节点',
                             name: "editNode",
                             iconCls: 'Pageedit',
@@ -643,11 +692,11 @@
 
             };
             var structureCategory = new Ext.tree.Panel({
-                tbar: ['<b>分类轴结构</b>','->', {
+                tbar: ['<b>分类轴结构</b>', '->', {
                     type: 'button',
                     text: '生成分类轴',
                     handler: function () {
-                        createChartInfo(structureCategory.getRootNode());
+                        createChartInfos(structureCategory.getRootNode());
                     }
                 }],
                 width: '100%',
@@ -705,7 +754,8 @@
                             }, null, true);
                             categoryStore.sync({
                                 params: {drag: true}, success: function () {
-                                    infoCategoryStore.reload();
+                                    createChartInfos(structureCategory.getRootNode());
+                                    //infoCategoryStore.reload();
                                 }
                             });
                             structureSeries.getRootNode().findChildBy(function (tmpNode) {
@@ -721,6 +771,7 @@
                                     infoSeriesStore.reload();
                                 }
                             });
+
                             return false;
                         }
                     }
@@ -834,11 +885,11 @@
             }
 
             var structureSeries = new Ext.tree.Panel({
-                tbar: ['<b>序列结构</b>','->', {
+                tbar: ['<b>序列结构</b>', '->', {
                     type: 'button',
                     text: '生成序列',
                     handler: function () {
-                        createChartInfo(structureSeries.getRootNode());
+                        createChartInfos(structureSeries.getRootNode());
                     }
                 }],
                 width: '100%',
@@ -894,7 +945,8 @@
                             seriesStore.sync({
                                 params: {drag: true},
                                 success: function () {
-                                    infoSeriesStore.reload();
+                                    createChartInfos(structureSeries.getRootNode());
+                                    //infoSeriesStore.reload();
                                 }
                             });
                             structureCategory.getRootNode().findChildBy(function (tmpNode) {
@@ -963,7 +1015,7 @@
                 height: '100%',
                 //autoScroll: true,
                 items: [propertyGrid],
-                tbar: ['<b>节点信息</b>','->',{}]
+                tbar: ['<b>节点信息</b>', '->', {}]
             });
 
             //-----------------------------------------------结构结束---------------------------------------------
@@ -1048,7 +1100,7 @@
                         }
                     }
                 },
-                tbar: ['<b>分类轴</b>','->', {
+                tbar: ['<b>分类轴</b>', '->', {
                     text: '修改分类轴',
                     handler: function () {
                         var selected = infoCategory.getSelection();
@@ -1060,6 +1112,8 @@
                                 });
                                 infoCategoryStore.sync();
                             }, selected, ANALYSISCHART_INFO.TYPE_CATEGORY);
+                        }else{
+                            Ext.Msg.alert("提示","请选择分类轴！");
                         }
                     }
                 }, {
@@ -1112,7 +1166,7 @@
                 },
                 width: '100%',
                 flex: 1,
-                tbar: ['<b>序列</b>','->', {
+                tbar: ['<b>序列</b>', '->', {
                     text: '修改序列',
                     handler: function () {
                         var selected = infoSeries.getSelection();
@@ -1124,6 +1178,8 @@
                                 });
                                 infoSeriesStore.sync();
                             }, selected, ANALYSISCHART_INFO.TYPE_SERIES);
+                        }else{
+                            Ext.Msg.alert("提示","请选择序列！");
                         }
                     }
                 }, {
@@ -1184,8 +1240,8 @@
                     text: '预览图表',
                     handler: function () {
 //                        Ext.fillChartInfoWin.init();
-                        createChartInfo(structureCategory.getRootNode());
-                        createChartInfo(structureSeries.getRootNode());
+                        //createChartInfos(structureCategory.getRootNode());
+                        //createChartInfos(structureSeries.getRootNode());
                         open(GLOBAL_PATH + '/support/resourcecategory/analysis/chart/test?chartId=' + chartId);
                     }
                 }]

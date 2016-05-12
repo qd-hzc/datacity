@@ -66,7 +66,7 @@ public class TextLabelController extends BaseController {
             result = genSuccessMsg("保存成功");
         } catch (Exception e) {
             e.printStackTrace();
-            result = genFaultMsg("保存失败,服务器端响应失败");
+            result = genFaultMsg("保存失败,该名称已存在!");
         }
         return result;
     }

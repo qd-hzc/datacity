@@ -296,7 +296,7 @@
             viewport.query('*[name=pass]')[0].hide();
             viewport.query('*[name=reject]')[0].hide();
         }
-        if(rptStatus == RPT_STATUS.PASS){
+        if(rptStatus == RPT_STATUS.PASS||rptStatus == RPT_STATUS.WAITING_PASS){
             viewport.query('*[name=save]')[0].hide();
             viewport.query('*[name=submit]')[0].hide();
             viewport.query('*[name=pass]')[0].hide();

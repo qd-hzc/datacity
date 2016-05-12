@@ -76,7 +76,11 @@
                     datas.set('code', rec.code);
                     datas.set('r1', rec.r1);
                     datas.set('comments', rec.comments);
-                    unitdataStore.sync();
+                    unitdataStore.sync({
+                        failure:function(){
+                            unitdataStore.reload();
+                        }
+                    });
                     win.close();
                 });
             } else {

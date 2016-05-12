@@ -63,41 +63,47 @@ public class BasicChartConfigService {
         }
         return result;
     }
+
     public List<AnalysisChartBase> queryAllChart() {
         List<AnalysisChartBase> result = null;
         result = analysisChartBaseDao.queryAllChart();
         return result;
     }
+
     public List<AnalysisChartBase> queryAllChartExceptMap() {
         List<AnalysisChartBase> result = new ArrayList<>();
         List<AnalysisChartBase> analysisChartBaseList = analysisChartBaseDao.queryAllChart();
-        for(AnalysisChartBase analysisChartBase: analysisChartBaseList){
+        for (AnalysisChartBase analysisChartBase : analysisChartBaseList) {
             Integer count = analysisChartInfoDao.getMapCount(analysisChartBase.getId());
-            if(count==0){
+            if (count == 0) {
                 analysisChartBase.setName(analysisChartBase.getTitle());
                 result.add(analysisChartBase);
             }
         }
         return result;
     }
+
     public List<AnalysisChartBase> queryAllMap() {
         List<AnalysisChartBase> result = new ArrayList<>();
         List<AnalysisChartBase> analysisChartBaseList = analysisChartBaseDao.queryAllChart();
-        for(AnalysisChartBase analysisChartBase: analysisChartBaseList){
+        for (AnalysisChartBase analysisChartBase : analysisChartBaseList) {
             Integer count = analysisChartInfoDao.getMapCount(analysisChartBase.getId());
-            if(count>0){
+            if (count > 0) {
                 analysisChartBase.setName(analysisChartBase.getTitle());
                 result.add(analysisChartBase);
             }
         }
         return result;
     }
+
     /**
      * 添加、修改图表分组
      *
      * @param chartGroupList
      */
-    public List<AnalysisChartGroup> updateAnalysisChartGroup(List<AnalysisChartGroup> chartGroupList) {
+    public Map<String, Object> updateAnalysisChartGroup(List<AnalysisChartGroup> chartGroupList) {
+        Map<String, Object> map = new HashMap<>();
+        boolean nameRepeat = false;
         ConvertUtil<AnalysisChartGroup> cu = new ConvertUtil<>();
         AnalysisChartGroup data = null;
         Integer chartGroupId = null;
@@ -106,20 +112,32 @@ public class BasicChartConfigService {
             chartGroupId = tmpChartGroup.getId();
             if (chartGroupId != null) {
                 data = analysisChartGroupDao.queryById(tmpChartGroup.getId());
-                if (data != null) {
+                List<AnalysisChartGroup> analysisChartGroupList = null;
+                if (tmpChartGroup.getpId() != null) {
+                    analysisChartGroupList = analysisChartGroupDao.getByNameAndId(data.getName(), tmpChartGroup.getpId(), data.getId());
+                }else if(tmpChartGroup.getName() != null){
+                    analysisChartGroupList = analysisChartGroupDao.getByNameAndId(tmpChartGroup.getName(), data.getpId(), data.getId());
+                }
+                if (data != null && (analysisChartGroupList == null || analysisChartGroupList.size() == 0)) {
                     cu.replication(tmpChartGroup, data, AnalysisChartGroup.class.getName());
                     analysisChartGroupDao.update(data, true);
                     result.add(data);
+                } else if (analysisChartGroupList != null && analysisChartGroupList.size() > 0) {
+                    nameRepeat = true;
                 }
             } else {
-                List<AnalysisChartGroup> analysisChartGroupList = analysisChartGroupDao.getByAllName(tmpChartGroup.getName());
-                if(analysisChartGroupList.size()==0) {
+                List<AnalysisChartGroup> analysisChartGroupList = analysisChartGroupDao.getByAllNameAndpId(tmpChartGroup.getName(), tmpChartGroup.getpId());
+                if (analysisChartGroupList.size() == 0) {
                     analysisChartGroupDao.insert(tmpChartGroup, true);
                     result.add(tmpChartGroup);
+                } else {
+                    nameRepeat = true;
                 }
             }
         }
-        return result;
+        map.put("datas", result);
+        map.put("nameRepeat", nameRepeat);
+        return map;
     }
 
     public void delAnalysisChartGroup(List<AnalysisChartGroup> chartGroupList) {
@@ -141,7 +159,9 @@ public class BasicChartConfigService {
      *
      * @param chartBaseList
      */
-    public List<AnalysisChartBase> updateAnalysisChartBase(List<AnalysisChartBase> chartBaseList) {
+    public Map<String, Object> updateAnalysisChartBase(List<AnalysisChartBase> chartBaseList) {
+        Map<String, Object> map = new HashMap<>();
+        boolean nameRepeat = false;
         ConvertUtil<AnalysisChartBase> cu = new ConvertUtil<>();
         AnalysisChartBase data = null;
         Integer chartBaseId = null;
@@ -150,17 +170,30 @@ public class BasicChartConfigService {
             chartBaseId = tmpChartBase.getId();
             if (chartBaseId != null) {
                 data = analysisChartBaseDao.queryById(tmpChartBase.getId());
-                if (data != null) {
+                List<AnalysisChartBase> analysisChartBaseList = null;
+                if (tmpChartBase.getTitle() != null) {
+                    analysisChartBaseList = analysisChartBaseDao.getByNameAndId(tmpChartBase.getTitle(), data.getGroupId(), data.getId());
+                }
+                if (data != null && (analysisChartBaseList == null || analysisChartBaseList.size() == 0)) {
                     cu.replication(tmpChartBase, data, AnalysisChartBase.class.getName());
                     analysisChartBaseDao.update(data, true);
                     result.add(data);
+                } else if (analysisChartBaseList != null && analysisChartBaseList.size() > 0) {
+                    nameRepeat = true;
                 }
             } else {
-                analysisChartBaseDao.insert(tmpChartBase, true);
-                result.add(tmpChartBase);
+                List<AnalysisChartBase> AnalysisChartBaseList = analysisChartBaseDao.getByAllNameAndGroupId(tmpChartBase.getTitle(), tmpChartBase.getGroupId());
+                if (AnalysisChartBaseList.size() == 0) {
+                    analysisChartBaseDao.insert(tmpChartBase, true);
+                    result.add(tmpChartBase);
+                } else {
+                    nameRepeat = true;
+                }
             }
         }
-        return result;
+        map.put("datas", result);
+        map.put("nameRepeat", nameRepeat);
+        return map;
     }
 
     public void delAnalysisChartBase(List<AnalysisChartBase> chartBaseList) {
@@ -168,6 +201,7 @@ public class BasicChartConfigService {
             analysisChartBaseDao.delete(tmpChartBase, true);
         }
     }
+
     public Map<String, Object> getChartById(Integer id) {
         Map<String, Object> result = new HashMap<>();
         AnalysisChartBase analysisChartBase = queryAnalysisChartBaseById(id);
@@ -200,6 +234,7 @@ public class BasicChartConfigService {
         result.put("series", seriesList);
         return result;
     }
+
     /**
      * 判断条件中是否含有动态指标和时间
      *
@@ -211,7 +246,7 @@ public class BasicChartConfigService {
             if (analysisChartStructure.getMetaType() == Constant.MetadataType.DYNAMIC_ITEM ||
                     analysisChartStructure.getMetaType() == Constant.MetadataType.DYNAMIC_ITEMGROUP ||
                     analysisChartStructure.getMetaType() == Constant.MetadataType.DYNAMIC_SUROBJ ||
-                    analysisChartStructure.getMetaType() == Constant.MetadataType.DYNAMIC_TIMEFRAME||
+                    analysisChartStructure.getMetaType() == Constant.MetadataType.DYNAMIC_TIMEFRAME ||
                     analysisChartStructure.getMetaType() == Constant.MetadataType.DYNAMIC_TIME) {
                 return 1;
             }

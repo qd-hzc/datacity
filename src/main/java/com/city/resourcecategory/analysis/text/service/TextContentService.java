@@ -23,9 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by wgx on 2016/3/16.
@@ -113,60 +111,76 @@ public class TextContentService {
      * @param datas
      * @return
      */
-    public List<TextContent> updateTextContent(List<TextContent> datas, User user, Integer themeId) {
+    public Map<String, Object> updateTextContent(List<TextContent> datas, User user, Integer themeId) {
+        Map<String, Object> map = new HashMap<>();
+        boolean nameRepeat = false;
         Integer dataId = null;
         List<TextContent> result = new ArrayList<>();
         for (TextContent data : datas) {
             dataId = data.getId();
             String labelIds = data.getLabelIds();
-            if (dataId == null) {
-                if (themeId != null) {
-                    TextTheme textTheme = new TextTheme();
-                    textTheme.setId(themeId);
-                    data.setTheme(textTheme);
-                    data.setCreator(user.getId());
-                    data.setCreatorName(user.getUserName());
-                    data.setCreateTime(new Date());
-                    data.setStatus(Constant.TEXT_CONTENT_STATUS.WAIT_CHECK);
-                    TextTheme textTheme1 = textThemeDao.queryById(themeId);
-                    if (textTheme1.getModelId() != null) {
-                        TextModel textModel = textModelDao.queryById(textTheme1.getModelId());
-                        data.setContent(textModel.getContent());
+            if (themeId != null) {
+                if (dataId == null) {
+                    List<TextContent> textContentList = textContentDao.queryByName(data.getName(), themeId);
+                    if (textContentList.size()==0) {
+                        TextTheme textTheme = new TextTheme();
+                        textTheme.setId(themeId);
+                        data.setTheme(textTheme);
+                        data.setCreator(user.getId());
+                        data.setCreatorName(user.getUserName());
+                        data.setCreateTime(new Date());
+                        data.setStatus(Constant.TEXT_CONTENT_STATUS.WAIT_CHECK);
+                        TextTheme textTheme1 = textThemeDao.queryById(themeId);
+                        if (textTheme1.getModelId() != null) {
+                            TextModel textModel = textModelDao.queryById(textTheme1.getModelId());
+                            data.setContent(textModel.getContent());
+                        }
+                        textContentDao.insert(data, true);
+                        result.add(data);
+                        textLabelService.linkLabel(data.getId(), labelIds);
+                    }else{
+                        nameRepeat = true;
                     }
-                    textContentDao.insert(data, true);
-                    result.add(data);
-                    textLabelService.linkLabel(data.getId(), labelIds);
+                } else {
+                    List<TextContent> textContentList =null;
+                    if(data.getName()!=null) {
+                        textContentList = textContentDao.queryByNameAndId(data.getName(), themeId,dataId);
+                    }
+                    if(textContentList==null||textContentList.size()==0) {
+                        ConvertUtil<TextContent> cu = new ConvertUtil<>();
+                        TextContent textContent = textContentDao.queryById(dataId);
+                        cu.replication(data, textContent, TextContent.class.getName());
+                        textContent.setUpdator(user.getId());
+                        textContent.setUpdatorName(user.getUserName());
+                        textContent.setUpdateTime(new Date());
+                        textContentDao.update(textContent, true);
+                        result.add(textContent);
+                        textLabelService.linkLabel(dataId, labelIds);
+                    }else{
+                        nameRepeat = true;
+                    }
                 }
-            } else {
-                ConvertUtil<TextContent> cu = new ConvertUtil<>();
-                TextContent textContent = textContentDao.queryById(dataId);
-                cu.replication(data, textContent, TextContent.class.getName());
-                textContent.setUpdator(user.getId());
-                textContent.setUpdatorName(user.getUserName());
-                textContent.setUpdateTime(new Date());
-                textContentDao.update(textContent, true);
-                result.add(textContent);
-                textLabelService.linkLabel(dataId, labelIds);
             }
-
-
         }
-        return result;
-    }
+            map.put("datas", result);
+            map.put("nameRepeat", nameRepeat);
+            return map;
+        }
 
-    /**
-     * 添加分析主题(前台添加)
-     *
-     * @param user
-     * @param themeId
-     * @param name
-     * @param content
-     * @param analysisDate
-     * @return
-     */
-    public TextContent addTextContent(User user,Integer id, Integer themeId, String name, String content, String analysisDate) {
+        /**
+         * 添加分析主题(前台添加)
+         *
+         * @param user
+         * @param themeId
+         * @param name
+         * @param content
+         * @param analysisDate
+         * @return
+         */
+
+    public TextContent addTextContent(User user, Integer id, Integer themeId, String name, String content, String analysisDate) {
         TextContent result = new TextContent();
-        if(id==null) {
+        if (id == null) {
             if (themeId != null) {
                 List<TextContent> textContentList = queryAllTextContentByThemeId(null, themeId, null, null, null);
                 TextTheme textTheme = new TextTheme();
@@ -183,7 +197,7 @@ public class TextContentService {
                 result.setAnalysisDate(new Date(analysisDate));
                 textContentDao.insert(result, true);
             }
-        }else{
+        } else {
             TextContent data = new TextContent();
             data.setName(name);
             data.setContent(content);

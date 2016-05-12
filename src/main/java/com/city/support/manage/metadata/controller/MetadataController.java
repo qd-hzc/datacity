@@ -1,6 +1,7 @@
 package com.city.support.manage.metadata.controller;
 
 import com.city.common.controller.BaseController;
+import com.city.common.pojo.Constant;
 import com.city.common.pojo.Page;
 import com.city.common.util.EsiJsonParamUtil;
 import com.city.support.manage.metadata.entity.*;
@@ -60,8 +61,13 @@ public class MetadataController extends BaseController {
     public Map<String, Object> saveMetadataType(MetadataType metadataType) {
         Map<String, Object> result;
         try {
-            metadataTypeService.save(metadataType);
-            result = genSuccessMsg(metadataType, "保存成功", 200);
+            List<MetadataType> metadataTypeList = metadataTypeService.findMetadataTypeByName(metadataType.getName());
+            if(metadataTypeList.size()==0) {
+                metadataTypeService.save(metadataType);
+                result = genSuccessMsg(metadataType, "保存成功", 200);
+            }else{
+                result = genFaultMsg(null, "名称已经存在！", 500);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             result = genFaultMsg(null, "保存失败", 500);
@@ -84,8 +90,14 @@ public class MetadataController extends BaseController {
         try {
             metadataTypeList = paramUtil.parseObjToList(request,MetadataType.class);
             if(metadataTypeList!=null){
-                metadataTypeService.update(metadataTypeList);
-                result = genSuccessMsg(null, "更新成功", 200);
+                int reqResult = metadataTypeService.update(metadataTypeList);
+                if (reqResult == Constant.RequestResult.SUCCESS) {
+                    result = genSuccessMsg(null, "更新成功", 200);
+                } else if (reqResult == Constant.RequestResult.EXIST) {
+                    result = genFaultMsg(null, "名称已经存在！", null);
+                } else {
+                    result = genFaultMsg(null, "更新失败", null);
+                }
             }else{
                 result = genFaultMsg(null, "更新失败", 500);
             }
@@ -174,6 +186,17 @@ public class MetadataController extends BaseController {
     }
 
     /**
+     * 查询所有职务
+     *
+     * @return
+     */
+    @RequestMapping("/getAllDuties")
+    @ResponseBody
+    public List<MetadataInfo> getAllDuties() {
+        return metadataInfoService.findByType(Constant.systemConfigPojo.getDutyType(), null);
+    }
+
+    /**
      * 保存系统元数据类型
      *
      * @param metadataInfo
@@ -184,8 +207,17 @@ public class MetadataController extends BaseController {
     public Map<String, Object> saveMetadataInfo(MetadataInfo metadataInfo) {
         Map<String, Object> result;
         try {
-            metadataInfoService.save(metadataInfo);
-            result = genSuccessMsg(metadataInfo, "保存成功", 200);
+            if(metadataInfo.getType()!=null) {
+                List<MetadataInfo> metadataInfoList = metadataInfoService.getByTypeAndName(metadataInfo.getType(), metadataInfo.getName());
+                if (metadataInfoList.size() == 0) {
+                    metadataInfoService.save(metadataInfo);
+                    result = genSuccessMsg(metadataInfo, "保存成功", 200);
+                } else {
+                    result = genFaultMsg(null, "名称已存在！", 500);
+                }
+            }else{
+                result = genFaultMsg(null, "保存失败", 500);
+            }
         } catch (Exception e) {
             e.printStackTrace();
             result = genFaultMsg(null, "保存失败", 500);
@@ -207,9 +239,16 @@ public class MetadataController extends BaseController {
         EsiJsonParamUtil<MetadataInfo> paramUtil = new EsiJsonParamUtil<>();
         try {
             metadataInfoList = paramUtil.parseObjToList(request,MetadataInfo.class);
+
             if(metadataInfoList!=null){
-                metadataInfoService.update(metadataInfoList);
-                result = genSuccessMsg(null, "更新成功", 200);
+                int reqResult = metadataInfoService.update(metadataInfoList);
+                if (reqResult == Constant.RequestResult.SUCCESS) {
+                    result = genSuccessMsg(null, "更新成功", 200);
+                } else if (reqResult == Constant.RequestResult.EXIST) {
+                    result = genFaultMsg(null, "名称已经存在！", null);
+                } else {
+                    result = genFaultMsg(null, "保存失败", null);
+                }
             }else{
                 result = genSuccessMsg(null, "更新失败", 500);
             }

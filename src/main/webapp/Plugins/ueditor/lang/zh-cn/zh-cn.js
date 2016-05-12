@@ -235,6 +235,7 @@ UE.I18N['zh-cn'] = {
         'deletetable': "删除表格",
         'insertparagraphbefore': "前插入段落",
         'insertparagraphafter': '后插入段落',
+        'deletecell':'删除单元格',
         'deleterow': "删除当前行",
         'deletecol': "删除当前列",
         'insertrow': "前插入行",

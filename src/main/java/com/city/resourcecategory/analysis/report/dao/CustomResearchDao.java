@@ -97,4 +97,20 @@ public class CustomResearchDao extends BaseDao<CustomResearchEntity> {
         }
         return 0;
     }
+
+
+    /**
+     * 返回分析报表模板
+     * <pre>
+     *     根据分析报表名字，查询分析报表
+     * </pre>
+     *
+     * @param name 分析报表名字
+     * @return
+     * @author hzc
+     * @createDate 2016-5-6
+     */
+    public List<CustomResearchEntity> selectResearchByName(String name) {
+        return queryByHQL("from CustomResearchEntity where name ='" + name + "'");
+    }
 }

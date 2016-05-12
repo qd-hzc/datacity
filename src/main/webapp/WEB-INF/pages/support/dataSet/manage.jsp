@@ -95,6 +95,11 @@
                                     },
                                     success: function (response) {
                                         dataSetStore.reload({params: commonParams.dataSetParams});
+                                        //清空已选
+                                        itemStore.removeAll();
+                                        tfStore.removeAll();
+                                        researchObjStore.removeAll();
+                                        itemMenuStore.removeAll();
                                     },
                                     failure: function (response) {
                                         Ext.Msg.alert('失败', '删除失败!');
@@ -195,6 +200,10 @@
                 },
                 rowcontextmenu: function (_this, record, tr, rowIndex, e) {//右击行
                     e.preventDefault();
+                    //首先选中
+                    commonParams.dataSetDataParams.dataSetId = record.get('id');
+                    reloadDataSetData(null, true);
+                    //显示菜单
                     dataSetMenu.showAt(e.getXY());
                 },
                 rowclick: function (_this, record) {//点击行

@@ -41,4 +41,8 @@ public class GenSynthesisStrUtil extends GenTableStrUtil<ReportTemplate> {
         return tmp.getRptComments();
     }
 
+    @Override
+    protected String getDepByItem(EsiProperty property) {
+        return null;
+    }
 }

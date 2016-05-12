@@ -24,6 +24,10 @@ import org.apache.poi.poifs.filesystem.POIFSFileSystem;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.ss.util.CellRangeAddress;
 import org.apache.poi.ss.util.RegionUtil;
+import org.apache.poi.xssf.usermodel.XSSFCell;
+import org.apache.poi.xssf.usermodel.XSSFRow;
+import org.apache.poi.xssf.usermodel.XSSFSheet;
+import org.apache.poi.xssf.usermodel.XSSFWorkbook;
 import org.jsoup.Jsoup;
 import org.jsoup.nodes.Document;
 import org.jsoup.nodes.Element;
@@ -136,31 +140,45 @@ public class ReportExcelController extends BaseController {
             User user = SessionUtil.getUser(request.getSession());
             MultipartHttpServletRequest multipartHttpServletRequest = (MultipartHttpServletRequest) request;
             MultipartFile multipartFile = multipartHttpServletRequest.getFile("excel");
-            InputStream inputStream = multipartFile.getInputStream();
-            POIFSFileSystem fs = new POIFSFileSystem(inputStream);
+            Workbook wb = null;
+            boolean isXlsx = false;
+            try {
+                InputStream inputStream = multipartFile.getInputStream();
+                POIFSFileSystem fs = new POIFSFileSystem(inputStream);
+                wb = new HSSFWorkbook(fs);
+            } catch (Exception ex) {
+                InputStream inputStream = multipartFile.getInputStream();
+                wb = new XSSFWorkbook(inputStream);
+                isXlsx = true;
+            }
             // poi读取excel 进行解析
-            HSSFWorkbook wb = new HSSFWorkbook(fs);
+            //HSSFWorkbook wb = new HSSFWorkbook(fs);
             int sn = wb.getNumberOfSheets();
             if (sn > 0) {
                 int importAll = 0;//导入报表数
-                int passOrWait =0;//待审核和已审核数量
-                int noPerm =0;//没有权限的数量
+                int passOrWait = 0;//待审核和已审核数量
+                int noPerm = 0;//没有权限的数量
                 for (int i = 0; i < sn; i++) {
-                    HSSFSheet sheet = wb.getSheetAt(i);
+                    Sheet sheet = null;
+                    if (isXlsx) {
+                        sheet = (XSSFSheet) wb.getSheetAt(i);
+                    } else {
+                        sheet = (HSSFSheet) wb.getSheetAt(i);
+                    }
                     String sheetName = sheet.getSheetName();
                     // System.out.println(sheetName);
                     String[] sheets = sheetName.split(Constant.UNDERLINE);
-                    if (sheets.length != 3&&sheets.length != 2) {
+                    if (sheets.length != 3 && sheets.length != 2) {
                         continue;
                     } else {
-                        String name = sheets.length==3?sheets[0]:"";//名称
-                        String sheetTime = sheets.length==3?sheets[1]:sheets[0];//时间
-                        Integer rptTmpId = sheets.length==3?Integer.parseInt(sheets[2]):Integer.parseInt(sheets[1]);//模板id
+                        String name = sheets.length == 3 ? sheets[0] : "";//名称
+                        String sheetTime = sheets.length == 3 ? sheets[1] : sheets[0];//时间
+                        Integer rptTmpId = sheets.length == 3 ? Integer.parseInt(sheets[2]) : Integer.parseInt(sheets[1]);//模板id
                         ReportTemplate reportTemplate = reportManageService.getRptTmpById(rptTmpId);
                         //判断当前用户是否有填报某报表的权限
                         boolean isWrite = CurrentUser.hasWritePermission(request, rptTmpId);
-                        if (reportTemplate != null&&isWrite) {
-                            if (name.equals(reportTemplate.getName())||sheets.length == 2) {
+                        if (reportTemplate != null && isWrite) {
+                            if (name.equals(reportTemplate.getName()) || sheets.length == 2) {
                                 Integer index = sheetTime.indexOf(Constant.FrequencyType.YEAR_STRING);
                                 Integer year = null;
                                 Integer month = null;
@@ -173,11 +191,11 @@ public class ReportExcelController extends BaseController {
                                 ReportInfo reportInfo = reportInfoService.getReportInfosByTimeAndTmpId(year, month, rptTmpId);
                                 if (reportInfo != null) {
                                     // 报表处于待审核状态和已审核状态不能导入数据
-                                    if (reportInfo.getRptStatus()!=Constant.RPT_STATUS.WAITING_PASS&&reportInfo.getRptStatus()!=Constant.RPT_STATUS.PASS) {
+                                    if (reportInfo.getRptStatus() != Constant.RPT_STATUS.WAITING_PASS && reportInfo.getRptStatus() != Constant.RPT_STATUS.PASS) {
                                         Integer rptStyleId = reportInfo.getRptStyleId();
                                         //ReportTemplateStyle reportTemplateStyle = reportManageService.getRptStyleById(rptStyleId);
                                         ReportTemplateStyle reportTemplateStyle = reportManageService.getRptStyleByRptInfo(reportInfo);
-                                        String styleHtml = (reportTemplateStyle!=null)?reportTemplateStyle.getRptStyle():null;
+                                        String styleHtml = (reportTemplateStyle != null) ? reportTemplateStyle.getRptStyle() : null;
                                         if (styleHtml != null) {
 
                                             Document doc = Jsoup.parse(styleHtml, "", new Parser(new XmlTreeBuilder()));
@@ -187,17 +205,21 @@ public class ReportExcelController extends BaseController {
                                                 Elements tbodys = table.select("tbody");//表格内容
                                                 if (tbodys.size() > 0) {
                                                     Elements trs = tbodys.select("tr");
-                                                    importExcelToHtml(trs, sheet);
+                                                    if (isXlsx) {
+                                                        importExcelToHtml(trs, (XSSFSheet) sheet);
+                                                    } else {
+                                                        importExcelToHtml(trs, (HSSFSheet) sheet);
+                                                    }
                                                 }
 
                                             }
-                                            List<RptHtmlPojo> rptHtmlList = ImportUtils.getRptHtml(reportInfo.getId(), Constant.DATA_TYPE.NUMBER, Constant.COLLECTION_TYPE.LEADIN, reportInfo.getTime(),reportInfo.getYear(),reportInfo.getMonth(), doc,reportInfo.getDptId());
+                                            List<RptHtmlPojo> rptHtmlList = ImportUtils.getRptHtml(reportInfo.getId(), Constant.DATA_TYPE.NUMBER, Constant.COLLECTION_TYPE.LEADIN, reportInfo.getTime(), reportInfo.getYear(), reportInfo.getMonth(), doc, reportInfo.getDptId());
 
 
-                                            reportDataService.saveOrSubmitRptDataList(user,rptHtmlList,reportInfo.getRptStatus(),reportInfo);
-                                            if(reportInfo.getRptStatus()!=Constant.RPT_STATUS.REJECT){
+                                            reportDataService.saveOrSubmitRptDataList(user, rptHtmlList, reportInfo.getRptStatus(), reportInfo);
+                                            if (reportInfo.getRptStatus() != Constant.RPT_STATUS.REJECT) {
                                                 //修改报表状态
-                                                reportInfoService.updateStatus(user,reportInfo.getId(), Constant.RPT_STATUS.DRAFT,request);
+                                                reportInfoService.updateStatus(user, reportInfo.getId(), Constant.RPT_STATUS.DRAFT, request);
                                             }
                                             /*for (RptHtmlPojo rptHtml : rptHtmlList) {
                                                 reportDataService.saveOrSubmitRptData(user,rptHtml,reportInfo.getRptStatus(),reportInfo);
@@ -208,7 +230,7 @@ public class ReportExcelController extends BaseController {
                                             }*/
                                             importAll++;
                                         }
-                                    }else{
+                                    } else {
                                         passOrWait++;
                                     }
                                 }
@@ -216,24 +238,24 @@ public class ReportExcelController extends BaseController {
                                 result = genSuccessMsg(null, "Excel格式错误", 500);
                                 return result;
                             }
-                        }else if(reportTemplate != null&&!isWrite){
+                        } else if (reportTemplate != null && !isWrite) {
                             noPerm++;
                         }
                     }
                 }
-                if(noPerm==sn){
+                if (noPerm == sn) {
                     result = genSuccessMsg(null, "导入失败，您没有修改报表权限", 500);
-                }else if (importAll== sn) {
+                } else if (importAll == sn) {
                     result = genSuccessMsg(null, "导入成功", 200);
-                }else if(passOrWait == sn) {
+                } else if (passOrWait == sn) {
                     result = genSuccessMsg(null, "导入失败，报表处于已审核或待审核状态", 500);
-                }else if(importAll == sn - passOrWait) {
+                } else if (importAll == sn - passOrWait) {
                     result = genSuccessMsg(null, "导入失败，部分报表处于已审核或待审核状态", 500);
-                }else if (importAll == 0) {
+                } else if (importAll == 0) {
                     result = genSuccessMsg(null, "导入失败，请检查Excel格式是否错误", 500);
-                } else if(noPerm>0){
+                } else if (noPerm > 0) {
                     result = genSuccessMsg(null, "部分数据导入失败，请检查是否有修改权限", 500);
-                }else {
+                } else {
                     result = genSuccessMsg(null, "部分数据导入失败，请检查Excel格式是否错误", 500);
                 }
             }
@@ -247,6 +269,7 @@ public class ReportExcelController extends BaseController {
 
     /**
      * 单sheet导入，按照传入的时间来处理第一个sheet页
+     *
      * @param response
      * @param request
      * @param rptInfoId
@@ -254,71 +277,91 @@ public class ReportExcelController extends BaseController {
      */
     @RequestMapping("/importFromSheet")
     @ResponseBody
-    public Map<String, Object> importFromSheet(HttpServletResponse response, HttpServletRequest request,Integer rptInfoId) {
+    public Map<String, Object> importFromSheet(HttpServletResponse response, HttpServletRequest request, Integer rptInfoId) {
         Map<String, Object> result = null;
         try {
             // 获取当前用户
             User user = SessionUtil.getUser(request.getSession());
             MultipartHttpServletRequest multipartHttpServletRequest = (MultipartHttpServletRequest) request;
             MultipartFile multipartFile = multipartHttpServletRequest.getFile("excel");
-            InputStream inputStream = multipartFile.getInputStream();
-            POIFSFileSystem fs = new POIFSFileSystem(inputStream);
+            //InputStream inputStream = multipartFile.getInputStream();
+            //POIFSFileSystem fs = new POIFSFileSystem(inputStream);
+            Workbook wb = null;
+            boolean isXlsx = false;
+            try {// .xls 格式
+                InputStream inputStream = multipartFile.getInputStream();
+                POIFSFileSystem fs = new POIFSFileSystem(inputStream);
+                wb = new HSSFWorkbook(fs);
+            } catch (Exception ex) {// .xlsx 格式
+                InputStream inputStream = multipartFile.getInputStream();
+                wb = new XSSFWorkbook(inputStream);
+                isXlsx = true;
+            }
             // poi读取excel 进行解析
-            HSSFWorkbook wb = new HSSFWorkbook(fs);
+            //HSSFWorkbook wb = new HSSFWorkbook(fs);
             int sn = wb.getNumberOfSheets();
             if (sn > 0) {
                 int importAll = 0;//导入报表数
-                int passOrWait =0;//待审核和已审核数量
+                int passOrWait = 0;//待审核和已审核数量
                 // 添加第一个sheet页内容
-                    HSSFSheet sheet = wb.getSheetAt(0);
-                    String sheetName = sheet.getSheetName();
-                    // System.out.println(sheetName);
-                    String[] sheets = sheetName.split(Constant.UNDERLINE);
-                    if (sheets.length != 3&&sheets.length != 2) {
-                        result = genSuccessMsg(null, "Sheet页格式错误", 500);
-                        return result;
-                    } else {
-                        String name = sheets.length==3?sheets[0]:"";//名称
-                        //String sheetTime = sheets[1];//时间
-                        Integer rptTmpId = sheets.length==3?Integer.parseInt(sheets[2]):Integer.parseInt(sheets[1]);//模板id
-                        ReportTemplate reportTemplate = reportManageService.getRptTmpById(rptTmpId);
-                        //判断当前用户是否有填报某报表的权限
-                        boolean isWrite = CurrentUser.hasWritePermission(request, rptTmpId);
-                        if (reportTemplate != null&&isWrite) {
-                            if (name.equals(reportTemplate.getName())||sheets.length == 2) {
-                                if (rptInfoId == null) {
-                                    result = genSuccessMsg(null, "导入失败", 500);
-                                    return result;
-                                }
-                                ReportInfo reportInfo = reportInfoService.getReportInfosByRptInfoId(rptInfoId);
+                Sheet sheet = null;
+                if(isXlsx) {
+                    sheet = (XSSFSheet) wb.getSheetAt(0);
+                }else{
+                    sheet = (HSSFSheet) wb.getSheetAt(0);
+                }
+                String sheetName = sheet.getSheetName();
+                // System.out.println(sheetName);
+                String[] sheets = sheetName.split(Constant.UNDERLINE);
+                if (sheets.length != 3 && sheets.length != 2) {
+                    result = genSuccessMsg(null, "Sheet页格式错误", 500);
+                    return result;
+                } else {
+                    String name = sheets.length == 3 ? sheets[0] : "";//名称
+                    //String sheetTime = sheets[1];//时间
+                    Integer rptTmpId = sheets.length == 3 ? Integer.parseInt(sheets[2]) : Integer.parseInt(sheets[1]);//模板id
+                    ReportTemplate reportTemplate = reportManageService.getRptTmpById(rptTmpId);
+                    //判断当前用户是否有填报某报表的权限
+                    boolean isWrite = CurrentUser.hasWritePermission(request, rptTmpId);
+                    if (reportTemplate != null && isWrite) {
+                        if (name.equals(reportTemplate.getName()) || sheets.length == 2) {
+                            if (rptInfoId == null) {
+                                result = genSuccessMsg(null, "导入失败", 500);
+                                return result;
+                            }
+                            ReportInfo reportInfo = reportInfoService.getReportInfosByRptInfoId(rptInfoId);
 
-                                if (reportInfo != null) {
-                                    // 报表处于待审核状态和已审核状态不能导入数据
-                                    if (reportInfo.getRptStatus()!=Constant.RPT_STATUS.WAITING_PASS&&reportInfo.getRptStatus()!=Constant.RPT_STATUS.PASS) {
-                                        Integer rptStyleId = reportInfo.getRptStyleId();
-                                        //ReportTemplateStyle reportTemplateStyle = reportManageService.getRptStyleById(rptStyleId);
-                                        ReportTemplateStyle reportTemplateStyle = reportManageService.getRptStyleByRptInfo(reportInfo);
-                                        String styleHtml = (reportTemplateStyle!=null)?reportTemplateStyle.getRptStyle():null;
-                                        if (styleHtml != null) {
+                            if (reportInfo != null) {
+                                // 报表处于待审核状态和已审核状态不能导入数据
+                                if (reportInfo.getRptStatus() != Constant.RPT_STATUS.WAITING_PASS && reportInfo.getRptStatus() != Constant.RPT_STATUS.PASS) {
+                                    Integer rptStyleId = reportInfo.getRptStyleId();
+                                    //ReportTemplateStyle reportTemplateStyle = reportManageService.getRptStyleById(rptStyleId);
+                                    ReportTemplateStyle reportTemplateStyle = reportManageService.getRptStyleByRptInfo(reportInfo);
+                                    String styleHtml = (reportTemplateStyle != null) ? reportTemplateStyle.getRptStyle() : null;
+                                    if (styleHtml != null) {
 
-                                            Document doc = Jsoup.parse(styleHtml, "", new Parser(new XmlTreeBuilder()));
-                                            Elements tables = doc.select("table");
-                                            if (tables.size() > 0) {
-                                                Element table = tables.first();
-                                                Elements tbodys = table.select("tbody");//表格内容
-                                                if (tbodys.size() > 0) {
-                                                    Elements trs = tbodys.select("tr");
-                                                    importExcelToHtml(trs, sheet);
+                                        Document doc = Jsoup.parse(styleHtml, "", new Parser(new XmlTreeBuilder()));
+                                        Elements tables = doc.select("table");
+                                        if (tables.size() > 0) {
+                                            Element table = tables.first();
+                                            Elements tbodys = table.select("tbody");//表格内容
+                                            if (tbodys.size() > 0) {
+                                                Elements trs = tbodys.select("tr");
+                                                if (isXlsx) {
+                                                    importExcelToHtml(trs, (XSSFSheet) sheet);
+                                                } else {
+                                                    importExcelToHtml(trs, (HSSFSheet) sheet);
                                                 }
-
                                             }
-                                            List<RptHtmlPojo> rptHtmlList = ImportUtils.getRptHtml(reportInfo.getId(), Constant.DATA_TYPE.NUMBER, Constant.COLLECTION_TYPE.LEADIN, reportInfo.getTime(),reportInfo.getYear(),reportInfo.getMonth(), doc,reportInfo.getDptId());
 
-                                            reportDataService.saveOrSubmitRptDataList(user,rptHtmlList,reportInfo.getRptStatus(),reportInfo);
-                                            if(reportInfo.getRptStatus()!=Constant.RPT_STATUS.REJECT){
-                                                //修改报表状态
-                                                reportInfoService.updateStatus(user,reportInfo.getId(), Constant.RPT_STATUS.DRAFT,request);
-                                            }
+                                        }
+                                        List<RptHtmlPojo> rptHtmlList = ImportUtils.getRptHtml(reportInfo.getId(), Constant.DATA_TYPE.NUMBER, Constant.COLLECTION_TYPE.LEADIN, reportInfo.getTime(), reportInfo.getYear(), reportInfo.getMonth(), doc, reportInfo.getDptId());
+
+                                        reportDataService.saveOrSubmitRptDataList(user, rptHtmlList, reportInfo.getRptStatus(), reportInfo);
+                                        if (reportInfo.getRptStatus() != Constant.RPT_STATUS.REJECT) {
+                                            //修改报表状态
+                                            reportInfoService.updateStatus(user, reportInfo.getId(), Constant.RPT_STATUS.DRAFT, request);
+                                        }
                                             /*for (RptHtmlPojo rptHtml : rptHtmlList) {
                                                 reportDataService.saveOrSubmitRptData(user,rptHtml,reportInfo.getRptStatus(),reportInfo);
                                                 if(reportInfo.getRptStatus()!=Constant.RPT_STATUS.REJECT){
@@ -326,19 +369,19 @@ public class ReportExcelController extends BaseController {
                                                     reportInfoService.updateStatus(user,rptHtml.getRptId(), Constant.RPT_STATUS.DRAFT,request);
                                                 }
                                             }*/
-                                            importAll++;
-                                        }
-                                    }else{
-                                        passOrWait++;
+                                        importAll++;
                                     }
+                                } else {
+                                    passOrWait++;
                                 }
-                            } else {
-                                result = genSuccessMsg(null, "Excel格式错误", 500);
-                                return result;
                             }
-                        }else if (reportTemplate != null&&!isWrite) {
-                            return genSuccessMsg(null, "导入失败,请检查是否有修改权限", 500);
+                        } else {
+                            result = genSuccessMsg(null, "Excel格式错误", 500);
+                            return result;
                         }
+                    } else if (reportTemplate != null && !isWrite) {
+                        return genSuccessMsg(null, "导入失败,请检查是否有修改权限", 500);
+                    }
                 }
                 result = genSuccessMsg(null, "导入成功", 200);
             }
@@ -349,6 +392,7 @@ public class ReportExcelController extends BaseController {
         return result;
 
     }
+
     /**
      * 按照模板id导出excel
      *
@@ -612,8 +656,8 @@ public class ReportExcelController extends BaseController {
             //单元格起始列
             int beginColCell = 0;
             for (Element td : tds) {
-                String rowspan = "".equals(td.attr("rowspan"))?"1":td.attr("rowspan");
-                String colspan = "".equals(td.attr("colspan"))?"1":td.attr("colspan");
+                String rowspan = "".equals(td.attr("rowspan")) ? "1" : td.attr("rowspan");
+                String colspan = "".equals(td.attr("colspan")) ? "1" : td.attr("colspan");
                 String value = "";
 
 
@@ -641,6 +685,7 @@ public class ReportExcelController extends BaseController {
         }
         return excelRowPojoList;
     }
+
     /**
      * 按行导入单元格内容
      *
@@ -658,13 +703,13 @@ public class ReportExcelController extends BaseController {
             //单元格起始列
             int beginColCell = 0;
             int colNum = 0;
-            ExcelRowPojo excelRow = excelRowList.get(beginRowCell-2);
+            ExcelRowPojo excelRow = excelRowList.get(beginRowCell - 2);
             List<ExcelCellPojo> excelCellList = excelRow.getExcelCellList();
             for (Element td : tds) {
                 ExcelCellPojo excelCell = excelCellList.get(colNum);
                 List<ExcelCellPojo> excelExtraCellList = excelRow.getExcelExtraCellList();
-                String rowspan = "".equals(td.attr("rowspan"))?"1":td.attr("rowspan");
-                String colspan = "".equals(td.attr("colspan"))?"1":td.attr("colspan");
+                String rowspan = "".equals(td.attr("rowspan")) ? "1" : td.attr("rowspan");
+                String colspan = "".equals(td.attr("colspan")) ? "1" : td.attr("colspan");
                 String value = "";
                 // 单元格的起始行，结束行，起始列，结束列
 /*                beginRowCell,
@@ -683,6 +728,50 @@ public class ReportExcelController extends BaseController {
             beginRowCell++;
         }
     }
+
+    /**
+     * 按行导入单元格内容
+     *
+     * @param trs
+     * @param sheet
+     */
+    public static void importExcelToHtml(Elements trs, XSSFSheet sheet) {
+        List<ExcelRowPojo> excelRowList = getExcelRowList(trs);
+        setExcelExtraCell(excelRowList);
+        List<ExcelRowPojo> excelRowPojoList = new ArrayList<ExcelRowPojo>();
+        //单元格起始行
+        int beginRowCell = 2;
+        for (Element tr : trs) {
+            Elements tds = tr.select("td");
+            //单元格起始列
+            int beginColCell = 0;
+            int colNum = 0;
+            ExcelRowPojo excelRow = excelRowList.get(beginRowCell - 2);
+            List<ExcelCellPojo> excelCellList = excelRow.getExcelCellList();
+            for (Element td : tds) {
+                ExcelCellPojo excelCell = excelCellList.get(colNum);
+                List<ExcelCellPojo> excelExtraCellList = excelRow.getExcelExtraCellList();
+                String rowspan = "".equals(td.attr("rowspan")) ? "1" : td.attr("rowspan");
+                String colspan = "".equals(td.attr("colspan")) ? "1" : td.attr("colspan");
+                String value = "";
+                // 单元格的起始行，结束行，起始列，结束列
+/*                beginRowCell,
+                  beginRowCell + Integer.valueOf(rowspan) - 1,
+                  beginColCell,
+                  beginColCell + Integer.valueOf(colspan) - 1*/
+                if (td.attr("esi-type").equals(Constant.TdEsiType.DATA)) {
+                    int[] colCell = excelCell.getColCell(beginColCell, beginRowCell + Integer.valueOf(rowspan) - 1, excelExtraCellList);
+                    XSSFRow row = sheet.getRow(beginRowCell);
+                    String cellValue = getCellFormatValue(row.getCell(colCell[0]));
+                    td.html(cellValue);
+                }
+                beginColCell = beginColCell + Integer.valueOf(colspan);
+                colNum++;
+            }
+            beginRowCell++;
+        }
+    }
+
     /**
      * 按行导入单元格内容
      *
@@ -698,8 +787,8 @@ public class ReportExcelController extends BaseController {
             //单元格起始列
             int beginColCell = 0;
             for (Element td : tds) {
-                String rowspan = "".equals(td.attr("rowspan"))?"1":td.attr("rowspan");
-                String colspan = "".equals(td.attr("colspan"))?"1":td.attr("colspan");
+                String rowspan = "".equals(td.attr("rowspan")) ? "1" : td.attr("rowspan");
+                String colspan = "".equals(td.attr("colspan")) ? "1" : td.attr("colspan");
                 String value = "";
                 // 单元格的起始行，结束行，起始列，结束列
 /*                beginRowCell,
@@ -724,6 +813,66 @@ public class ReportExcelController extends BaseController {
      * @return
      */
     private static String getCellFormatValue(HSSFCell cell) {
+
+        String cellvalue = "";
+        if (cell != null) {
+            // 判断当前Cell的Type
+            switch (cell.getCellType()) {
+                // 如果当前Cell的Type为NUMERIC
+                case HSSFCell.CELL_TYPE_NUMERIC:
+                case HSSFCell.CELL_TYPE_FORMULA: {
+                    // 判断当前的cell是否为Date
+                    if (HSSFDateUtil.isCellDateFormatted(cell)) {
+                        // 如果是Date类型则，转化为Data格式
+
+                        //方法1：这样子的data格式是带时分秒的：2011-10-12 0:00:00
+                        //cellvalue = cell.getDateCellValue().toLocaleString();
+
+                        //方法2：这样子的data格式是不带带时分秒的：2011-10-12
+                        Date date = cell.getDateCellValue();
+                        SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
+                        cellvalue = sdf.format(date);
+
+                    }
+                    // 如果是纯数字
+                    else {
+                        // 取得当前Cell的数值
+                        DataFormatter dataFormatter = new HSSFDataFormatter();
+                        dataFormatter.createFormat(cell);
+                        cellvalue = dataFormatter.formatCellValue(cell);
+                        try {
+                            Double.parseDouble(cellvalue);
+                        } catch (NumberFormatException e) {
+                            cellvalue = String.valueOf(cell.getNumericCellValue());
+                        }
+
+
+                    }
+                    break;
+                }
+                // 如果当前Cell的Type为STRIN
+                case HSSFCell.CELL_TYPE_STRING:
+                    // 取得当前的Cell字符串
+                    cellvalue = cell.getRichStringCellValue().getString();
+                    break;
+                // 默认的Cell值
+                default:
+                    cellvalue = " ";
+            }
+        } else {
+            cellvalue = "";
+        }
+        return cellvalue;
+
+    }
+
+    /**
+     * 根据XSSFCell类型设置数据
+     *
+     * @param cell
+     * @return
+     */
+    private static String getCellFormatValue(XSSFCell cell) {
 
         String cellvalue = "";
         if (cell != null) {

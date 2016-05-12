@@ -19,8 +19,15 @@ public class AnalysisChartStructure {
     private Integer parentId;
     private Integer structureSort;
     private Integer realNode;
-//    private AnalysisChartInfo analysisChartInfo=new AnalysisChartInfo();
+    //    private AnalysisChartInfo analysisChartInfo=new AnalysisChartInfo();
     private Boolean leaf;
+
+    private String text;
+
+    @Transient
+    public String getText() {
+        return metaName;
+    }
 
     @Id
     @Column(name = "ID")
@@ -50,6 +57,7 @@ public class AnalysisChartStructure {
 
     public void setMetaName(String metaName) {
         this.metaName = metaName;
+        this.text = metaName;
     }
 
     @Column(name = "META_ID")

@@ -78,7 +78,11 @@
                         datas.set('sort',0);
                     }
                     datas.set('comments', rec.comments);
-                    defaultdataStore.sync();
+                    defaultdataStore.sync({
+                        failure:function(){
+                            defaultdataStore.reload();
+                        }
+                    });
                     win.close();
                 });
             } else {

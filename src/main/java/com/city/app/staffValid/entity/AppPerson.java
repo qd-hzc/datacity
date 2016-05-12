@@ -12,7 +12,7 @@ import java.io.Serializable;
  */
 @Entity
 @Table(name = "APP_PERSON")
-public class AppPerson implements Serializable{
+public class AppPerson implements Serializable {
     @Id
     @Column
     @SequenceGenerator(name = "appPersonGen", sequenceName = "APP_PERSON_SEQ")
@@ -34,6 +34,8 @@ public class AppPerson implements Serializable{
     //职务
     @Column
     private String duty;
+    @Column
+    private Integer dutyId;
     //说明
     @Column
     private String comments;
@@ -89,6 +91,14 @@ public class AppPerson implements Serializable{
 
     public void setDuty(String duty) {
         this.duty = duty;
+    }
+
+    public Integer getDutyId() {
+        return dutyId;
+    }
+
+    public void setDutyId(Integer dutyId) {
+        this.dutyId = dutyId;
     }
 
     public String getComments() {

@@ -28,6 +28,13 @@ public class SptMgrItemDictEntity {
     private Date updateDate;
     private Integer status;
 
+    private String text;
+
+    @Transient
+    public String getText() {
+        return text;
+    }
+
     @Id
     @Column(name = "ID", unique = true, nullable = false)
     @GeneratedValue(generator = "generator")
@@ -58,6 +65,7 @@ public class SptMgrItemDictEntity {
 
     public void setName(String name) {
         this.name = name;
+        this.text = name;
     }
 
     @Basic

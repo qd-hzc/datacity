@@ -97,18 +97,34 @@ public class TimeFrameService extends PackageListToTree<TimeFrame> {
      *
      * @param timeFrameList 时间框架信息
      */
-    public void update(List<TimeFrame> timeFrameList) {
+    public Map<String, Object> update(List<TimeFrame> timeFrameList) {
+        Map<String, Object> map = new HashMap<>();
+        boolean nameRepeat = false;
         ConvertUtil<TimeFrame> convertUtil = new ConvertUtil<>();
         TimeFrame tf = null;
+        List<TimeFrame> datas = new ArrayList<>();
         for (TimeFrame timeFrame : timeFrameList) {
-            tf = tfd.queryById(timeFrame.getId());
-            if ("".equals(timeFrame.getOrder())) {
-                timeFrame.setOrder(0);
+            String name = timeFrame.getName();
+            List<TimeFrame> timeFrames = null;
+            if (name != null) {
+                timeFrames = tfd.getByNameAndId(timeFrame.getName(), timeFrame.getId());
             }
-            convertUtil.replication(timeFrame, tf, TimeFrame.class.getName());
-            tfd.saveOrUpdate(tf, true);
+            if (timeFrames == null || timeFrames.size() == 0) {
+                tf = tfd.queryById(timeFrame.getId());
+                if ("".equals(timeFrame.getOrder())) {
+                    timeFrame.setOrder(0);
+                }
+                convertUtil.replication(timeFrame, tf, TimeFrame.class.getName());
+                tfd.saveOrUpdate(tf, true);
+                datas.add(tf);
+            } else {
+                nameRepeat = true;
+            }
         }
         tfd.flush();
+        map.put("datas", datas);
+        map.put("nameRepeat", nameRepeat);
+        return map;
     }
 
     /**
@@ -116,7 +132,7 @@ public class TimeFrameService extends PackageListToTree<TimeFrame> {
      *
      * @param tf 时间框架信息
      */
-    public void update(TimeFrame tf) {
+    public void update1(TimeFrame tf) {
         TimeFrame timeFrame = tfd.queryById(tf.getId());
         ConvertUtil<TimeFrame> convertUtil = new ConvertUtil<>();
         convertUtil.replication(tf, timeFrame, TimeFrame.class.getName());

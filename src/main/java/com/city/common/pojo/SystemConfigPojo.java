@@ -24,6 +24,22 @@ public class SystemConfigPojo {
      * 重点关注显示数据期数
      */
     private Integer mainFocusSpan;
+    /**
+     * 系统元数据 数据类型
+     */
+    private Integer unitDataType;
+    /**
+     * 系统元数据 地区等级
+     */
+    private Integer areaType;
+    /**
+     * 系统元数据 时间类型-年
+     */
+    private Integer yearType;
+    /**
+     * 系统元数据 人员职务
+     */
+    private Integer dutyType;
 
     public boolean isShowSysLog() {
         return showSysLog;
@@ -63,5 +79,37 @@ public class SystemConfigPojo {
 
     public void setMainFocusSpan(Integer mainFocusSpan) {
         this.mainFocusSpan = mainFocusSpan;
+    }
+
+    public Integer getUnitDataType() {
+        return unitDataType;
+    }
+
+    public void setUnitDataType(Integer unitDataType) {
+        this.unitDataType = unitDataType;
+    }
+
+    public Integer getAreaType() {
+        return areaType;
+    }
+
+    public void setAreaType(Integer areaType) {
+        this.areaType = areaType;
+    }
+
+    public Integer getYearType() {
+        return yearType;
+    }
+
+    public void setYearType(Integer yearType) {
+        this.yearType = yearType;
+    }
+
+    public Integer getDutyType() {
+        return dutyType;
+    }
+
+    public void setDutyType(Integer dutyType) {
+        this.dutyType = dutyType;
     }
 }

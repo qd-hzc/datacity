@@ -41,4 +41,13 @@ public class TextThemeDao extends BaseDao<TextTheme> {
         StringBuilder sb = new StringBuilder("from TextTheme where id in (").append(ids).append(") order by sortIndex");
         return queryByHQL(sb.toString());
     }
+
+    public List<TextTheme> queryByName(String name) {
+        String hql = "from TextTheme t where t.name ='" + name + "'";
+        return super.queryByHQL(hql);
+    }
+    public List<TextTheme> queryByNameAndId(String name,Integer id) {
+        String hql = "from TextTheme t where t.name ='" + name + "' and t.id <>"+id;
+        return super.queryByHQL(hql);
+    }
 }

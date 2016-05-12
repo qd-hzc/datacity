@@ -3,6 +3,7 @@ package com.city.common.util.table.builder;
 import com.city.common.pojo.Constant;
 import com.city.common.util.EsiLogUtil;
 import com.city.common.util.ListUtil;
+import com.city.common.util.StringUtil;
 import com.city.common.util.table.pojo.*;
 import com.city.support.manage.item.dao.ItemInfoDao;
 import com.city.support.manage.item.entity.ItemInfo;
@@ -334,7 +335,7 @@ public abstract class GenTableStrUtil<T> {
             }
             //设置rowspan
             td.attr(TdAttrName.ROWSPAN, node.getSpan().toString());
-            if(node.getDepth()>1) {
+            if (node.getDepth() > 1) {
                 td.attr("esi-left", "true");
             }
             //设置colspan
@@ -409,7 +410,10 @@ public abstract class GenTableStrUtil<T> {
                     case Constant.MetadataType.ITEM://指标
                         pro.put(ProAttrName.ITEM, property.getDataValue());
                         pro.put(ProAttrName.ITEM_CALIBER, property.getDataInfo1());
-                        pro.put(ProAttrName.DEP, property.getDataInfo2());
+                        String depByItem = getDepByItem(property);
+                        if (StringUtil.notEmpty(depByItem)) {
+                            pro.put(ProAttrName.DEP, depByItem);
+                        }
                         break;
                     case Constant.MetadataType.ITEM_GROUP://指标体系分组
                         pro.put(ProAttrName.ITEM_GROUP, property.getDataValue());
@@ -436,15 +440,15 @@ public abstract class GenTableStrUtil<T> {
                     case Constant.MetadataType.TIME://时间类型
                         //设置时间
                         if (Integer.parseInt(property.getDataInfo1()) == Constant.TIMERANGE.INFO_YEAR) {//年份数据
-                            if(property.getDataInfo2().equals(Constant.TIMERANGE.BAOGAOQI.toString())){//期数
+                            if (property.getDataInfo2().equals(Constant.TIMERANGE.BAOGAOQI.toString())) {//期数
                                 pro.put(ProAttrName.YEAR, property.getDataName());
-                            }else{
+                            } else {
                                 pro.put(ProAttrName.YEAR, property.getDataValue());
                             }
                         } else {//期度数据
-                            if(property.getDataInfo2().equals(Constant.TIMERANGE.BAOGAOQI.toString())){//期数
+                            if (property.getDataInfo2().equals(Constant.TIMERANGE.BAOGAOQI.toString())) {//期数
                                 pro.put(ProAttrName.TIME, property.getDataName());
-                            }else{
+                            } else {
                                 pro.put(ProAttrName.TIME, property.getDataValue());
                             }
                         }
@@ -548,6 +552,14 @@ public abstract class GenTableStrUtil<T> {
         }
         this.defaultUnitSelector = defaultUnitSelector;
     }
+
+    /**
+     * 根据指标获取部门
+     *
+     * @param property
+     * @return
+     */
+    abstract protected String getDepByItem(EsiProperty property);
 
 }
 

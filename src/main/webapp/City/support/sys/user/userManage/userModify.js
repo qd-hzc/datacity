@@ -880,6 +880,7 @@ var rptFlag = false;
         frame : false,
         border : false,
         items : [tabPanel],
+        layout:'fit',
         bbar : ['->',{
             text : "修改",
             padding : "5 20 5 20",

@@ -107,8 +107,13 @@ public class CustomResearchManageController extends BaseController {
     @RequestMapping("/saveOrUpdateGroup")
     @ResponseBody
     public Object saveOrUpdateGroup(ResearchGroupEntity entity, HttpServletRequest req) {
-        if (StringUtils.isEmpty(entity.getName())) {
-            return genFaultMsg("请求错误", "系统繁忙，请稍候再试", null);
+        String trim = entity.getName().trim();
+        if (StringUtils.isEmpty(trim)) {
+            return genFaultMsg("请求错误", "请填写完整名称", null);
+        }
+        List<ResearchGroupEntity> group = manageService.getResearchGroupByName(trim);
+        if (null != group && group.size() > 0) {
+            return genFaultMsg("请求错误", "分组名称重复，不可用", null);
         }
         Date date = new Date();
         User user = SessionUtil.getUser(req.getSession());
@@ -136,6 +141,15 @@ public class CustomResearchManageController extends BaseController {
     @RequestMapping("/saveCustomResearch")
     @ResponseBody
     public Object saveCustomResearch(CustomResearchEntity entity, HttpServletRequest request) {
+        String name = entity.getName().trim();
+        if (StringUtils.isEmpty(name)) {
+            return genFaultMsg("请求失败", "请填写完整名称", null);
+        }
+        List<CustomResearchEntity> list = researchService.getCustomResearchByName(name);
+        if (null != list && list.size() > 0) {
+            return genFaultMsg("请求失败", "模板名称重复，不可用", null);
+        }
+
         String resourceId = request.getParameter("resourceId");
         if (!StringUtils.isEmpty(resourceId)) {
             DataSet dataSet = new DataSet();

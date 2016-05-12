@@ -2,6 +2,7 @@ package com.city.support.dataSet.service;
 
 import com.city.common.pojo.Constant;
 import com.city.common.pojo.Page;
+import com.city.common.util.ListUtil;
 import com.city.support.dataSet.dao.DataSetDao;
 import com.city.support.dataSet.dao.DataSetDataDao;
 import com.city.support.dataSet.entity.DataSet;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -54,8 +54,21 @@ public class DataSetService {
     /**
      * 保存数据集
      */
-    public void saveDataSet(DataSet dataSet) {
-        dataSetDao.saveOrUpdate(dataSet, false);
+    public String saveDataSet(DataSet dataSet) {
+        //查看名称是否重复
+        List<DataSet> dataSets = dataSetDao.queryByName(dataSet.getName().trim());
+        if (ListUtil.notEmpty(dataSets)) {
+            return "保存失败,数据集名称不能重复!";
+        } else {
+            try {
+                dataSetDao.saveOrUpdate(dataSet, false);
+                return null;
+            } catch (Exception e) {
+                e.printStackTrace();
+                return "保存失败,服务端运行异常!";
+            }
+        }
+
     }
 
     /**
@@ -67,8 +80,10 @@ public class DataSetService {
         //TODO 清空扩展集
         dataSetDao.removeDataSets(ids);
     }
+
     /**
      * 返回所有数据集
+     *
      * @return
      * @author crx
      * @createDate 2016-3-22

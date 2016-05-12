@@ -463,13 +463,22 @@ Ext.roleModifyWin.show = function(fnt,rec){//两个参数，fnt是回调函数�
                         store.getAt(row).set('isWrite',true);
                         store.getAt(row).set('isApproval',true);
                         store.getAt(row).set('isRead',true);
+                        store.getAt(row).set('checked', true);
                         // selectRptWestCheckBoxModel.selectRange(row,row,true);
-
+                        //第一步，先级联子节点
+                        checkChild(store.getAt(row),true);
+                        //第二步，再级联父节点
+                        checkFather(store.getAt(row),true);
                     }else{
                         store.getAt(row).set('isWrite',false);
                         store.getAt(row).set('isApproval',false);
                         store.getAt(row).set('isRead',false);
+                        store.getAt(row).set('checked', false);
                         // selectRptWestCheckBoxModel.deselectRange(row,row);
+                        //第一步，先级联子节点
+                        checkChild(store.getAt(row),false);
+                        //第二步，再级联父节点
+                        checkFather(store.getAt(row),false);
                     }
                 }
             }
@@ -615,6 +624,7 @@ Ext.roleModifyWin.show = function(fnt,rec){//两个参数，fnt是回调函数�
         title : '修改角色权限信息 ',
         frame : false,
         border : false,
+        layout:'fit',
         items : [tabPanel],
         bbar : ['->',{
             text : "修改",

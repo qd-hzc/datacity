@@ -120,6 +120,19 @@ public class ThemePageDao extends BaseDao<ThemePage> {
      * @createDate 2016-4-29
      */
     public List getMaxSort(Integer parentId) {
-        return queryByHQL("select max(sort) from ThemePage where parentId = " + parentId);
+        return queryByHQL("select max(sortIndex) from ThemePage where parentId = " + parentId);
+    }
+
+    /**
+     * 查询名称是否重复  根据名称及父id
+     * @param name
+     * @param parentId
+     * @return
+     * @author CRX
+     * @createDate 2016-5-10
+     */
+    public List<ThemePage> queryByNameAndParentId(String name, Integer parentId) {
+        String hql = "from ThemePage t where t.name ='" + name + "' and t.parentId ='" + parentId +"'";
+        return super.queryByHQL(hql);
     }
 }

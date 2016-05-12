@@ -195,9 +195,7 @@ public class ReportManageService {
             //添加并触发事件
             EsiEvent e = new EsiEvent();
             e.setEventName(RptTmpWatched.BEFOREUPDATETMP);
-            e.getArgs().put(RptTmpWatched.PARAMS_TMPID, rptTmp.getId());
-            e.getArgs().put(RptTmpWatched.PARAMS_TMPPERIOD, rptTmp.getPeriod());
-            e.getArgs().put(RptTmpWatched.PARAMS_TMPDALAY, rptTmp.getSubmitDaysDelay());
+            e.getArgs().put(RptTmpWatched.PARAMS_TMP, rptTmp);
             e.getArgs().put(RptTmpWatched.PARAMS_USER, currentUser.getUser());
             esiEventWatched.notifyAllListener(e);
 

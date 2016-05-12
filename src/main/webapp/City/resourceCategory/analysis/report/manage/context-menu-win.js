@@ -76,7 +76,7 @@ Ext.researchGroupContextMenuWin.init = function (prec, rec, fn) {
                                     }
                                 });
                             },
-                            failure: function (form, acction) {
+                            failure: function (form, action) {
                                 Ext.Msg.alert('提示', action.result.msg);
                             }
                         });

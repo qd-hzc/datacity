@@ -141,9 +141,18 @@ public class TimeFrameController extends BaseController {
         try {
             timeFrameList = paramUtil.parseObjToList(request, TimeFrame.class);
             if (timeFrameList != null) {
-                timeFrameService.update(timeFrameList);
-                result = genSuccessMsg(null, "更新成功", null);
-            } else {
+                Map map = timeFrameService.update(timeFrameList);
+                timeFrameList = (List<TimeFrame>)map.get("datas");
+                if(timeFrameList.size()>0){
+                    result = genSuccessMsg(timeFrameList, "更新成功", null);
+                }else{
+                    if((boolean)map.get("nameRepeat")){
+                        result = genFaultMsg(null, "时间框架已经存在！", null);
+                    }else {
+                        result = genFaultMsg(null, "更新失败", null);
+                    }
+                }
+            }else {
                 result = genFaultMsg(null, "更新失败", null);
             }
         } catch (Exception e) {

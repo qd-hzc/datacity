@@ -21,11 +21,19 @@ Ext.fillChartInfoWin.init = function (fnt, records, infoType) {
 //==========================名称begin============================
     var nameField = new Ext.form.field.Text({
         name: 'name',
-        fieldLabel: '名称',
+        fieldLabel: '名称<b style="color:red">*</b>',
         columnWidth: 1,
         labelWidth: 60,
         margin: '5 15',
-        allowBlank: false  // requires a non-empty value
+        maxLength:50,
+        allowBlank: false,  // requires a non-empty value
+        validator:function(text){
+            if(text.length && text.replace(/\s+/g, "").length<text.length){
+                return "不允许输入空格！";
+            }else {
+                return true;
+            }
+        }
     });
     var namePanel = new Ext.panel.Panel({
         width: '100%',
