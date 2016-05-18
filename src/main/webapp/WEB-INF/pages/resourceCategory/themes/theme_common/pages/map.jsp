@@ -28,13 +28,13 @@
         var Map = {};
         Map.uuid = '${uuid}';
         Map.page = ${page};
-        console.log(Map.page)
+
         Map.contents = Map.page.contents;
         Map.esi = new EsiTheme();
         //    初始化
         Map.init = function () {
             Map.esi.getData(Map.contents[0], function (data) {
-                console.log(Map.contents[0])
+
                 if (data.success) {
                     var result = data.datas;
                     if (result) {

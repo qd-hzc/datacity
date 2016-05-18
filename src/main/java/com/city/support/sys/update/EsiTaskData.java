@@ -12,6 +12,9 @@ public class EsiTaskData {
     public void addData(String key, Object data) {
         datas.put(key, data);
     }
+    public Object getData(String key){
+        return datas.get(key);
+    }
 
     public void removeData(String key) {
         datas.remove(key);

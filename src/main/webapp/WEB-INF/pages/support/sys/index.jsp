@@ -11,6 +11,12 @@
         html, body {
             height: 100%
         }
+
+        .top-background {
+            background-image: url("../../City/support/index/img/topbanner.png") ;
+            -webkit-background-size: cover;
+            background-size: cover;
+        }
     </style>
     <script type="text/javascript">
         var MODULEID = ${MODULEID};
@@ -139,7 +145,8 @@
                 items: [{
                     region: 'north',//上
                     xtype: 'panel',
-                    height: 50,
+                    height: 80,
+                    bodyCls: 'top-background',
                     loader: {
                         autoLoad: true,
                         url: '<%=request.getContextPath()%>/support/sys/top',

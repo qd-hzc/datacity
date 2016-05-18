@@ -1,6 +1,7 @@
 package com.city.resourcecategory.analysis.chart.service;
 
 import com.city.common.pojo.Constant;
+import com.city.common.pojo.Page;
 import com.city.common.util.ConvertUtil;
 import com.city.resourcecategory.analysis.chart.dao.AnalysisChartBaseDao;
 import com.city.resourcecategory.analysis.chart.dao.AnalysisChartGroupDao;
@@ -115,7 +116,7 @@ public class BasicChartConfigService {
                 List<AnalysisChartGroup> analysisChartGroupList = null;
                 if (tmpChartGroup.getpId() != null) {
                     analysisChartGroupList = analysisChartGroupDao.getByNameAndId(data.getName(), tmpChartGroup.getpId(), data.getId());
-                }else if(tmpChartGroup.getName() != null){
+                } else if (tmpChartGroup.getName() != null) {
                     analysisChartGroupList = analysisChartGroupDao.getByNameAndId(tmpChartGroup.getName(), data.getpId(), data.getId());
                 }
                 if (data != null && (analysisChartGroupList == null || analysisChartGroupList.size() == 0)) {
@@ -280,5 +281,36 @@ public class BasicChartConfigService {
             analysisChartStructureList.add(analysisChartStructure);
             setChartStructure(analysisChartStructureList, parentId);
         }
+    }
+
+    /**
+     * 返回图表分析数量
+     * <pre>
+     *     根据图表名称，模糊查询图表分析，返回匹配数量
+     * </pre>
+     *
+     * @param text
+     * @return
+     * @author hzc
+     * @createDate 2016-5-13
+     */
+    public int getChartForSearchCount(String text) {
+        return analysisChartBaseDao.selectForSearchCount(text);
+    }
+
+    /**
+     * 返回图表分析
+     * <pre>
+     *     根据图表名称，模糊查询图表分析，分页
+     * </pre>
+     *
+     * @param text
+     * @param page
+     * @return
+     * @author hzc
+     * @createDate 2016-5-13
+     */
+    public List getChartForSearch(String text, Page page) {
+        return analysisChartBaseDao.selectForSearch(text,page);
     }
 }

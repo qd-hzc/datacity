@@ -4,13 +4,14 @@ import com.city.common.dao.BaseDao;
 import com.city.common.pojo.Page;
 import com.city.common.util.ListUtil;
 import com.city.common.util.StringUtil;
+import com.city.resourcecategory.analysis.common.entity.QueryResourceVO;
 import com.city.resourcecategory.analysis.text.entity.TextContent;
-import com.city.resourcecategory.analysis.text.entity.TextTheme;
 import com.city.resourcecategory.analysis.text.pojo.TimeSpan;
 import com.city.support.dataSet.query.pojo.TimePojo;
 import com.city.support.dataSet.query.pojo.TimeRangePojo;
 import com.city.support.sys.user.entity.User;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.springframework.stereotype.Repository;
 
 import java.util.ArrayList;
@@ -37,26 +38,28 @@ public class TextContentDao extends BaseDao<TextContent> {
     }
 
     public List<TextContent> queryByThemeId(User user, Integer themeId, String contentSortType, String name, Integer status) {
-        StringBuilder sb = new StringBuilder("from TextContent where 1=1");
+        StringBuilder sb = new StringBuilder("select new com.city.resourcecategory.analysis.text.entity.TextContent(tc.id,tc.name,tc.subTitle,tc.theme,tc.status,tc.type,tc.infos,tc.analysisDate,tc.sortIndex,tc.creator,tc.creatorName,tc.createTime,tc.updator,tc.updatorName,tc.updateTime) from TextContent tc where 1=1");
         if (name != null && !"".equals(name)) {
-            sb.append(" and( name like '%").append(name).append("%' or infos like '%").append(name).append("%')");
+            sb.append(" and( tc.name like '%").append(name).append("%' or tc.infos like '%").append(name).append("%')");
         }
         if (user != null && user.getId() != 0) {
-            sb.append(" and creator=").append(user.getId());
+            sb.append(" and tc.creator=").append(user.getId());
         }
         if (status != null && status != 0) {
-            sb.append(" and status=").append(status);
+            sb.append(" and tc.status=").append(status);
         }
         if (themeId != null) {
-            sb.append(" and theme.id=").append(themeId);
+            sb.append(" and tc.theme.id=").append(themeId);
         }
         sb.append(" order by ");
         if (contentSortType != null && !"".equals(contentSortType)) {
-            sb.append(contentSortType).append(" desc");
+            sb.append("tc.").append(contentSortType).append(" desc");
         } else {
-            sb.append("sortIndex");
+            sb.append("tc.sortIndex");
         }
-        return queryByHQL(sb.toString());
+
+        List<TextContent> list = queryByHQL(sb.toString());
+        return list;
     }
 
     /**
@@ -176,5 +179,55 @@ public class TextContentDao extends BaseDao<TextContent> {
     public List<TextContent> queryByNameAndId(String name, Integer themeId, Integer id) {
         String hql = "from TextContent t where t.name ='" + name + "' and t.theme.id = '" + themeId + "' and t.id <>" + id;
         return super.queryByHQL(hql);
+    }
+
+    /**
+     * 搜索文字分析，返回匹配数量
+     * <pre>
+     *     根据文字分析名称，模糊搜索
+     * </pre>
+     *
+     * @param text
+     * @return
+     * @author hzc
+     * @createDate 2016-5-13
+     */
+    public int selectForSearchCount(String text) {
+        String sql = "select count(id) from TextContent t where  1=1 ";
+        if (StringUtil.notEmpty(text)) {
+            sql = sql + " and t.name like '%" + text + "%'";
+        }
+        List tmps = queryByHQL(sql);
+        if (tmps != null && tmps.size() > 0) {
+            long count = (long) tmps.get(0);
+            return (int) count;
+        }
+        return 0;
+    }
+
+
+    /**
+     * 搜索文字分析，返回匹配的文字分析
+     * <pre>
+     *     模糊查询，匹配名称，分页
+     * </pre>
+     *
+     * @param text
+     * @param page
+     * @return
+     * @author hzc
+     * @createDate 2016-5-13
+     */
+    public List selectForSearch(String text, Page page) {
+        StringBuffer hql = new StringBuffer("SELECT RTC.ID, RTC.NAME, 5 AS TYPE, -1 AS period, '' AS comments, RTC.THEME_ID AS extraId, RTT.\"NAME\" as extraName, -1 AS departmentId, '' as departmentName,rownum as rn ");
+        hql.append(" FROM RC_TEXT_CONTENT rtc LEFT JOIN RC_TEXT_THEME rtt ON RTC.THEME_ID = RTT.\"ID\" where 1=1 ");
+        if (StringUtil.notEmpty(text)) {
+            hql.append(" and rtc.name like '%").append(text).append("%'");
+        }
+        hql.append(" order by rtc.id");
+        SQLQuery q = getSession().createSQLQuery(hql.toString());
+        q.addEntity(QueryResourceVO.class);
+        setPageParamsForQuery(q, page);
+        return (List<QueryResourceVO>) q.list();
     }
 }

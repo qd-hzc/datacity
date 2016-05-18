@@ -12,6 +12,10 @@ import java.io.Serializable;
 @Entity
 @Table(name = "APP_DATA_DICT_MENU")
 public class AppDataDictMenu implements Serializable {
+    //配置信息
+    public static final int TYPE_CONFIG = 1;
+    //推送信息
+    public static final int TYPE_PUSH = 2;
     @Id
     @Column
     @SequenceGenerator(name = "appDataDictMenuGen", sequenceName = "APP_DATA_DICT_MENU_SEQ")
@@ -33,6 +37,8 @@ public class AppDataDictMenu implements Serializable {
     @OneToOne
     @JoinColumn(name = "BG_ID")
     private AppDataDictMenuIcon menuBg;
+    @Column
+    private Integer type;
     @Transient
     private String icon;
     @Transient
@@ -107,6 +113,14 @@ public class AppDataDictMenu implements Serializable {
 
     public void setMenuBg(AppDataDictMenuIcon menuBg) {
         this.menuBg = menuBg;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 
     public String getIcon() {

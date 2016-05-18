@@ -100,7 +100,7 @@ public class ReportInfoController extends BaseController {
                 rptTmpIds.add(reportPermission.getReportTmpId());
             }
         }
-        return reportInfoService.getReportInfosByCondition(page,request, groupId, includeGroupChildren, rptTmpIds, name, depId, includeDownLevel, rptStatus, periods, type, beginYear, endYear);
+        return reportInfoService.getReportInfosByCondition(page, request, groupId, includeGroupChildren, rptTmpIds, name, depId, includeDownLevel, rptStatus, periods, type, beginYear, endYear);
     }
 
     /**
@@ -128,7 +128,7 @@ public class ReportInfoController extends BaseController {
                 String months = map.get("month");
                 String[] monthList = months.split(",");
                 for (int j = 0; j < monthList.length; j++) {
-                    int count = reportInfoService.createAllReportInfos(user,reportTemplate, Integer.valueOf(year), Integer.valueOf(monthList[j]));
+                    int count = reportInfoService.createAllReportInfos(user, reportTemplate, Integer.valueOf(year), Integer.valueOf(monthList[j]));
                     if (count == ReportInfo.SUCCESS) {
                         result = genSuccessMsg(null, "生成报表成功", 200);
                     } else if (count == ReportInfo.EXIST) {
@@ -138,7 +138,7 @@ public class ReportInfoController extends BaseController {
             }
             if (result == null) {
                 if (isRptInfoExist) {
-                    result = genSuccessMsg(null, "已经生成过报表", 200);
+                    result = genFaultMsg(null, "已经生成过报表", 200);
                 } else {
                     result = genFaultMsg(null, "生成报表失败", 500);
                 }
@@ -179,14 +179,14 @@ public class ReportInfoController extends BaseController {
      * 数据填报
      */
     @RequestMapping("/dataCollection")
-    public ModelAndView dataCollection(Integer rptInfoId, Integer rptStatus, Boolean isReview, HttpServletRequest request) {
+    public ModelAndView dataCollection(Integer rptInfoId, Boolean isReview,Boolean isReadOnly, HttpServletRequest request) {
         ModelAndView mv = new ModelAndView("support/regime/collection/dataCollection");
         // 获取当前用户
         User user = SessionUtil.getUser(request.getSession());
         //判断当前用户是否有填报某报表的权限
         Boolean isWrite = false;
         Boolean isApproval = false;
-
+        Gson gson = new Gson();
         if (rptInfoId != null) {
             ReportInfo reportInfo = reportInfoService.getReportInfosByRptInfoId(rptInfoId);
             //判断当前用户是否有填报某报表的权限
@@ -194,17 +194,62 @@ public class ReportInfoController extends BaseController {
             isApproval = CurrentUser.hasApprovalPermission(request, reportInfo.getTmpId());
             mv.addObject("year", reportInfo.getYear());
             mv.addObject("month", reportInfo.getMonth());
+            mv.addObject("isWrite", isWrite);
+            mv.addObject("isApproval", isApproval);
+            mv.addObject("rptInfoId", rptInfoId);
+            mv.addObject("rptStatus", reportInfo.getRptStatus());
+            List<Map<String, Object>> rptInfos = reportInfoService.getRptInfos(reportInfo.getTmpId(), isReview);
+            mv.addObject("rptInfos", gson.toJson(rptInfos));
+            mv.addObject("rptTmpId", reportInfo.getTmpId());
+            mv.addObject("rptTmpName", reportInfo.getName());
+            List<Map<String, Object>> years = getAllYears(rptInfos);
+            Integer period = reportInfo.getPeriod();
+            mv.addObject("years", gson.toJson(years));
+            mv.addObject("period", period);
+            if (isReview == null||!isReview) {
+                //填报状态
+                List<Map<String, Object>> rptStatusList = Constant.RPT_STATUS.getAllForArray();
+                mv.addObject("rptStatusList", gson.toJson(rptStatusList));
+                mv.addObject("isReview", false);
+
+            } else {
+                //审核状态
+                List<Map<String, Object>> rptStatusList = Constant.RPT_STATUS.getReviewForArray();
+                mv.addObject("rptStatusList", gson.toJson(rptStatusList));
+                mv.addObject("isReview", isReview);
+            }
+            if(isReadOnly ==null){
+                mv.addObject("isReadOnly", false);
+            }else{
+                mv.addObject("isReadOnly", isReadOnly);
+            }
         }
-        mv.addObject("isWrite", isWrite);
-        mv.addObject("isApproval", isApproval);
-        mv.addObject("rptInfoId", rptInfoId);
-        mv.addObject("rptStatus", rptStatus);
-        if (isReview == true) {
-            mv.addObject("isReview", isReview);
-        } else {
-            mv.addObject("isReview", false);
-        }
+
         return mv;
+    }
+
+    private List<Map<String, Object>> getAllYears(List<Map<String, Object>> rptInfos) {
+        int minYear = Integer.MAX_VALUE;
+        int maxYear = Integer.MIN_VALUE;
+        if(rptInfos!=null){
+            for(Map<String, Object> map:rptInfos){
+                int year = (int)map.get("year");
+                if(year>maxYear){
+                    maxYear = year;
+                }
+                if(year<minYear){
+                    minYear = year;
+                }
+            }
+        }
+        List<Map<String, Object>> years = new ArrayList<>();
+        for(int i=0;i<=maxYear-minYear;i++){
+            Map<String, Object> map = new HashMap<>();
+            map.put("text",maxYear-i+"年");
+            map.put("value",maxYear-i);
+            years.add(map);
+        }
+        return years;
     }
 
     /**
@@ -227,15 +272,18 @@ public class ReportInfoController extends BaseController {
                 ReportInfo reportInfo = reportInfoService.getReportInfosByRptInfoId(rptInfoId);
                 //判断当前用户的报表的权限
                 isRead = CurrentUser.hasReadPermission(request, reportInfo.getTmpId());
+                String table = reportInfoService.getRptInfoHtml(rptInfoId);
+                if (StringUtils.isEmpty(table) && isRead) {
+                    result.put("table", "暂无表样");
+                } else if (isRead) {
+                    result.put("table", table);
+                } else {
+                    result.put("table", "您没有查看该报表权限！");
+                }
+            }else{
+                result.put("table", "");
             }
-            String table = reportInfoService.getRptInfoHtml(rptInfoId);
-            if (StringUtils.isEmpty(table) && isRead) {
-                result.put("table", "暂无表样");
-            } else if (isRead) {
-                result.put("table", table);
-            } else {
-                result.put("table", "您没有查看该报表权限！");
-            }
+
         } catch (Exception e) {
             e.printStackTrace();
             result.put("table", "获取表样失败");
@@ -294,17 +342,17 @@ public class ReportInfoController extends BaseController {
             if (tableHtml != null) {
                 Document doc = Jsoup.parse(tableHtml, "", new Parser(new XmlTreeBuilder()));
                 List<RptHtmlPojo> rptHtmlList = ImportUtils.getRptHtml(reportId, dataType, collectionType, time, year, month, doc, depId);
-                reportDataService.saveOrSubmitRptDataList(user,rptHtmlList,status,reportInfo);
+                reportDataService.saveOrSubmitRptDataList(user, rptHtmlList, status, reportInfo);
 /*                for (RptHtmlPojo rptHtml : rptHtmlList) {
                     reportDataService.saveOrSubmitRptData(user,rptHtml, status,reportInfo);
                 }*/
                 result = genSuccessMsg(null, success, 200);
                 if (reportInfo.getRptStatus() != Constant.RPT_STATUS.REJECT && reportInfo.getRptStatus() != Constant.RPT_STATUS.PASS && reportInfo.getRptStatus() != Constant.RPT_STATUS.WAITING_PASS) {
                     //修改报表状态
-                    reportInfoService.updateStatus(user,reportId, rptStatus, request);
+                    reportInfoService.updateStatus(user, reportId, rptStatus, request);
                 } else if (reportInfo.getRptStatus() == Constant.RPT_STATUS.REJECT && rptStatus == Constant.RPT_STATUS.WAITING_PASS) {
                     //修改报表状态
-                    reportInfoService.updateStatus(user,reportId, rptStatus, request);
+                    reportInfoService.updateStatus(user, reportId, rptStatus, request);
                 }
                 /*updateReportLog(request, reportId, "", operateType);*/
             } else {
@@ -477,7 +525,7 @@ public class ReportInfoController extends BaseController {
         try {
             EsiJsonParamUtil<ReportInfo> paramUtil = new EsiJsonParamUtil<>();
             datas = paramUtil.parseObjToList(request, ReportInfo.class);
-            reportInfoService.remove(user,datas, rptTmpIds);
+            reportInfoService.remove(user, datas, rptTmpIds);
             //updateReportLog(request, datas, "", Constant.OPERATE_TYPE.DELETE);
             result = genSuccessMsg(null, "删除成功", null);
         } catch (Exception e) {

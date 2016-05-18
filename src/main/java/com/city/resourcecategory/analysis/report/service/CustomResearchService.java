@@ -183,5 +183,36 @@ public class CustomResearchService {
     public List<CustomResearchEntity> getCustomResearchByName(String name) {
         return researchDao.selectResearchByName(name);
     }
+
+    /**
+     * 返回分析报表数量
+     * <pre>
+     *     根据分析报表名称查询，返回匹配数量
+     * </pre>
+     *
+     * @param text
+     * @return
+     * @author hzc
+     * @createDate 2016-5-13
+     */
+    public int getResearchForSearchCount(String text) {
+        return researchDao.selectForSearchCount(text);
+    }
+
+    /**
+     * 返回分析报表
+     * <pre>
+     *     根据分析报表名称，模糊查询
+     * </pre>
+     *
+     * @param text
+     * @param page
+     * @return
+     * @author hzc
+     * @createDate 2016-5-13
+     */
+    public List getResearchForSearch(String text, Page page) {
+        return researchDao.selectForSearch(text,page);
+    }
 }
 

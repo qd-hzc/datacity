@@ -250,24 +250,21 @@ public class TextManageController extends BaseController {
     public Map<String, Object> addTextContent(HttpServletRequest request,Integer id, Integer themeId,String name,String content,String analysisDate) {
         Map<String, Object> result = null;
         TextContent data = new TextContent();
+        List<TextContent> datas = null;
         try {
             //获取当前用户
             User user = SessionUtil.getUser(request.getSession());
-            data = textContentService.addTextContent(user,id, themeId,name,content,analysisDate);
-            if (data!=null) {
-                if(id!=null){
-                    result = genSuccessMsg(data, "修改成功!", null);
+            Map map = textContentService.addTextContent(user,id, themeId,name,content,analysisDate);
+            datas = (List<TextContent>)map.get("datas");
+            if(datas.size()>0) {
+                result = genSuccessMsg(datas, "保存成功", null);
+            }else{
+                if((boolean)map.get("nameRepeat")){
+                    result = genFaultMsg(null, "文字分析名称已存在！", null);
                 }else {
-                    result = genSuccessMsg(data, "添加成功!", null);
-                }
-            } else {
-                if(id!=null) {
-                    result = genFaultMsg(null, "修改失败!", null);
-                }else{
-                    result = genFaultMsg(null, "添加失败!", null);
+                    result = genFaultMsg(null, "保存失败", null);
                 }
             }
-
         } catch (Exception e) {
             e.printStackTrace();
             EsiLogUtil.error(getLog(), e.getMessage());

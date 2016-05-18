@@ -745,11 +745,17 @@ public class Constant {
 
         public static int ALL = 0;//全部
         public static int WAITING_FILL = 1;//待填报
+        public static String WAITING_FILL_CH = "待填报";
         public static int DRAFT = 2;//草稿
+        public static String DRAFT_CH = "草稿";
         public static int WAITING_PASS = 3;//待审
+        public static String WAITING_PASS_CH = "待审核";
         public static int PASS = 4;//已审
+        public static String PASS_CH = "已审核";
         public static int REJECT = 5;//已驳回
+        public static String REJECT_CH = "已驳回";
         public static int REVIEW_ALL = 10;//全部（报表审核）
+
 
         /**
          * 获取所有类型

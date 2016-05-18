@@ -59,7 +59,11 @@ public class UserManagerController extends BaseController {
         Department dep = departmentManagerService.findDepById(departmentId);
         user.setDepartment(dep);
         if (user.getId() == null) {
-            user.setLoginPwd(MD5Util.MD5("123456"));//初始密码为123456
+            if (!("".equals(user.getLoginPwd().trim()))) {//密码不为空时修改密码
+                user.setLoginPwd(MD5Util.MD5(user.getLoginPwd().trim()));//修改密码
+            }else {
+                user.setLoginPwd(MD5Util.MD5("123456"));//初始密码为123456
+            }
             user.setIndexPage("/support/sys/index");
         } else {
             if (!("".equals(user.getLoginPwd().trim()))) {//密码不为空时修改密码

@@ -15,7 +15,6 @@ public class ReportTemplate implements Serializable {
     private Integer id;
     private String name;
     //    分组id
-    @Column(name = "GROUP_ID")
     private Integer groupId;
     /**
      * 表号
@@ -90,6 +89,7 @@ public class ReportTemplate implements Serializable {
         this.id = id;
     }
 
+    @Column(name = "GROUP_ID")
     public Integer getGroupId() {
         return groupId;
     }

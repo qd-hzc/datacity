@@ -187,8 +187,13 @@ public class CommonService {
         int themeId = Integer.parseInt(contentValue);
         if (1 == 1) {// 权限验证
             Map<String, Object> result = new HashMap<>();
+            //开始的时候
+            long begin=System.currentTimeMillis();
             List<TextContent> textContentList = textContentService.queryAllTextContentByThemeId(null, themeId, TextTheme.SORT_BY_DATE, null, Constant.TEXT_CONTENT_STATUS.CHECKED);
+            System.out.println((System.currentTimeMillis()-begin));
+            begin=System.currentTimeMillis();
             List<TextContent> textContentListByUser = textContentService.queryAllTextContentByThemeId(user.getUser(), themeId, TextTheme.SORT_BY_DATE, null, null);
+            System.out.println((System.currentTimeMillis()-begin));
             if (textContentList != null) {
                 List<Map<String, Object>> allTextMapList = new ArrayList<>();
                 List<Map<String, Object>> userTextMapList = new ArrayList<>();

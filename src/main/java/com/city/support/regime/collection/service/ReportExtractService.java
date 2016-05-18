@@ -68,6 +68,7 @@ public class ReportExtractService {
      * @param rptInfoId      报表id
      * @param html            抽取网页
      * @param request
+     * @return
      */
     public Boolean extractHtml(Integer rptInfoId, String html, HttpServletRequest request) {
 

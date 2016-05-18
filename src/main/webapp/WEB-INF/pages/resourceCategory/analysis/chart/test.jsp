@@ -58,10 +58,6 @@
         });
         // 访问子组件
         var child = navV.$children[0].$refs.select
-        console.log("child")
-        console.log(navV)
-        console.log(navV.$refs.chart)
-        console.log(child)
         /*$("#buttonDiv2").show();
         $(".timeFrame1").on("click", function () {
             //var timeFrame = this.gg.createDynamicMetadata(103, item, 12);

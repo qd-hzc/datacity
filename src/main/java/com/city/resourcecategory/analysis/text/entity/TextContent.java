@@ -52,6 +52,27 @@ public class TextContent implements Serializable {
     @Transient
     private Boolean isSel;
 
+    public TextContent() {
+    }
+
+    public TextContent(Integer id,String name, String subTitle, TextTheme theme, Integer status, Integer type, String infos, Date analysisDate, Integer sortIndex, Integer creator, String creatorName, Date createTime, Integer updator, String updatorName, Date updateTime) {
+        this.id = id;
+        this.name = name;
+        this.subTitle = subTitle;
+        this.theme = theme;
+        this.status = status;
+        this.type = type;
+        this.infos = infos;
+        this.analysisDate = analysisDate;
+        this.sortIndex = sortIndex;
+        this.creator = creator;
+        this.creatorName = creatorName;
+        this.createTime = createTime;
+        this.updator = updator;
+        this.updatorName = updatorName;
+        this.updateTime = updateTime;
+    }
+
     public Integer getId() {
         return id;
     }

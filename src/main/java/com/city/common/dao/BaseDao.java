@@ -258,7 +258,7 @@ public class BaseDao<T> implements IBaseDao<T> {
     /**
      * 给Query添加分页条件
      */
-    protected void setPageParamsForQuery(Query q, Page page) {
+    public void setPageParamsForQuery(Query q, Page page) {
         if (page != null) {
             q.setMaxResults(page.getLimit());
             q.setFirstResult(page.getStart());

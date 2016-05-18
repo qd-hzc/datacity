@@ -1,0 +1,67 @@
+SELECT
+        id,
+        name,
+        type,
+        period,
+        comments,
+        extraId,
+        extraName,
+        departmentId,
+        departmentName,
+rn
+        
+    FROM
+        ( select
+            t.id,
+            t.name,
+            t.type,
+            t.period,
+            t.comments,
+            t.extraId,
+            t.extraName,
+            t.departmentId,
+            t.departmentName,
+            rownum as rn
+        from
+            ( select
+                id,
+                name,
+                type,
+                period,
+                comments,
+                extraId,
+                extraName,
+                departmentId,
+                departmentName 
+            from
+                (
+                SELECT srrt.ID, srrt.NAME, 2 AS TYPE, srrt.PERIOD, srrt.RPT_COMMENTS AS comments, srrt.group_id as extraId,
+                 srrg.name as extraName, srrt.DEP_ID AS departmentId,
+                    ssd.DEP_NAME as departmentName FROM SPT_RGM_RPT_TMP srrt left join
+                    SPT_SYS_DEPART ssd on srrt.DEP_ID = ssd.id
+                LEFT JOIN spt_rgm_rpt_group srrg on srrg.id = srrt.group_id where
+                    srrt.id in (
+                        343,342,341,350,401,347,346,345,344,461,384,373,441,372,375,442,374,369,368,371,370,383,382,377,376,425,427,426,352,353,354,364,365,366,367,421,361,362,-1
+                    ) and srrt.name like '%心%'
+                UNION
+                ALL SELECT RRCR.ID, RRCR.NAME, 3 AS TYPE, RRCR.PERIOD, RRCR.comments,
+                    RRCR.RESEARCH_GROUP_ID AS extraId, RRRG."NAME" as extraName, -1 AS departmentId,
+                    '' as departmentName FROM RC_REPORT_CUSTOM_RESEARCH rrcr
+                LEFT JOIN RC_REPORT_RESEARCH_GROUP rrrg ON RRCR.RESEARCH_GROUP_ID = RRRG."ID"
+                where rrcr.name like '%心%'
+                UNION
+                ALL SELECT RAC.ID, RAC.title AS NAME, 4 AS TYPE, RAC.PERIOD_TYPE AS period, '' AS comments, RAC.GROUP_ID AS extraId, RACG."NAME" as extraName, -1 AS departmentId, '' as departmentName
+                FROM RC_ANALYSIS_CHARTBASE rac LEFT JOIN RC_ANALYSIS_CHARTGROUP racg
+                        ON RAC."GROUP_ID" = RACG."ID" where rac.title like '%心%'
+                UNION
+                ALL
+                SELECT RTC.ID, RTC.NAME, 5 AS TYPE, -1 AS period, '' AS comments, RTC.THEME_ID AS extraId, RTT."NAME" as extraName, -1 AS departmentId, '' as departmentName,rownum as rn
+                FROM RC_TEXT_CONTENT rtc LEFT JOIN RC_TEXT_THEME rtt ON RTC.THEME_ID = RTT."ID" where 1=1
+                    rtc.name like '%心%' 
+            ) 
+        ORDER BY
+            NAME 
+    ) t 
+
+) 
+where rn BETWEEN 10 and 20

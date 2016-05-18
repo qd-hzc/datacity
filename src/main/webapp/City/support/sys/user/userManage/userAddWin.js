@@ -46,6 +46,36 @@ Ext.userAddWin.show = function(fnt,rec){//两个参数，fnt是回调函数，re
         margin :MARGIN_ROW_SPACE,
         items : [userDisplayName,loginName]
     });
+    //------------修改密码 start--------------
+    var loginPwd = Ext.create('Ext.form.field.Text',{
+        name : 'loginPwd',
+        fieldLabel : '密码',
+        inputType : 'password',
+        labelWidth : 100,
+        labelAlign : 'right',
+        columnWidth : .45,
+        border : false,
+        value : "123456"
+    });
+    var confirmLoginPwd = Ext.create('Ext.form.field.Text',{
+        name : 'confirmLoginPwd',
+        fieldLabel : '确认密码',
+        inputType : 'password',
+        compareTo : loginPwd,
+        //vtype : 'password',
+        labelWidth : 100,
+        labelAlign : 'right',
+        columnWidth : .45,
+        border : false,
+        value : "123456"
+    });
+    var passwordLine = Ext.create('Ext.panel.Panel',{
+        layout : 'column',
+        border : false,
+        margin :MARGIN_ROW_SPACE,
+        items : [loginPwd,confirmLoginPwd]
+    });
+//------------修改密码 end--------------
     //------------------------第二行---------------------------
     if(!Ext.ClassManager.isCreated("userAddDepartmentModel")){
         Ext.define('userAddDepartmentModel',{
@@ -235,7 +265,7 @@ Ext.userAddWin.show = function(fnt,rec){//两个参数，fnt是回调函数，re
         border : false,
         padding : "40 0 0 0",
         region : 'center',
-        items : [firstLine,secondLine,thirdLine,forthLine,fifthLine]
+        items : [firstLine,passwordLine,secondLine,thirdLine,forthLine,fifthLine]
     });
 //--------------用户信息 end ----------------
 

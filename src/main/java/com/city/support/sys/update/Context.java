@@ -5,20 +5,15 @@ package com.city.support.sys.update;
  */
 public class Context {
     private TaskQueue taskQueue;
-    private EsiRule esiRule;
 
     public Context() {
         this.onCreate();
         if (this.taskQueue == null) {
-            this.taskQueue = new TaskQueue(this);
+            setTaskQueue(new TaskQueue(this));
             this.taskQueue.addExecutor(new EsiExecutor());
-        }
-
-        if (this.esiRule == null) {
-            this.esiRule = new EsiRule();
+            this.taskQueue.addExecutor(new EsiAnalyExecutor());
         }
         this.onInit();
-
     }
 
     public void onCreate() {
@@ -41,11 +36,4 @@ public class Context {
         this.taskQueue = taskQueue;
     }
 
-    public EsiRule getEsiRule() {
-        return esiRule;
-    }
-
-    public void setEsiRule(EsiRule esiRule) {
-        this.esiRule = esiRule;
-    }
 }

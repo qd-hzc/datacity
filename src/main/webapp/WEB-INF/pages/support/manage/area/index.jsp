@@ -71,7 +71,7 @@
             listeners: {
                 itemclick: function (_this, record, item, index, e, eOpts) {
                     areaInfoPanel.getForm().loadRecord(record);
-                    console.log(record);
+
                 },
                 itemcontextmenu: function (_this, record, item, index, e) {
                     e.preventDefault();

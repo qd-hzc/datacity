@@ -112,7 +112,7 @@
          }
          })*/
         MapData.content = MapData.contents[0];
-        console.log(MapData.content)
+
         var mapId = 0;
         //    初始化
         MapData.init = function () {
@@ -127,7 +127,7 @@
                         var contentHtml = '';
                         $.each(pages, function (i, li) {
                             li.index = i;
-                            console.log(li)
+
                             menuHtml += $.render(tempMenuHtml, li);
                         });
                         var menuContainer = $('[data-id=mapdatadiv1][data-uuid=' + MapData.uuid + ']');
@@ -218,7 +218,7 @@
                     //console.log(gg.esiDataHandler)
                     //console.log(gg)
                     option = gg.createOption();
-                    console.log(option)
+
                     $.each(option.legend.data, function (i, selected) {
                         option.legend.selected[selected] = true;
                     })
@@ -265,7 +265,7 @@
             // 加载当前地图
             MapData.loadData = function (content) {
                 MapData.esi.getData(content, function (data) {
-                    console.log(content)
+
                     if (data.success) {
                         var result = data.datas;
                         if (result) {
@@ -297,7 +297,7 @@
                                     $.each(series.data, function (j, data) {
 
                                         if (data.timeStr == '2013年4季度') {
-                                            console.log(data.timeStr)
+
                                             dataByTime.push(data);
                                         }
                                     })
@@ -316,7 +316,7 @@
                                 }
                             }
                             setRank(option.series);
-                            console.log(option)
+
                             var myChart = echarts.init($('[data-uuid=' + MapData.uuid + '][data-id=mapdiv2]').get(0));
                             gg.configMap("svg1.2.svg");
                             if (myChart) {

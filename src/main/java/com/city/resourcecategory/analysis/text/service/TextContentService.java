@@ -1,6 +1,7 @@
 package com.city.resourcecategory.analysis.text.service;
 
 import com.city.common.pojo.Constant;
+import com.city.common.pojo.Page;
 import com.city.common.util.ConvertUtil;
 import com.city.common.util.ListUtil;
 import com.city.resourcecategory.analysis.text.dao.TextContentDao;
@@ -50,25 +51,29 @@ public class TextContentService {
         List<TextContent> result = null;
         if (themeId != null) {
             result = textContentDao.queryByThemeId(user, themeId, contentSortType, name, status);
-            for (TextContent textContent : result) {
-                // 如果内容为空，读取关联模板的内容
-                if ((textContent.getContent() == null || "".equals(textContent.getContent())) && textContent.getStatus() != Constant.TEXT_CONTENT_STATUS.CHECKED) {
-                    TextTheme textTheme = textThemeDao.queryById(textContent.getTheme().getId());
-                    if (textTheme.getModelId() != null) {
-                        TextModel textModel = textModelDao.queryById(textTheme.getModelId());
-                        textContent.setContent(textModel.getContent());
-                    }
-                }
-                List<TextLabelLink> textLabelLinkList = textLabelLinkService.queryTextLabelsByContentId(textContent.getId());
-                String labelIds = "";
-                for (TextLabelLink textLabelLink : textLabelLinkList) {
-                    labelIds += textLabelLink.getLabel().getId() + ",";
-                }
-                if (!"".equals(labelIds)) {
-                    labelIds = labelIds.substring(0, labelIds.length() - 1);
-                }
-                textContent.setLabelIds(labelIds);
-            }
+           try{
+               for (TextContent textContent : result) {
+                   // 如果内容为空，读取关联模板的内容
+                   if ((textContent.getContent() == null || "".equals(textContent.getContent())) && textContent.getStatus() != Constant.TEXT_CONTENT_STATUS.CHECKED) {
+                       TextTheme textTheme = textThemeDao.queryById(textContent.getTheme().getId());
+                       if (textTheme.getModelId() != null) {
+                           TextModel textModel = textModelDao.queryById(textTheme.getModelId());
+                           textContent.setContent(textModel.getContent());
+                       }
+                   }
+                   List<TextLabelLink> textLabelLinkList = textLabelLinkService.queryTextLabelsByContentId(textContent.getId());
+                   String labelIds = "";
+                   for (TextLabelLink textLabelLink : textLabelLinkList) {
+                       labelIds += textLabelLink.getLabel().getId() + ",";
+                   }
+                   if (!"".equals(labelIds)) {
+                       labelIds = labelIds.substring(0, labelIds.length() - 1);
+                   }
+                   textContent.setLabelIds(labelIds);
+               }
+           }catch (Exception e){
+               e.printStackTrace();
+           }
 
         }
         return result;
@@ -122,7 +127,7 @@ public class TextContentService {
             if (themeId != null) {
                 if (dataId == null) {
                     List<TextContent> textContentList = textContentDao.queryByName(data.getName(), themeId);
-                    if (textContentList.size()==0) {
+                    if (textContentList.size() == 0) {
                         TextTheme textTheme = new TextTheme();
                         textTheme.setId(themeId);
                         data.setTheme(textTheme);
@@ -138,15 +143,15 @@ public class TextContentService {
                         textContentDao.insert(data, true);
                         result.add(data);
                         textLabelService.linkLabel(data.getId(), labelIds);
-                    }else{
+                    } else {
                         nameRepeat = true;
                     }
                 } else {
-                    List<TextContent> textContentList =null;
-                    if(data.getName()!=null) {
-                        textContentList = textContentDao.queryByNameAndId(data.getName(), themeId,dataId);
+                    List<TextContent> textContentList = null;
+                    if (data.getName() != null) {
+                        textContentList = textContentDao.queryByNameAndId(data.getName(), themeId, dataId);
                     }
-                    if(textContentList==null||textContentList.size()==0) {
+                    if (textContentList == null || textContentList.size() == 0) {
                         ConvertUtil<TextContent> cu = new ConvertUtil<>();
                         TextContent textContent = textContentDao.queryById(dataId);
                         cu.replication(data, textContent, TextContent.class.getName());
@@ -156,30 +161,31 @@ public class TextContentService {
                         textContentDao.update(textContent, true);
                         result.add(textContent);
                         textLabelService.linkLabel(dataId, labelIds);
-                    }else{
+                    } else {
                         nameRepeat = true;
                     }
                 }
             }
         }
-            map.put("datas", result);
-            map.put("nameRepeat", nameRepeat);
-            return map;
-        }
+        map.put("datas", result);
+        map.put("nameRepeat", nameRepeat);
+        return map;
+    }
 
-        /**
-         * 添加分析主题(前台添加)
-         *
-         * @param user
-         * @param themeId
-         * @param name
-         * @param content
-         * @param analysisDate
-         * @return
-         */
+    /**
+     * 添加分析主题(前台添加)
+     *
+     * @param user
+     * @param themeId
+     * @param name
+     * @param content
+     * @param analysisDate
+     * @return
+     */
 
-    public TextContent addTextContent(User user, Integer id, Integer themeId, String name, String content, String analysisDate) {
+    public Map<String, Object> addTextContent(User user, Integer id, Integer themeId, String name, String content, String analysisDate) {
         TextContent result = new TextContent();
+        List<TextContent> datas = new ArrayList<>();
         if (id == null) {
             if (themeId != null) {
                 List<TextContent> textContentList = queryAllTextContentByThemeId(null, themeId, null, null, null);
@@ -195,7 +201,8 @@ public class TextContentService {
                 result.setContent(content);
                 result.setName(name);
                 result.setAnalysisDate(new Date(analysisDate));
-                textContentDao.insert(result, true);
+                datas.add(result);
+                //textContentDao.insert(result, true);
             }
         } else {
             TextContent data = new TextContent();
@@ -208,9 +215,11 @@ public class TextContentService {
             textContent.setUpdator(user.getId());
             textContent.setUpdatorName(user.getUserName());
             textContent.setUpdateTime(new Date());
-            textContentDao.update(textContent, true);
+            //textContentDao.update(textContent, true);
+            datas.add(textContent);
         }
-        return result;
+        Map<String, Object> map = updateTextContent(datas, user, themeId);
+        return map;
     }
 
     /**
@@ -256,4 +265,32 @@ public class TextContentService {
         textContentDao.checkTextContent(ids, status);
     }
 
+
+    /**
+     * 搜索文字分析，返回匹配数量
+     *
+     * @param text
+     * @return
+     * @author hzc
+     * @createDate 2016-5-13
+     */
+    public int getTextForSearchCount(String text) {
+        return textContentDao.selectForSearchCount(text);
+    }
+
+    /**
+     * 搜索文字分析，返回匹配的文字分析
+     * <pre>
+     *     模糊查询，匹配名称，分页
+     * </pre>
+     *
+     * @param text
+     * @param page
+     * @return
+     * @author hzc
+     * @createDate 2016-5-13
+     */
+    public List getTextForSearch(String text,Page page) {
+        return textContentDao.selectForSearch(text,page);
+    }
 }

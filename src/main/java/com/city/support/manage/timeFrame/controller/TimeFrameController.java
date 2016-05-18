@@ -118,9 +118,9 @@ public class TimeFrameController extends BaseController {
             } else {
                 result = genFaultMsg(null, "保存失败", null);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-            EsiLogUtil.error(getLog(), e.getMessage());
+        } catch (Exception notEmpty) {
+            notEmpty.printStackTrace();
+            EsiLogUtil.error(getLog(), notEmpty.getMessage());
             result = genFaultMsg(null, "保存失败", null);
         }
         return result;

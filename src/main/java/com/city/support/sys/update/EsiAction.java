@@ -21,6 +21,7 @@ public class EsiAction implements Action {
     @Override
     public void execute(Task task) {
         if (esiRule != null) {
+
             Class clazz = esiRule.getClass();
             try {
                 Method method = clazz.getMethod(command, Task.class);

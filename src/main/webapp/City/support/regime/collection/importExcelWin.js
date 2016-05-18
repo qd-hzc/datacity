@@ -38,7 +38,7 @@ Ext.importExcelWin.init = function(rec,fn,isSheet) {
                             var _rptInfoId = "";
                             if(isSheet){
                                 url =  GLOBAL_PATH + '/support/regime/collection/excel/importFromSheet'
-                                _rptInfoId = rptInfoId;
+                                _rptInfoId = isSheet;
                             }
                             try {
                                 formPanel.submit({

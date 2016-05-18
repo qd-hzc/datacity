@@ -167,10 +167,9 @@
             var textTitle = $.trim($('#textTitle').val());
             var textTime = $.trim($('#textTime').val());
             var textContent = ue.getContent();
-            console.log(textTitle)
-            console.log(textTime)
-            console.log(textContent)
+
             if (textTitle != "" && textTime != "") {
+                console.log(contentId)
                 var msg = {
                     themeId: themeId,
                     name: textTitle,
@@ -191,12 +190,14 @@
                         alert("出现异常!");
                     },
                     success: function (data) {
-                        console.log(data);
+
                         //改变加载状态 已发送
                         //alert(data.msg);
                         if(data.success) {
                             alert(data.msg);
-                            contentId = data.datas.id;
+                            if(data.datas&&data.datas.length) {
+                                contentId = data.datas[0].id;
+                            }
                             $this.attr("value", "修改");
                         }else{
                             alert(data.msg);

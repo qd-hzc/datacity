@@ -14,7 +14,7 @@ function showAddStructureWindow(record, callback) {
             rptTmp: ''
         }
     };
-    console.log(record);
+
     var name = record.get('dataName');
     var itemId = record.get('dataValue') ? record.get('dataValue') : record.get('metaId');
     if (record.get('metaExt')) {
@@ -118,7 +118,7 @@ function showAddStructureWindow(record, callback) {
                 handler: function () {
                     var addStructureResult = form.getForm().getValues();
                     if (form.isValid()) {
-                        console.log(getMeatExtObj(addStructureResult))
+
                         callback(getMeatExtObj(addStructureResult));
                         mw.close();
                     }

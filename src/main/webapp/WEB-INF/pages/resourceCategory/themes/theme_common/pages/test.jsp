@@ -98,7 +98,7 @@
             $('.fcontainer').height(document.body.clientHeight-100);
         });
         $('.fcontainer').height(document.body.clientHeight-100);
-        console.log(document.body.clientHeight-100);
+
         var theme = new EsiTheme();
         var initData = {
             navs: [{

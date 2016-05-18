@@ -53,25 +53,25 @@ EsiTheme.prototype = {
      * <pre>
      *   返回一个页面和一个page对象
      *   {
- *        "id": 121,//id
- *        "name": "经济指标",//目录名称
- *        "parentId": 0,//目录父id
- *        "themeConfigPath": "theme_common/common.config",//目录对应的配置文件
- *        "modulePath": "theme_common/pages/panel",//目录对应的页面
- *        "status": 1,//状态
- *        "contents": [//目录对应页面的内容
- *            {
- *                "id": 89,//id
- *                "themePageId": 121,//目录id
- *                "containerId": "paneldiv2",//内容id
- *                "contentType": 8,//内容类型
- *                "contentValue": "161",//1:综合表，2：自定义表，3：图表，4：地图，5：文字分析，6：文件，7：目录，8：页面，9：数据集
- *            }
- *        ],
- *        "sortIndex": 4,//顺序
- *        "leaf": true,//是否为子节点，如果为子节点，则该菜单无子菜单
- *        "role": "145;181;148"//目录权限
- *    }
+     *        "id": 121,//id
+     *        "name": "经济指标",//目录名称
+     *        "parentId": 0,//目录父id
+     *        "themeConfigPath": "theme_common/common.config",//目录对应的配置文件
+     *        "modulePath": "theme_common/pages/panel",//目录对应的页面
+     *        "status": 1,//状态
+     *        "contents": [//目录对应页面的内容
+     *            {
+     *                "id": 89,//id
+     *                "themePageId": 121,//目录id
+     *                "containerId": "paneldiv2",//内容id
+     *                "contentType": 8,//内容类型
+     *                "contentValue": "161",//1:综合表，2：自定义表，3：图表，4：地图，5：文字分析，6：文件，7：目录，8：页面，9：数据集
+     *            }
+     *        ],
+     *        "sortIndex": 4,//顺序
+     *        "leaf": true,//是否为子节点，如果为子节点，则该菜单无子菜单
+     *        "role": "145;181;148"//目录权限
+     *    }
      * </pre>
      * @param id 页面id
      */

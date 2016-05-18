@@ -66,7 +66,7 @@ Ext.fillAnalysisChartGroup.init = function (fnt, record) {
         form.add(radioContainer);
     } else
         form.loadRecord(record);
-    console.log(form)
+
     var win = new Ext.fillAnalysisChartGroup({
         title: "分析图表分组",
         width: 300,

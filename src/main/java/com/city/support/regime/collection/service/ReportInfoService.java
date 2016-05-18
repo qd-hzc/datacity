@@ -532,7 +532,7 @@ public class ReportInfoService {
             isChange = false;
             if (!reportInfo.getDptId().equals(rptTmp.getDepartment().getId())) {
                 reportInfo.setDptId(rptTmp.getDepartment().getId());
-                reportDataDao.updateDepId(reportInfo.getId(),rptTmp.getDepartment().getId());
+                reportDataDao.updateDepId(reportInfo.getId(), rptTmp.getDepartment().getId());
                 // 添加触发事件
                 List<ReportData> reportDataList = reportDataDao.queryByRptId(reportInfo.getId());
                 sendListener(user, SystemLog.UPDATE, reportInfo, Thread.currentThread().getStackTrace()[1].getMethodName(), reportDataList);
@@ -554,12 +554,12 @@ public class ReportInfoService {
         }
     }
 
-        /**
-         * 修改报表状态
-         *
-         * @param reportId
-         * @param rptStatus
-         */
+    /**
+     * 修改报表状态
+     *
+     * @param reportId
+     * @param rptStatus
+     */
 
     public void updateStatus(User user, Integer reportId, Integer rptStatus, HttpServletRequest request) {
         ReportInfo reportInfo = reportInfoDao.queryById(reportId);
@@ -811,6 +811,41 @@ public class ReportInfoService {
      */
     public List<ReportInfo> getInfoByTime(ReportVO vo) {
         return reportInfoDao.selectInfoByTime(vo);
+    }
+
+    /**
+     * 根据模板id和审核、填报状态获取该模板下的相应的报表信息
+     * @param tmpId
+     * @param isReview
+     * @return
+     */
+    public List<Map<String, Object>> getRptInfos(Integer tmpId, Boolean isReview) {
+        List<Map<String, Object>> result = new ArrayList<>();
+        List<ReportInfo> reportInfoList = null;
+        if (isReview == null||!isReview) {
+            reportInfoList = getReportInfosByRptTmpId(tmpId);
+        } else {
+            reportInfoList = getInfosByTmpIdAndStatus(tmpId, Constant.RPT_STATUS.WAITING_PASS + "," + Constant.RPT_STATUS.PASS);
+        }
+        for (ReportInfo reportInfo : reportInfoList) {
+            Map<String, Object> map = new HashMap<>();
+            String name = reportInfo.getYear() + "年" + Constant.FrequencyType.getFrequencyName(reportInfo.getPeriod(), reportInfo.getMonth());
+            Integer id = reportInfo.getId();
+            Integer status = reportInfo.getRptStatus();
+            Integer year = reportInfo.getYear();
+            Integer month = reportInfo.getMonth();
+            map.put("name",name);
+            map.put("id",id);
+            map.put("status",status);
+            map.put("year",year);
+            map.put("month",month);
+            result.add(map);
+        }
+
+        return result;
+    }
+    public Integer getReportId(String name,Integer year ,Integer month){
+        return reportInfoDao.getReportId(name,year,month);
     }
 
 }

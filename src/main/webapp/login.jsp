@@ -43,7 +43,7 @@
                                 //TODO 待添加默认跳转页面 后期通过配置文件实现，添加全局变量
                                 //location.href = "跳转到默认页面";
                             } else {
-                                location.href = GLOBAL_PATH + result.datas;
+                                top.location.href = GLOBAL_PATH + result.datas;
                             }
                         } else {
                             alert(result.msg);

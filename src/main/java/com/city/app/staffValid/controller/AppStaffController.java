@@ -42,11 +42,11 @@ public class AppStaffController extends BaseController {
     @RequestMapping("/queryStaffs")
     @ResponseBody
     public List<AppPerson> queryStaffs(String name, String validCode, Integer depId, boolean includeDownLevel) {
-        List<AppPerson> persons=appPersonService.queryStaffs(name, validCode, depId, includeDownLevel);
-        if(ListUtil.notEmpty(persons)){
-            for(AppPerson AppPerson:persons){
-                Role role=AppPerson.getRole();
-                if(role!=null){
+        List<AppPerson> persons = appPersonService.queryStaffs(name, validCode, depId, includeDownLevel);
+        if (ListUtil.notEmpty(persons)) {
+            for (AppPerson AppPerson : persons) {
+                Role role = AppPerson.getRole();
+                if (role != null) {
                     role.setCreateUser(null);
                 }
             }
@@ -74,10 +74,9 @@ public class AppStaffController extends BaseController {
      */
     @RequestMapping("queryStaffByValidCode")
     @ResponseBody
-    public AppPerson queryStaffByValidCode(String validCode) {
+    public String queryStaffByValidCode(String validCode) {
         return appPersonService.queryStaffByValidCode(validCode);
     }
-
 
     /**
      * 修改人员
@@ -113,5 +112,14 @@ public class AppStaffController extends BaseController {
             result = genFaultMsg(null, "删除失败", 500);
         }
         return result;
+    }
+
+    /**
+     * 获取人员树
+     */
+    @RequestMapping("/getStaffTree")
+    @ResponseBody
+    public List<Map<String, Object>> getStaffTree() {
+        return appPersonService.getStaffTree();
     }
 }

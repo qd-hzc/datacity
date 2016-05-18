@@ -32,9 +32,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by wxl on 2016/1/14 0014.
@@ -651,5 +649,67 @@ public class ReportManageService {
             }
         }
         return true;
+    }
+
+    /**
+     * 返回综合表模糊查询匹配到的数量
+     * <pre>
+     *     根据综合表名称，模糊查询，返回所有数量
+     *     验证用户权限：可读、可写
+     * </pre>
+     *
+     * @param currentUser
+     * @param text
+     * @return
+     * @author hzc
+     * @createDate 2016-5-13
+     */
+    public int getReportForSearchCount(CurrentUser currentUser, String text) {
+        Map<Integer, ReportPermission> permissionMap = currentUser.getReportPermissionMap();
+        Set<Integer> integers = permissionMap.keySet();
+        Iterator<Integer> iterator = integers.iterator();
+        List list = new LinkedList();
+        while (iterator.hasNext()) {
+            Integer next = iterator.next();
+            ReportPermission reportPermission = permissionMap.get(next);
+            if (reportPermission.isRead() && reportPermission.isWrite()) {
+                list.add(next);
+            }
+        }
+
+        if (null == list || list.size() < 1) {
+            return 0;
+        }
+        return reportTemplateDao.selectForSearchCount(list, text);
+    }
+
+    /**
+     * 返回综合表
+     * <pre>
+     *     根据综合表名称，模糊查询
+     *     分页，验证权限：可读、可写
+     * </pre>
+     *
+     * @param currentUser
+     * @param text
+     * @param page
+     * @return
+     */
+    public List getReportForSearch(CurrentUser currentUser, String text, Page page) {
+        Map<Integer, ReportPermission> permissionMap = currentUser.getReportPermissionMap();
+        Set<Integer> integers = permissionMap.keySet();
+        Iterator<Integer> iterator = integers.iterator();
+        List list = new LinkedList();
+        while (iterator.hasNext()) {
+            Integer next = iterator.next();
+            ReportPermission reportPermission = permissionMap.get(next);
+            if (reportPermission.isRead() && reportPermission.isWrite()) {
+                list.add(next);
+            }
+        }
+        if (null == list || list.size() < 1) {
+            return null;
+        }
+        return reportTemplateDao.selectForSearch(list, text, page);
     }
 }

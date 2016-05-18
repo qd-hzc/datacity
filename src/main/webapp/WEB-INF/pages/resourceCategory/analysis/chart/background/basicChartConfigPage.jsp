@@ -225,7 +225,7 @@
                     chartGroupStore.reload();
                 }*/
                 write: function (store, operate, callback) {
-                    console.log(operate);
+
                     //Ext.Msg.alert('提示', operate._resultSet.message);
                 }
             }

@@ -7,7 +7,7 @@ createModel('Ext.dataDict.EditDataDictWin', function () {
         extend: 'Ext.window.Window',
         width: 350,
         modal: true,
-        title: '数据字典目录'
+        title: '移动数据目录'
     });
 });
 /**
@@ -27,6 +27,10 @@ Ext.dataDict.EditDataDictWin.init = function (pnode, node, fn) {
             xtype: 'hidden',
             name: 'parentId',
             value: pnode ? pnode.get('id') : ''
+        }, {
+            xtype: 'hidden',
+            name: 'type',
+            value: pnode ? pnode.get('type') : 1
         }, {
             xtype: 'hidden',
             name: 'sortIndex'

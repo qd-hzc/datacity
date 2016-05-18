@@ -1,6 +1,8 @@
 package com.city.support.sys.update;
 
 import java.util.Vector;
+import java.util.concurrent.ExecutorService;
+import java.util.concurrent.Executors;
 
 /**
  * Created by wys on 2016/5/3.
@@ -8,9 +10,11 @@ import java.util.Vector;
  * 任务执行器
  */
 public class EsiExecutor implements Executor {
-
-    private String type = "getRpt";
+    private ExecutorService exe = Executors.newFixedThreadPool(10);
+    private String type = "getHtml";
     private Vector<Task> taskVector = new Vector();
+    public EsiExecutor(){
+    }
 
     @Override
     public String getType() {
@@ -18,8 +22,14 @@ public class EsiExecutor implements Executor {
     }
 
     @Override
-    public void addTask(Task task) {
-        taskVector.add(task);
+    public void  addTask(final Task task) {
+//        taskVector.add(task);
+        exe.submit(new Runnable() {
+            @Override
+            public void run() {
+                task.getEsiAction().execute(task);
+            }
+        });
     }
 
     @Override

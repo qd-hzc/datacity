@@ -13,7 +13,7 @@ import java.util.List;
 @Table(name = "RC_TEXT_THEME")
 public class TextTheme implements Serializable {
     //根据分析日期排序
-    public static final String SORT_BY_DATE = "analysisDate desc";
+    public static final String SORT_BY_DATE = "analysisDate";
     //根据索引排序
     public static final String SORT_BY_INDEX = "sortIndex";
 

@@ -7,7 +7,7 @@ public class Task {
     //任务类型
     public String type = "";
     //任务状态
-    private TaskState state;
+    private TaskState state=TaskState.READY;
     //任务所在的队列
     private TaskQueue taskQueue;
     //任务的执行器

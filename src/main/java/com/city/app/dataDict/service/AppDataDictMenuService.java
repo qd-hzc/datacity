@@ -55,16 +55,33 @@ public class AppDataDictMenuService {
     /**
      * 返回节点树
      */
-    public List<AppDataDictMenu> queryDictMenus(User user, String projectPath) {
+    public List<AppDataDictMenu> queryDictMenus(User user, String projectPath, boolean showPushTree) {
         //用户 角色
 //        String roleIds = getRoles(user);
         String roleIds = null;//todo 角色暂时不需要,需要时解开注释即可
-        List<AppDataDictMenu> menus = appDataDictMenuDao.queryDictMenu(null, roleIds, null, null);
+        List<AppDataDictMenu> menus = appDataDictMenuDao.queryDictMenu(roleIds, showPushTree ? null : 1);
         if (ListUtil.notEmpty(menus)) {
             for (AppDataDictMenu menu : menus) {
                 //设置图标
                 menu.setIconByPath(projectPath);
             }
+        }
+        //若推送树显示,添加根节点
+        if (showPushTree) {
+            //移动数据目录
+            AppDataDictMenu root = new AppDataDictMenu();
+            root.setId(-1);
+            root.setParentId(0);
+            root.setName("移动数据目录");
+            root.setType(AppDataDictMenu.TYPE_CONFIG);
+            menus.add(root);
+            //推送数据目录
+            root = new AppDataDictMenu();
+            root.setId(-2);
+            root.setParentId(0);
+            root.setName("推送数据目录");
+            root.setType(AppDataDictMenu.TYPE_PUSH);
+            menus.add(root);
         }
         return menus;
     }

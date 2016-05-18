@@ -451,7 +451,7 @@
                     }
                     if (cellIndex == 7) {//弹出填报窗口
 
-                        var winal = open(GLOBAL_PATH + '/support/regime/collection/dataCollection?rptInfoId=' + record.get('id') + '&rptStatus=' + record.get('rptStatus') + '&isReview=' + false);
+                        var winal = open(GLOBAL_PATH + '/support/regime/collection/dataCollection?rptInfoId=' + record.get('id'));
                         var loop = setInterval(function () {
                             if(!winal){
                                 clearInterval(loop);

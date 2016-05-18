@@ -27,7 +27,7 @@
             margin: 0 auto;
         }
 
-        td, th {
+        .esi td, th {
             border: 1px solid black;
             padding: 5px 10px;
         }
@@ -38,6 +38,7 @@
     </style>
 </head>
 <body>
+<script src="<%=request.getContextPath()%>/City/support/regime/report/design/addAllPeriodsWin.js"></script>
 <script>
     var contextPath = '<%=contextPath%>';
     var MARGIN_4_8 = '8 8';
@@ -201,25 +202,93 @@
                 }
             }
         });
+        var formExport = Ext.create('Ext.Button', {
+            text: '报表导出',
+            margin: MARGIN_4_8,
+            handler: function () {
+                Ext.MessageBox.confirm("提示", "是否导出该表？", function (btn) {
+                    if (btn == 'yes') {
+                        var list = [];
+                        list.push(research);
+                        var url = GLOBAL_PATH + '/resourcecategory/analysis/report/designCustomResearch/checkExportToExcel?research='
+                                + JSON.stringify(list);
+
+                        var yearValue = yearCombobox.getValue();
+                        var periodValue = periodCombobox.getValue();
+                        var periodRawValue = periodCombobox.getRawValue();
+                        var year = '';
+                        var month = '';
+//                        判断时间选择器是否有值
+                        if (null != yearValue && '' != yearValue) {
+                            year = yearValue;
+                        }
+                        if (null != periodValue && '' != periodValue) {
+                            month = periodValue;
+                        }
+                        var obj = {
+                            year: year,
+                            month: month,
+                            name: periodRawValue
+                        }
+                        if (year != '') {
+                            var yearArray = new Array();//年
+                            yearArray.push(obj);
+                            url += '&yearArray=' + JSON.stringify(yearArray);
+                        }
+                        window.location.href = url;
+                    }
+                })
+            }
+        });
+        var batchExport = Ext.create('Ext.Button', {
+            text: '批量导出',
+            margin: MARGIN_4_8,
+            handler: function () {
+                var rsch = [];
+                rsch.push(research);
+                    var lists = [];
+                    for (var i = 0; i < periods.length; i++) {
+                        var year = periods[i].year;
+                        var period = genPeriodStore(year, periods);
+                        if (period.length == 0) {
+                            period = [{id: '', name: '全年'}]
+                        }
+                        var obj = {'year': year, 'period': period};
+                        lists.push(obj)
+                    }
+                    Ext.addAllPeriodsWin.init(rsch, lists, function (rec) {
+                    });
+            }
+        });
 //        时间选择器
         var timeRangeContainer = Ext.create('Ext.panel.Panel', {
             height: '40',
-            region: 'north',
+//            region: 'north',
             border: false,
-            layout: 'hbox',
+            layout: 'vbox',
+            columnWidth: .2,
             items: [
                 {
-                    xtype: 'displayfield',
-                    value: '请选择',
-                    margin: MARGIN_4_8
+                    xtype: 'panel',
+                    layout: 'hbox',
+                    border: false,
+                    margin: '0 10 10 10',
+                    items: [{
+                        xtype: 'displayfield',
+                        value: '请选择',
+                        margin: MARGIN_4_8,
+                    },
+                        yearCombobox,
+                        periodCombobox,
+                    ]
                 },
-                yearCombobox,
-                periodCombobox
+
             ],
             listeners: {
                 afterrender: function (_this, eOpts) {
                     if (timeRange.type != 3 || null == time) {
                         _this.hide();
+                        batchExport.hide();
                         return;
                     }
                     var period = time.periods[0];
@@ -238,6 +307,44 @@
                 }
             }
         });
+        var exportContainer = Ext.create('Ext.panel.Panel', {
+            height: '40',
+//            region: 'south',
+            border: false,
+            layout: 'vbox',
+            columnWidth: .2,
+            hidden: table == '无数据',
+            items: [{
+                xtype: 'panel',
+                layout: 'hbox',
+                border: false,
+                margin: '0 10 10 10',
+                items: [
+                    {
+                        xtype: 'displayfield',
+                        border: false,
+//                            columnWidth: .52
+                    },
+                    formExport,
+                    batchExport]
+            }]
+        });
+        var topContainer = Ext.create('Ext.panel.Panel', {
+            height: '40',
+            region: 'north',
+            border: false,
+            layout: 'column',
+            items: [
+                timeRangeContainer,
+//                {
+//                    xtype: 'displayfield',
+//                    border: false,
+//                            columnWidth: .6
+//                },
+
+                exportContainer
+            ]
+        });
         var researchHtml = Ext.create('Ext.panel.Panel', {
             region: 'center',
             scrollable: true,
@@ -253,7 +360,7 @@
             renderTo: Ext.getBody(),
             layout: 'border',
             items: [
-                timeRangeContainer,
+                topContainer,
                 researchHtml
             ]
         });

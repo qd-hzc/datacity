@@ -69,7 +69,7 @@
                     commonParams.contentParams.contentSortType = themeStore.getAt(0).get("contentSortType");
                     isDefault = true;
                 }
-                console.log(commonParams.contentParams)
+
                 Ext.Ajax.request({
                     url: GLOBAL_PATH + "/support/resourceCategory/analysis/text/updateTextContent",
                     method: 'POST',
@@ -425,7 +425,7 @@
         });
         // 重新加载参数
         contentStore.on('beforeload', function (s) {
-            console.log(commonParams.contentParams)
+
             s.getProxy().extraParams = commonParams.contentParams;
         });
         this.contentStore =contentStore;
@@ -570,11 +570,26 @@
                     commonParams.dataParams.foreignType = TEXT_TYPE.CONTENT;
                     dataStore.load({params: commonParams.dataParams});
                     if (cellIndex == 4) {//弹出修改窗口
-                        var win = Ext.addContentWin.init(record, function (data) {
-                            record.set('content', data.content);
-                            contentStore.sync();
-                            win.close();
-                        });
+                        Ext.Ajax.request({
+                            url:  GLOBAL_PATH+ '/support/resourceCategory/analysis/text/queryContentById',
+                            params: {
+                                contentId:commonParams.dataParams.foreignId
+                            },
+                            waitMsg: '正在操作...',
+                            success: function (response) {
+                                var obj = Ext.decode(response.responseText);
+                                record.set('content', obj.content);
+                                var win = Ext.addContentWin.init(record, function (data) {
+                                    record.set('content', data.content);
+                                    contentStore.sync();
+                                    win.close();
+                                });
+                            },
+                            failure: function () {
+                                Ext.Msg.alert('提示', "请求异常!");
+                            }
+                        })
+
                     }
                 },
                 containercontextmenu: function (_this, e) {

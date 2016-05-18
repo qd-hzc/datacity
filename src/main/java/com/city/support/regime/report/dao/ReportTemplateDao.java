@@ -2,8 +2,9 @@ package com.city.support.regime.report.dao;
 
 import com.city.common.dao.BaseDao;
 import com.city.common.pojo.Page;
-import com.city.support.regime.collection.entity.ReportInfo;
+import com.city.resourcecategory.analysis.common.entity.QueryResourceVO;
 import com.city.support.regime.report.entity.ReportTemplate;
+import org.hibernate.SQLQuery;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -278,5 +279,71 @@ public class ReportTemplateDao extends BaseDao<ReportTemplate> {
      */
     public void updateReportsGroupId(String reportIds, Integer groupId) {
         updateByHQL("update ReportTemplate set groupId = " + groupId + " where id in (" + reportIds + ")");
+    }
+
+    /**
+     * 返回综合表模糊查询匹配到的数量
+     * <pre>
+     *     根据综合表名称，模糊查询，返回所有数量
+     *     验证用户权限：可读、可写
+     * </pre>
+     *
+     * @param list 有权限的报表id
+     * @param text
+     * @return
+     * @author hzc
+     * @createDate 2016-5-13
+     */
+    public int selectForSearchCount(List list, String text) {
+        StringBuffer ids = new StringBuffer();
+        for (int i = 0; i < list.size(); i++) {
+            int id = (int) list.get(i);
+            ids.append(id).append(",");
+        }
+        ids.append("-1");
+        String hql = "select count(id) from ReportTemplate where 1=1";
+        if (null != text && text != "") {
+            hql = hql + " and name like '%" + text + "%' and id in (" + ids.toString() + ")";
+        }
+        List result = queryByHQL(hql);
+        if (null != result && result.size() > 0) {
+            return (int) (long) result.get(0);
+        }
+        return 0;
+    }
+
+    /**
+     * 返回综合表
+     * <pre>
+     *     根据综合表名称，模糊查询
+     *     分页，验证权限：可读、可写
+     * </pre>
+     *
+     * @param list 有权限的报表id
+     * @param text
+     * @param page
+     * @return
+     */
+    public List<QueryResourceVO> selectForSearch(List list, String text, Page page) {
+        StringBuffer ids = new StringBuffer();
+        for (int i = 0; i < list.size(); i++) {
+            int id = (int) list.get(i);
+            ids.append(id).append(",");
+        }
+        ids.append("-1");
+        StringBuffer hql = new StringBuffer("SELECT srrt.ID, srrt.NAME, 2 AS TYPE, srrt.PERIOD, srrt.RPT_COMMENTS AS comments, srrt.group_id as extraId,");
+        hql.append(" srrg.name as extraName, srrt.DEP_ID AS departmentId,")
+                .append(" ssd.DEP_NAME as departmentName ,rownum as rn FROM SPT_RGM_RPT_TMP srrt left join")
+                .append(" SPT_SYS_DEPART ssd on srrt.DEP_ID = ssd.id ")
+                .append(" LEFT JOIN spt_rgm_rpt_group srrg on srrg.id = srrt.group_id where ")
+                .append(" srrt.id in (" + ids.toString() + ")");
+        if (null != text && text != "") {
+            hql.append(" and srrt.name like '%").append(text).append("%'");
+        }
+        hql.append(" order by srrt.id");
+        SQLQuery q = getSession().createSQLQuery(hql.toString());
+        q.addEntity(QueryResourceVO.class);
+        setPageParamsForQuery(q, page);
+        return (List<QueryResourceVO>) q.list();
     }
 }

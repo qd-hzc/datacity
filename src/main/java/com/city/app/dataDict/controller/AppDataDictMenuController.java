@@ -45,9 +45,9 @@ public class AppDataDictMenuController extends BaseController {
      */
     @RequestMapping("/queryDictMenus")
     @ResponseBody
-    public List<AppDataDictMenu> queryDictMenus(HttpServletRequest request) {
+    public List<AppDataDictMenu> queryDictMenus(HttpServletRequest request, boolean showPushTree) {
         User user = CurrentUser.getCurrentUser(request).getUser();
-        return appDataDictMenuService.queryDictMenus(user, request.getContextPath());
+        return appDataDictMenuService.queryDictMenus(user, request.getContextPath(), showPushTree);
     }
 
     /**
@@ -180,10 +180,10 @@ public class AppDataDictMenuController extends BaseController {
      * 预览
      */
     @RequestMapping("/previewPage")
-    public ModelAndView previewPage(Integer menuId,String name) {
+    public ModelAndView previewPage(Integer menuId, String name) {
         ModelAndView mv = new ModelAndView("/app/dataDict/previewPage");
         mv.addObject("menuId", menuId);
-        mv.addObject("name",name);
+        mv.addObject("name", name);
         return mv;
     }
 
@@ -191,11 +191,11 @@ public class AppDataDictMenuController extends BaseController {
      * 预览内容
      */
     @RequestMapping("/previewContent")
-    public ModelAndView previewContent(Integer menuId,String name) {
+    public ModelAndView previewContent(Integer menuId, String name) {
         ModelAndView mv = new ModelAndView("/app/dataDict/previewContent");
         Map<String, List<AppDataDict>> infos = appDataDictService.queryDictsForGroup(menuId);
         mv.addObject("infos", new Gson().toJson(infos));
-        mv.addObject("name",name);
+        mv.addObject("name", name);
         return mv;
     }
 

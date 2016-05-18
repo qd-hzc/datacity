@@ -324,10 +324,14 @@
 
                             '<\/script>';
                     SubmitData.esi.detailDialog(html);
+                    $(".close").on("click",function(){
+                        SubmitData.init();
+                    })
                 }
             }
 
         })
+
         var submitTab = new Vue({
             el: '#submitTab',
             data: {

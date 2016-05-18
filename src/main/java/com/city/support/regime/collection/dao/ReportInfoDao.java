@@ -289,4 +289,27 @@ public class ReportInfoDao extends BaseDao<ReportInfo> {
         return queryByHQL(sql.toString());
     }
 
+    /**
+     * 根据名字和报告期查id
+     *
+     * @param name
+     * @param year
+     * @param month
+     * @return
+     */
+    public Integer getReportId(String name, Integer year, Integer month) {
+        String hql = "";
+        if (name != null && year != null && month != null) {
+            hql = "from ReportInfo where name='" + name + "'and year=" + year + " and month=" + month;
+
+        }
+        List<ReportInfo> result = this.queryByHQL(hql);
+        if (result.size() > 0)
+            return result.get(0).getId();
+        else
+            return 0;
+
+
+    }
+
 }

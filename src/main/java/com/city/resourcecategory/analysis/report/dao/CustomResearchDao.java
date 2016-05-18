@@ -2,8 +2,10 @@ package com.city.resourcecategory.analysis.report.dao;
 
 import com.city.common.dao.BaseDao;
 import com.city.common.pojo.Page;
+import com.city.common.util.StringUtil;
+import com.city.resourcecategory.analysis.common.entity.QueryResourceVO;
 import com.city.resourcecategory.analysis.report.entity.CustomResearchEntity;
-import com.city.resourcecategory.analysis.report.entity.CustomResearchStyleEntity;
+import org.hibernate.SQLQuery;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
@@ -112,5 +114,57 @@ public class CustomResearchDao extends BaseDao<CustomResearchEntity> {
      */
     public List<CustomResearchEntity> selectResearchByName(String name) {
         return queryByHQL("from CustomResearchEntity where name ='" + name + "'");
+    }
+
+    /**
+     * 返回分析报表数量
+     * <pre>
+     *     根据分析报表名称查询，返回匹配数量
+     * </pre>
+     *
+     * @param text
+     * @return
+     * @author hzc
+     * @createDate 2016-5-13
+     */
+    public int selectForSearchCount(String text) {
+        String hql = "select count(id) from CustomResearchEntity where 1=1 ";
+        if (StringUtil.notEmpty(text)) {
+            hql = hql + " and name like '%" + text + "%'";
+        }
+        List list = queryByHQL(hql);
+        if (null != list && list.size() > 0) {
+            return (int) (long) list.get(0);
+        }
+        return 0;
+    }
+
+    /**
+     * 返回分析报表
+     * <pre>
+     *     根据分析报表名称，模糊查询
+     * </pre>
+     *
+     * @param text
+     * @param page
+     * @return
+     * @author hzc
+     * @createDate 2016-5-13
+     */
+    public List selectForSearch(String text, Page page) {
+        StringBuffer hql = new StringBuffer("SELECT RRCR.ID, RRCR.NAME, 3 AS TYPE, RRCR.PERIOD, RRCR.comments,");
+        hql.append(" RRCR.RESEARCH_GROUP_ID AS extraId, RRRG.\"NAME\" as extraName, -1 AS departmentId,").
+                append(" '' as departmentName,rownum as rn FROM RC_REPORT_CUSTOM_RESEARCH rrcr ").
+                append(" LEFT JOIN RC_REPORT_RESEARCH_GROUP rrrg ON RRCR.RESEARCH_GROUP_ID = RRRG.\"ID\" ").
+                append(" where 1=1 ");
+        if (StringUtil.notEmpty(text)) {
+            hql.append(" and rrcr.name like '%").append(text).append("%' ");
+        }
+        hql.append("order by rrcr.id");
+        SQLQuery q = getSession().createSQLQuery(hql.toString());
+        q.addEntity(QueryResourceVO.class);
+        setPageParamsForQuery(q, page);
+        return (List<QueryResourceVO>) q.list();
+
     }
 }

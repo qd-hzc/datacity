@@ -411,7 +411,7 @@
                         rptInfoMenu.hide();
                     }
                     if (cellIndex == 6) {//弹出填报窗口
-                        var winal1 = open(GLOBAL_PATH + '/support/regime/collection/dataCollection?rptInfoId=' + record.get('id') + '&rptStatus=' + record.get('rptStatus') + '&isReview=' + true);
+                        var winal1 = open(GLOBAL_PATH + '/support/regime/collection/dataCollection?rptInfoId=' + record.get('id') + '&isReview=' + true);
                         var loop1 = setInterval(function() {
                             if(!winal1){
                                 clearInterval(loop1);

@@ -47,7 +47,8 @@
                     {name: 'menuIcon'},
                     {name: 'menuBg'},
                     {name: 'icon', type: 'string'},
-                    {name: 'sortIndex', type: 'int'}
+                    {name: 'sortIndex', type: 'int'},
+                    {name: 'type', type: 'int'}
                 ]
             });
         });
@@ -55,8 +56,9 @@
             model: 'AppDataDictMenu',
             parentIdProperty: 'parentId',
             root: {
-                id: 0,
-                name: '移动数据目录'
+                id: -1,
+                name: '移动数据目录',
+                type: 1
             },
             proxy: {
                 type: 'ajax',
@@ -64,6 +66,9 @@
                     read: APP_DATADICT_PATH + '/queryDictMenus',
                     update: APP_DATADICT_PATH + '/saveDictMenus',
                     destroy: APP_DATADICT_PATH + '/deleteDictMenus'
+                },
+                extraParams: {
+                    showPushTree: false
                 }
             },
             autoLoad: true,
@@ -75,7 +80,7 @@
                         root.findChildBy(function (node) {
                             _this.byIdMap[node.getId()] = node;
                             return false;
-                        },root, true);
+                        }, root, true);
                     }
                 }
             }
@@ -202,7 +207,7 @@
                             }
                         }, {
                             text: '添加同级',
-                            hidden: record.get('id') == 0,
+                            hidden: record.get('id') <= 0,
                             iconCls: 'Pageadd',
                             handler: function () {
                                 var pnode = record.parentNode;
@@ -216,7 +221,7 @@
                             }
                         }, '-', {
                             text: '修改',
-                            hidden: record.get('id') == 0,
+                            hidden: record.get('id') <= 0,
                             iconCls: 'Pageedit',
                             handler: function () {
                                 Ext.dataDict.EditDataDictWin.init(null, record, function (data) {
@@ -226,7 +231,7 @@
                             }
                         }, {
                             text: '删除',
-                            hidden: record.get('id') == 0,
+                            hidden: record.get('id') <= 0,
                             iconCls: 'Delete',
                             handler: function () {
                                 Ext.Msg.confirm('提示', '确定删除?', function (btn) {
@@ -407,7 +412,7 @@
                     if (sel.length) {
                         var menuRecord = sel[0];
                         var menuId = menuRecord.get('id');
-                        var name= menuRecord.get('name');
+                        var name = menuRecord.get('name');
                         //获取属于这个的数据
                         var count = dictStore.getCount();
                         var flag = false;
@@ -422,7 +427,7 @@
                         }
                         if (flag) {
                             //此处预览
-                            open(APP_DATADICT_PATH + '/previewPage?menuId=' + menuId+'&name='+name);
+                            open(APP_DATADICT_PATH + '/previewPage?menuId=' + menuId + '&name=' + name);
                         } else {
                             Ext.Msg.alert('提示', '无内容不可预览o(╯□╰)o');
                         }
@@ -441,7 +446,7 @@
                             Ext.Msg.alert('提示', '该目录已发布,无需再次发布!');
                         } else {
                             var menuId = record.get('id');
-                            if (menuId == 0) {
+                            if (menuId <= 0) {
                                 Ext.Msg.alert('提示', '根目录不可发布!');
                             } else {
                                 record.set('status', 1);
@@ -460,7 +465,7 @@
                 text: '添加',
                 iconCls: 'Add',
                 handler: function () {
-                    if (gridParams.menuId) {
+                    if (gridParams.menuId && gridParams.menuId > 0) {
                         Ext.dataDict.EditDataDictInfoWin.init(gridParams.menuId, null, function (data) {
                             dictStore.insert(0, data);
                         });

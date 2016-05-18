@@ -146,7 +146,7 @@
                         }
                     });
                     var child = navV.$refs.qqq;
-                    console.log(navV)
+
 
                 }
             });

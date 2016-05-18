@@ -38,6 +38,21 @@ public class AppDataDictMenuDao extends BaseDao<AppDataDictMenu> {
         return queryByHQL(sb.toString());
     }
 
+    /**
+     * 查询
+     */
+    public List<AppDataDictMenu> queryDictMenu(String roleIds, Integer type) {
+        StringBuilder sb = new StringBuilder("from AppDataDictMenu where 1=1");
+        if (roleIds != null && roleIds.length() > 0) {//角色
+            sb.append(" and roleId in (").append(roleIds).append(")");
+        }
+        if (type != null) {//类型
+            sb.append(" and type=").append(type);
+        }
+        sb.append(" order by sortIndex");
+        return queryByHQL(sb.toString());
+    }
+
 
     /**
      * 查询父节点下最大排序
