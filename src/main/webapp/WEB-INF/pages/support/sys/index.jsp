@@ -13,7 +13,7 @@
         }
 
         .top-background {
-            background-image: url("../../City/support/index/img/topbanner.png") ;
+            *background-image: url("<%=request.getContextPath()%>/City/support/index/img/topbanner.png");
             -webkit-background-size: cover;
             background-size: cover;
         }
@@ -72,51 +72,55 @@
                                         //如果已打开则跳到打开的tab
                                         tabPanel.setActiveTab(tabId);
                                     } else {
-                                        //创建模块配置tab
-                                        var panel = {
-                                            xtype: 'panel',
-                                            id: tabId,
-                                            title: tabTitle,
-                                            closable: true,
-                                            closeAction: 'destroy',
-                                            listeners: {
-                                                //激活面板事件
-                                                activate: function () {
-                                                    var tabPanel = indexPanel.down("#tabCenter");
-                                                    if (tabPanel && this.myPanel) {
-                                                        if (this.myPanel.hasListener('reDR'))
-                                                            this.myPanel.fireEvent('reDR', tabPanel.getSize());
+                                        if (tabPanel.items.getCount() >= 10) {
+                                            Ext.Msg.alert("提示",'打开的窗口数不能超过10个,请减少打开的窗口数');
+                                        } else {
+                                            //创建模块配置tab
+                                            var panel = {
+                                                xtype: 'panel',
+                                                id: tabId,
+                                                title: tabTitle,
+                                                closable: true,
+                                                closeAction: 'destroy',
+                                                listeners: {
+                                                    //激活面板事件
+                                                    activate: function () {
+                                                        var tabPanel = indexPanel.down("#tabCenter");
+                                                        if (tabPanel && this.myPanel) {
+                                                            if (this.myPanel.hasListener('reDR'))
+                                                                this.myPanel.fireEvent('reDR', tabPanel.getSize());
+                                                        }
+                                                    },
+                                                    close: function () {
+                                                        var tabPanel = indexPanel.down("#tabCenter");
+                                                        if (tabPanel && this.myPanel) {
+                                                            this.myPanel.fireEvent('close', true);
+                                                        }
                                                     }
                                                 },
-                                                close: function () {
-                                                    var tabPanel = indexPanel.down("#tabCenter");
-                                                    if (tabPanel && this.myPanel) {
-                                                        this.myPanel.fireEvent('close', true);
-                                                    }
-                                                }
-                                            },
-                                            loader: {
-                                                url: GLOBAL_PATH + tabURL,
-                                                autoLoad: true,
-                                                loadMask: '正在加载...',
+                                                loader: {
+                                                    url: GLOBAL_PATH + tabURL,
+                                                    autoLoad: true,
+                                                    loadMask: '正在加载...',
 //                                                renderer:'html',//版本问题
-                                                closeAction: "destroy",
-                                                scripts: true,
-                                                renderer: function (loader, response, active) {
-                                                    var text = response.responseText;
-                                                    loader.getTarget().update(text, true, null);
-                                                    return true;
-                                                },
-                                                nocache: true
-                                                /*,如果需要带参数这里再实现,如用户信息，模块信息等
-                                                 params: {
-                                                 childId: childId,
-                                                 param: Ext.encode(param)
-                                                 }*/
+                                                    closeAction: "destroy",
+                                                    scripts: true,
+                                                    renderer: function (loader, response, active) {
+                                                        var text = response.responseText;
+                                                        loader.getTarget().update(text, true, null);
+                                                        return true;
+                                                    },
+                                                    nocache: true
+                                                    /*,如果需要带参数这里再实现,如用户信息，模块信息等
+                                                     params: {
+                                                     childId: childId,
+                                                     param: Ext.encode(param)
+                                                     }*/
+                                                }
                                             }
+                                            var k = tabPanel.add(panel).show();
+                                            tabPanel.setActiveTab(tabId);
                                         }
-                                        var k = tabPanel.add(panel).show();
-                                        tabPanel.setActiveTab(tabId);
                                     }
                                 }
                             }

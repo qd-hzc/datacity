@@ -68,14 +68,14 @@ public class AppStaffController extends BaseController {
     }
 
     /**
-     * 查询根据validcode
+     * 查询根据validcode  手机端登录!
      *
      * @param validCode 校验码
      */
     @RequestMapping("queryStaffByValidCode")
     @ResponseBody
-    public String queryStaffByValidCode(String validCode) {
-        return appPersonService.queryStaffByValidCode(validCode);
+    public String queryStaffByValidCode(String validCode, String uuid) {
+        return appPersonService.queryStaffByValidCode(validCode,uuid);
     }
 
     /**

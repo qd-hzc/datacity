@@ -12,6 +12,9 @@
     <title>header</title>
     <meta charset="UTF-8"/>
     <style>
+        html,body{
+            height: 100%;
+        }
         #top_container {
             width: 400px;
             float: right;
@@ -21,12 +24,14 @@
             margin-right: 10px;
             background: rgba(255, 255, 255, 0) none repeat scroll 0 0 !important;
             filter: Alpha(opacity=0);
+            z-index: 1000;
         }
 
     </style>
 </head>
 <body>
 <div id="top_container"></div>
+<div style="position: absolute;z-index: 0;width: 100%;height: 100%"><img style="width: 100%;height: 100%;" src="<%=request.getContextPath()%>/City/support/index/img/topbanner.png"></div>
 <script>
     Ext.onReady(function () {
         //用户的model
@@ -76,7 +81,7 @@
             renderTo: 'top_container',
             margin: '5 0 0 0',
             border: false,
-            bodyStyle: 'background: rgba(255, 255, 255, 0) none repeat scroll 0 0 !important; filter: Alpha(opacity=0);',
+            bodyStyle: 'background: rgba(255, 255, 255, 0) none repeat scroll 0 0 !important; filter: Alpha(opacity=0);z-index:1000',
             defaults: {
                 height: 25,
                 margin: '5'

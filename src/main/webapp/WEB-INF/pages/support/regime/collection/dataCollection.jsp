@@ -15,6 +15,7 @@
     <jsp:include page="../../../common/sysConstant.jsp"/>
     <script src="<%=request.getContextPath()%>/City/support/regime/collection/importExcelWin.js"></script>
     <script src="<%=request.getContextPath()%>/City/support/regime/collection/exportExcelWin.js"></script>
+    <script src="<%=request.getContextPath()%>/City/support/regime/collection/rejectReportWin.js"></script>
     <link rel="stylesheet" href="<%=request.getContextPath()%>/Plugins/ueditor/themes/iframe.css">
     <style>
         body {
@@ -116,7 +117,28 @@
     var rptInfos = ${rptInfos};              //所有报表
     var years = ${years};                    // 所有生成报表的年份
     var period = ${period};                  // 报送频率
-    var fres = getFres(year, period);       //生成报告期月、季
+    var hasFres = false;
+    var fres = null;
+
+    if (isReview) {// 审核状态下当前报表驳回状态时刷新不显示当前报表
+        if (rptInfos.length) {
+            console.log(rptInfos[0])
+            year = rptInfos[0].year;
+            month = rptInfos[0].month;
+            rptStatus = rptInfos[0].status;
+            rptInfoId = rptInfos[0].id;
+        } else {
+            years = {
+                text: year + "年",
+                value: year
+            }
+            fres = {
+                text: FREQUENCY_TYPE.getString(period, month),
+                value: month
+            }
+        }
+    }
+    fres = fres?fres:getFres(year, period);       //生成报告期月、季
     // 获取当前年的报送频率
     function getFres(year, period) {
         var list = new Array();
@@ -171,7 +193,7 @@
 
     }
     // 保存、提交审核按钮
-    function saveOrSubmitRptData(rptStatus, fn,rptId) {
+    function saveOrSubmitRptData(rptStatus, fn, rptId) {
         var inputList = Ext.query('.esi input');
         var ispass = true;
         for (var i = 0; i < inputList.length; i++) {
@@ -219,7 +241,8 @@
         }
     }
     // 审核驳回
-    function updateRptStatus(status, fn,rptId) {
+    function updateRptStatus(status, fn, rptId, info) {
+        info = info ? info : "";
         Ext.Ajax.request({
             url: GLOBAL_PATH + '/support/regime/review/rptReview',
             waitTitle: '提示',
@@ -229,7 +252,7 @@
             params: {
                 ids: rptId,
                 rptStatus: status,
-                info: ""
+                info: info
             },
             success: function (response, opts) {
                 var result = Ext.decode(response.responseText);
@@ -252,7 +275,7 @@
             id: 'tableForm',
             width: '100%',
             autoScroll: true,
-            padding:0,
+            padding: 0,
             bodyStyle: 'background:#fff;padding:20px',
             //height: 100,
             flex: 1,
@@ -481,16 +504,19 @@
                         if (year && month) {
                             var rptId = getRptId(year, month);
                             if (rptId) {
-                                updateRptStatus(RPT_STATUS.REGECT, function () {
-                                    $.each(rptInfos, function (i, rptInfo) {
-                                        if (rptInfo.id == rptId) {
-                                            rptInfo.status = RPT_STATUS.REGECT;
-                                            statusLabel.setText(RPT_STATUS.getString(rptInfo.status));
-                                            showAllButton();
-                                            hideButton(rptInfo.status);
-                                            return false;
-                                        }
-                                    },rptId);
+                                console.log(rptId);
+                                Ext.rejectReportWin.init(null, function (rec) {
+                                    updateRptStatus(RPT_STATUS.REGECT, function () {
+                                        $.each(rptInfos, function (i, rptInfo) {
+                                            if (rptInfo.id == rptId) {
+                                                rptInfo.status = RPT_STATUS.REGECT;
+                                                statusLabel.setText(RPT_STATUS.getString(rptInfo.status));
+                                                showAllButton();
+                                                hideButton(rptInfo.status);
+                                                return false;
+                                            }
+                                        });
+                                    }, rptId, rec);
                                 });
                             } else {
                                 Ext.Msg.alert("提示", "没有可以驳回的报表！")
@@ -524,7 +550,7 @@
                                         }
                                     });
 
-                                },rptId);
+                                }, rptId);
                             } else {
                                 Ext.Msg.alert("提示", "没有可以通过的报表！")
                             }
@@ -555,7 +581,7 @@
                                             return false;
                                         }
                                     });
-                                },rptId);
+                                }, rptId);
                             } else {
                                 Ext.Msg.alert("提示", "没有可以提交审核的报表！")
                             }
@@ -578,7 +604,7 @@
                             if (rptId) {
                                 if (rptStatus == RPT_STATUS.REGECT) {
                                     saveOrSubmitRptData(rptStatus, function () {
-                                    },rptId);
+                                    }, rptId);
                                 } else {
                                     saveOrSubmitRptData(RPT_STATUS.DRAFT, function () {
                                         $.each(rptInfos, function (i, rptInfo) {
@@ -590,7 +616,7 @@
                                                 return false;
                                             }
                                         });
-                                    },rptId);
+                                    }, rptId);
                                 }
                             } else {
                                 Ext.Msg.alert("提示", "没有可以保存的报表！")
@@ -604,7 +630,7 @@
         });
         hideButton();
         function hideButton(status) {
-            if(status){
+            if (status) {
                 rptStatus = status;
             }
             if (isReadOnly) {
@@ -613,18 +639,18 @@
                 viewport.query('*[name=pass]')[0].hide();
                 viewport.query('*[name=reject]')[0].hide();
                 viewport.query('*[name=import]')[0].hide();
-            }else if (isReview) {
+            } else if (isReview) {
                 viewport.query('*[name=save]')[0].hide();
                 viewport.query('*[name=submit]')[0].hide();
                 viewport.query('*[name=import]')[0].hide();
-                if (rptStatus == RPT_STATUS.PASS){
+                if (rptStatus == RPT_STATUS.PASS) {
                     viewport.query('*[name=pass]')[0].hide();
-                }else if(rptStatus == RPT_STATUS.REGECT){
+                } else if (rptStatus == RPT_STATUS.REGECT) {
                     viewport.query('*[name=reject]')[0].hide();
                 }
 
             } else {
-                if (rptStatus == RPT_STATUS.PASS||rptStatus == RPT_STATUS.WAITING_PASS){
+                if (rptStatus == RPT_STATUS.PASS || rptStatus == RPT_STATUS.WAITING_PASS) {
                     viewport.query('*[name=save]')[0].hide();
                     viewport.query('*[name=submit]')[0].hide();
                     viewport.query('*[name=import]')[0].hide();

@@ -318,13 +318,8 @@
                 xtype: 'panel',
                 layout: 'hbox',
                 border: false,
-                margin: '0 10 10 10',
+//                margin: '0 10 10 0',
                 items: [
-                    {
-                        xtype: 'displayfield',
-                        border: false,
-//                            columnWidth: .52
-                    },
                     formExport,
                     batchExport]
             }]

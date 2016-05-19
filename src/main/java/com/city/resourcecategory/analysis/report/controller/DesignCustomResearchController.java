@@ -357,7 +357,6 @@ public class DesignCustomResearchController extends BaseController {
                         //时间频度为 年
                         addTableAndTime(researchId, pojo, year, "12", "", tableList);
                     }
-
                 }
             } else {
                 //没有报告期数
@@ -386,7 +385,7 @@ public class DesignCustomResearchController extends BaseController {
      */
     private List<Map<String, String>> addTableAndTime(Integer researchId, TimePojo pojo, String year, String month, String monthName, List<Map<String, String>> tableList) {
         Map<String, String> tableAndTime = new HashMap<String, String>();
-        if (year == "") {
+        if ("" == year) {
             pojo = null;
             tableAndTime.put("yearName", "");
         } else {
@@ -414,7 +413,7 @@ public class DesignCustomResearchController extends BaseController {
      * @createDate 2016-5-16
      */
     private String getExportToExcel(List<String> fileNameList, String fileName, String path, List<Map<String, String>> tableList) {
-        FileOutputStream fileOutputStream = null;
+//        FileOutputStream fileOutputStream = null;
         try {
             // 判断是否存在路径
             File dir = new File(path);

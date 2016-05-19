@@ -79,6 +79,15 @@ public class TextManageController extends BaseController {
         return mv;
     }
     /**
+     * 进入文字分析内容界面
+     */
+    @RequestMapping("/textContent")
+    public ModelAndView textContentJsp(Integer contentId) {
+        ModelAndView mv = new ModelAndView("resourceCategory/analysis/text/textContent");
+        mv.addObject("contentId", contentId);
+        return mv;
+    }
+    /**
      * 查询所有分析主题
      */
     @RequestMapping("/queryTextTheme")

@@ -24,6 +24,8 @@ public class AppPersonService {
     private AppPersonDao appPersonDao;
     @Autowired
     private DepartmentManagerService departmentManagerService;
+    @Autowired
+    private AppLoginStatusService appLoginStatusService;
 
     /**
      * 根据条件查询
@@ -55,19 +57,40 @@ public class AppPersonService {
     }
 
     /**
-     * 查询含有某验证码的人
+     * 查询含有某验证码的人 手机端认证登录
      */
-    public String queryStaffByValidCode(String validCode) {
-        byte[] decode = Base64.decode(Base64.decode(validCode.getBytes()));//解码
-        AppPerson appPerson = appPersonDao.queryStaffByValidCode(new String(decode));
-        if (appPerson == null) {
-            return null;
+    public String queryStaffByValidCode(String validCode, String uuid) {
+        Map<String, Object> result = new HashMap<>();
+        //首先根据验证码查询能登陆还剩多长时间
+        long l = appLoginStatusService.nextLoginTime(uuid);
+        if (l > 0) {//不可登录!
+            long t = 60 * 1000 * 60 - l;
+            result.put("success", false);
+            //分钟数
+            long minutes = t / 1000 / 60;
+            //秒数
+            long seconds = (t / 1000) % 60;
+            result.put("msg", "短时间内登陆过于频繁,距离下次登录时间还有:" + minutes + "分" + seconds + "秒!");
+        } else {//登录
+            byte[] decode = Base64.decode(Base64.decode(validCode.getBytes()));//解码
+            AppPerson appPerson = appPersonDao.queryStaffByValidCode(new String(decode));
+            if (appPerson == null) {//验证码错误
+                //保存失败次数
+                appLoginStatusService.saveFailLogin(uuid);
+                result.put("success", false);
+                result.put("msg", "登录失败,验证码错误!");
+            } else {
+                //登陆成功,清除登陆次数
+                appLoginStatusService.clearFailLogin(uuid);
+                result.put("success", true);
+                Map<String, Object> obj = new HashMap<>();
+                obj.put("id", appPerson.getId());
+                obj.put("name", appPerson.getName());
+                obj.put("duty", appPerson.getDuty());
+                result.put("data", obj);
+            }
         }
-        Map<String, Object> obj = new HashMap<>();
-        obj.put("id", appPerson.getId());
-        obj.put("name", appPerson.getName());
-        obj.put("duty", appPerson.getDuty());
-        return new String(Base64.encode(Base64.encode(new Gson().toJson(obj).getBytes(Charset.forName("UTF-8")))));
+        return new String(Base64.encode(Base64.encode(new Gson().toJson(result).getBytes(Charset.forName("UTF-8")))));
     }
 
     /**

@@ -113,7 +113,18 @@ public class CustomResearchManageController extends BaseController {
         }
         List<ResearchGroupEntity> group = manageService.getResearchGroupByName(trim);
         if (null != group && group.size() > 0) {
-            return genFaultMsg("请求错误", "分组名称重复，不可用", null);
+//            是否重复
+            boolean isRepeat = true;
+            if (null != entity.getId()) {
+                for (ResearchGroupEntity rg : group) {
+                    if (entity.getId() == rg.getId()) {
+                        isRepeat = false;
+                    }
+                }
+            }
+            if (isRepeat) {
+                return genFaultMsg("请求错误", "分组名称重复，不可用", null);
+            }
         }
         Date date = new Date();
         User user = SessionUtil.getUser(req.getSession());
@@ -147,7 +158,17 @@ public class CustomResearchManageController extends BaseController {
         }
         List<CustomResearchEntity> list = researchService.getCustomResearchByName(name);
         if (null != list && list.size() > 0) {
-            return genFaultMsg("请求失败", "模板名称重复，不可用", null);
+            boolean isRepeat = true;
+            if (null != entity.getId()) {
+                for (CustomResearchEntity rg : list) {
+                    if (entity.getId() == rg.getId()) {
+                        isRepeat = false;
+                    }
+                }
+            }
+            if (isRepeat) {
+                return genFaultMsg("请求失败", "模板名称重复，不可用", null);
+            }
         }
 
         String resourceId = request.getParameter("resourceId");

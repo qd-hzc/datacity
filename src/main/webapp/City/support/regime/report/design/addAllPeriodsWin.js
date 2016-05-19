@@ -27,15 +27,14 @@ Ext.addAllPeriodsWin.init = function (research, time, fn) {
         var yearFieldSet = Ext.create('Ext.form.FieldSet', {
             title: year,
             margin: '10 10 10 10',
-            //height: 80,
             items: [],
         });
 
         var period = time[i].period;
         var checkboxGroup = new Ext.form.CheckboxGroup({
             name: year,
-            items: [],
             column: 6,
+            items: [],
             id: 'checkbox' + i
         });
         //var array = [];
@@ -44,7 +43,7 @@ Ext.addAllPeriodsWin.init = function (research, time, fn) {
             var inputValue = prd.id;
             var boxLabel = prd.name;
             var id = prd.id + '-' + year;
-//          根据时间频度创建checkBox
+            //根据时间频度创建checkBox
             var periodCheckBox = new Ext.form.field.Checkbox({
                 inputValue: inputValue,
                 boxLabel: boxLabel,
@@ -109,10 +108,10 @@ Ext.addAllPeriodsWin.init = function (research, time, fn) {
             handler: function () {
                 var yearArray = new Array();//年
                 for (var i = 0; i < time.length; i++) {
-                    var monthArray = new Array();
+                    var monthArray = new Array();//12、9、6……
                     var nameArray = new Array();//月、季、半年
 
-//                  获取选中的checkbox及所属年份
+                    //获取选中的checkbox及所属年份
                     var array = form.getForm().findField("checkbox" + i).items;
                     var year = form.getForm().findField("checkbox" + i).name;
                     array.each(function (item) {

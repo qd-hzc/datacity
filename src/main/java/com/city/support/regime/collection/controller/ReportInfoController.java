@@ -174,7 +174,18 @@ public class ReportInfoController extends BaseController {
         result.put("nowmonth", month);
         return result;
     }
-
+    /**
+     * 数据填报
+     */
+    @RequestMapping("/dataCollectionByTmpId")
+    public ModelAndView dataCollectionByTmpId(Integer rptTmpId, Boolean isReview,Boolean isReadOnly, HttpServletRequest request) {
+        List<ReportInfo> reportInfoList = reportInfoService.getReportInfosByRptTmpId(rptTmpId);
+        if(reportInfoList!=null&&reportInfoList.size()>0) {
+            Integer rptInfoId = reportInfoList.get(0).getId();
+            return dataCollection(rptInfoId, isReview, isReadOnly, request);
+        }
+        return null;
+    }
     /**
      * 数据填报
      */

@@ -221,16 +221,18 @@
         function alertDetail(type, id) {
             switch (type) {
                 case 2://综合表
-                    Ext.showReportStyleWin.init(id, yearFres, halfFres, quarterFres, monthFres);
+                    //Ext.showReportStyleWin.init(id, yearFres, halfFres, quarterFres, monthFres);
+                    open(contextPath + '/support/regime/collection/dataCollectionByTmpId?rptTmpId=' + id);
                     break;
                 case 3://分析报表
-                    open(contextPath + '/resourcecategory/analysis/report/designCustomResearch/showDesignResearch?_cr=' + id);
+                    open(contextPath + '/resourcecategory/analysis/report/designCustomResearch/showPreviewResearch?researchId=' + id);
                     break;
                 case 4://分析图表
-                    open(contextPath + "/support/resourcecategory/analysis/chart/chartDesign?chartId=" + id);
+                    open(contextPath + "/support/resourcecategory/analysis/chart/test?chartId=" + id);
                     break;
                 case 5://文字分析
-                    Ext.Ajax.request({
+                    open(contextPath + "/support/resourceCategory/analysis/text/textContent?contentId=" + id);
+                    /*Ext.Ajax.request({
                         url: GLOBAL_PATH + "/support/resourceCategory/analysis/text/queryContentById",
                         method: 'POST',
                         params: {
@@ -239,12 +241,13 @@
                         success: function (response, opts) {
                             var result = Ext.JSON.decode(response.responseText);
                             if (result) {
+                                console.log(result)
                                 Ext.showTextWin.init(result);
                             } else {
                                 Ext.Msg.alert('提示', '无内容');
                             }
                         }
-                    });
+                    });*/
                     break;
             }
         }
@@ -306,7 +309,5 @@
     });
 </script>
 <div id="<%=time%>" style="height: 100%;width:100%;"></div>
-<script src="<%=contextPath%>/City/resourceCategory/analysis/common/showTextWin.js"></script>
-<script src="<%=contextPath%>/City/resourceCategory/analysis/common/showReportStyle.js"></script>
 </body>
 </html>
