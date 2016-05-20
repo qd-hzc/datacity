@@ -42,7 +42,14 @@ Ext.dataDict.EditDataDictWin.init = function (pnode, node, fn) {
             labelAlign: 'right',
             allowBlank: false,
             columnWidth: 0.9,
-            margin: '20 0 0 0'
+            margin: '20 0 0 0',
+            validator: function (text) {
+                var trimVal = text.trim();
+                if (trimVal != text) {
+                    return '名称前后不允许出现空格!';
+                }
+                return true;
+            }
         }, {
             xtype: 'combo',
             name: 'roleId',
@@ -146,7 +153,11 @@ Ext.dataDict.EditDataDictWin.init = function (pnode, node, fn) {
                             win.close();
                         },
                         failure: function (form, action) {
-                            Ext.Msg.alert('提示', '请求发送失败!');
+                            if (action.result.code == 500) {
+                                Ext.Msg.alert('提示', action.result.msg);
+                            } else {
+                                Ext.Msg.alert('提示', "请求发送失败!");
+                            }
                         }
                     });
                 }

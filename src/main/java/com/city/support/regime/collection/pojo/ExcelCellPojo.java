@@ -8,6 +8,9 @@ import java.util.List;
 public class ExcelCellPojo {
     public static int real =0;//实节点
     public static int virtual = 1;//虚节点
+
+    public static int main = 1;// 主栏
+    public static int guest = 2;// 宾栏
     //单元格值
     private String cellValue;
     //单元格起始行
@@ -20,6 +23,8 @@ public class ExcelCellPojo {
     private int endColCell;
     // 是否实节点
     private int nodeType;
+    // 主宾栏
+    private int columnType;
     // excel单元格类型
     private Integer cellType;
     public ExcelCellPojo() {
@@ -70,6 +75,14 @@ public class ExcelCellPojo {
 
     public void setEndColCell(int endColCell) {
         this.endColCell = endColCell;
+    }
+
+    public int getColumnType() {
+        return columnType;
+    }
+
+    public void setColumnType(int columnType) {
+        this.columnType = columnType;
     }
 
     public int getNodeType() {

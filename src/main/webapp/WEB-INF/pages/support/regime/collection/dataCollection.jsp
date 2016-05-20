@@ -122,11 +122,13 @@
 
     if (isReview) {// 审核状态下当前报表驳回状态时刷新不显示当前报表
         if (rptInfos.length) {
-            console.log(rptInfos[0])
-            year = rptInfos[0].year;
-            month = rptInfos[0].month;
-            rptStatus = rptInfos[0].status;
-            rptInfoId = rptInfos[0].id;
+            if(rptStatus == RPT_STATUS.REGECT) {
+                console.log(rptInfos[0])
+                year = rptInfos[0].year;
+                month = rptInfos[0].month;
+                rptStatus = rptInfos[0].status;
+                rptInfoId = rptInfos[0].id;
+            }
         } else {
             years = {
                 text: year + "年",
@@ -138,7 +140,7 @@
             }
         }
     }
-    fres = fres?fres:getFres(year, period);       //生成报告期月、季
+    fres = fres ? fres : getFres(year, period);       //生成报告期月、季
     // 获取当前年的报送频率
     function getFres(year, period) {
         var list = new Array();

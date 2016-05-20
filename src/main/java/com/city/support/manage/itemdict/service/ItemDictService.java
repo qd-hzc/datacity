@@ -43,7 +43,7 @@ public class ItemDictService extends PackageListToTree<SptMgrItemDictEntity> {
         String name = entity.getName();
         List<SptMgrItemDictEntity> newList = new LinkedList<>();
         for (SptMgrItemDictEntity lst : list) {
-            if (lst.getName().equals(name)) {//查询是否有重复名称
+            if (lst.getName().equals(name) && lst.getId().intValue() != entity.getId().intValue()) {//查询是否有重复名称
                 newList.add(lst);
             }
         }
@@ -113,18 +113,27 @@ public class ItemDictService extends PackageListToTree<SptMgrItemDictEntity> {
         Integer parentId = entity.getParentId();
         List sorts = itemDictDao.getMaxSort(parentId);
         entity.setSort(getIndex(sorts));
-        if (null == dicts || dicts.size() < 1) {
-            //保存的指标分组目录有父，则获取所有同级，并添加该指标分组目录排序，同时添加指标分组目录等级
-            SptMgrItemDictEntity itemDictParent = getItemDictById(parentId);
-            if (null != itemDictParent) {
-                itemDictParent.setLeaf(false);
-                itemDictDao.saveOrUpdate(itemDictParent, Boolean.FALSE);
+        if (null != dicts && dicts.size() > 0) {
+            boolean isRepeat = true;
+            if (null != entity.getId()) {
+                for (SptMgrItemDictEntity rg : dicts) {
+                    if (entity.getId().intValue() == rg.getId().intValue()) {
+                        isRepeat = false;
+                    }
+                }
             }
-            itemDictDao.saveOrUpdate(entity, Boolean.FALSE);
-            return Boolean.TRUE;
-        } else {
-            return Boolean.FALSE;
+            if (isRepeat) {
+                return Boolean.FALSE;
+            }
         }
+        //保存的指标分组目录有父，则获取所有同级，并添加该指标分组目录排序，同时添加指标分组目录等级
+        SptMgrItemDictEntity itemDictParent = getItemDictById(parentId);
+        if (null != itemDictParent) {
+            itemDictParent.setLeaf(false);
+            itemDictDao.saveOrUpdate(itemDictParent, Boolean.FALSE);
+        }
+        itemDictDao.saveOrUpdate(entity, Boolean.FALSE);
+        return Boolean.TRUE;
     }
 
     /**

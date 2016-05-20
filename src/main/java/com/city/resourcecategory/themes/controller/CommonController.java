@@ -684,9 +684,9 @@ public class CommonController extends BaseController {
     }
 
     /**
-     * 返回重点关注菜单
+     * 返回综合数据菜单
      * <pre>
-     *     返回重点关注菜单集合，集合是树结构，保存在 child 中
+     *     返回综合数据菜单集合，集合是树结构，保存在 child 中
      * </pre>
      *
      * @param menus 菜单id的字符串，使用英文逗号（,）分隔

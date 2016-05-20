@@ -457,7 +457,7 @@ public class DesignCustomResearchController extends BaseController {
                     style_left.setDataFormat(format.getFormat("@"));
                     Document doc = Jsoup.parse(tableHtml, "", new Parser(new XmlTreeBuilder()));
                     Elements tables = doc.select("table");
-                    int collength = 0;
+                    int collength = 1;
                     if (tables.size() > 0) {
                         Element table = tables.first();
                         //在sheet中添加标题
@@ -478,7 +478,6 @@ public class DesignCustomResearchController extends BaseController {
                         List<Map<String, Object>> cellRangeAddressList = new ArrayList<Map<String, Object>>();
                         int beginRow = 2;
                         if (tbodys.size() > 0) {
-
                             Elements trs = tbodys.select("tr");
                             List<ExcelRowPojo> excelRowList = ExportUtils.getExcelRowList(trs, true);
                             ExportUtils.setExcelExtraCell(excelRowList);
@@ -492,7 +491,7 @@ public class DesignCustomResearchController extends BaseController {
                                     int endColCell = excelCell.getEndColCell();
                                     int beginRowCell = excelCell.getBeginRowCell();
                                     int endRowCell = excelCell.getEndRowCell();
-                                    //HSSFCell cell = row.createCell(beginRowCell);
+//                                    HSSFCell cell = row.createCell(beginRowCell);
                                     int[] colCell = excelCell.getColCell(beginColCell, endColCell, excelExtraCellList);
                                     HSSFCell cell = row.createCell(colCell[0]);
                                     cell.setCellValue(excelCell.getCellValue());
@@ -502,6 +501,7 @@ public class DesignCustomResearchController extends BaseController {
                                         Map<String, Object> map = new HashMap<>();
                                         map.put("address", new CellRangeAddress(beginRowCell, endRowCell, colCell[0], colCell[1]));
                                         map.put("nodeType", ExcelCellPojo.real);
+                                        map.put("columnType",excelCell.getColumnType());
                                         cellRangeAddressList.add(map);
                                     }
                                     if (excelCell.getCellType() != null) {
@@ -517,6 +517,7 @@ public class DesignCustomResearchController extends BaseController {
                                         Map<String, Object> map = new HashMap<>();
                                         map.put("address", new CellRangeAddress(beginRowCell, endRowCell, colCell[0], colCell[1]));
                                         map.put("nodeType", excelCell.getNodeType());
+                                        map.put("columnType",excelCell.getColumnType());
                                         cellRangeAddressList.add(map);
                                     }
                                 }
@@ -543,7 +544,8 @@ public class DesignCustomResearchController extends BaseController {
                         for (Map<String, Object> map : cellRangeAddressList) {
                             CellRangeAddress cellRangeAddress = (CellRangeAddress) map.get("address");
                             int nodeType = (int) map.get("nodeType");
-                            ExportUtils.setRegionBorder(HSSFCellStyle.BORDER_THIN, cellRangeAddress, sheet, wb, nodeType);
+                            int columnType = (int) map.get("columnType");
+                            ExportUtils.setRegionBorder(HSSFCellStyle.BORDER_THIN, cellRangeAddress, sheet, wb, nodeType,columnType);
                         }
                         RegionUtil.setBorderRight(HSSFCellStyle.BORDER_NONE, new CellRangeAddress(beginRow, beginRow, 0, collength - 1), sheet, wb);
                     }

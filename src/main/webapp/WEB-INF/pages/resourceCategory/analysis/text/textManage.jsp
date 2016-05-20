@@ -312,7 +312,6 @@
             }],
             listeners: {
                 cellclick: function (_this, td, cellIndex, record) {
-
                     hideMenu();
                     commonParams.contentParams.themeId = record.getId();
                     commonParams.contentParams.contentSortType = record.get("contentSortType")

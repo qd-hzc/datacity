@@ -750,7 +750,7 @@ public class ReportInfoService {
                         if (reportData.getItemValue() != null && !"".equals(reportData.getItemValue())) {
                             td.html(reportData.getItemValue());
                         } else {
-                            td.html("");
+
                         }
                     } else {
                         if (reportData.getItemValue() != null && !"".equals(reportData.getItemValue())) {
@@ -762,7 +762,11 @@ public class ReportInfoService {
 
 
                 } else {
-                    td.html("<input value=''/>");
+                    if (rptStatus == Constant.RPT_STATUS.WAITING_PASS || rptStatus == Constant.RPT_STATUS.PASS) {
+                        td.html("");
+                    }else{
+                        td.html("<input value=''/>");
+                    }
                 }
             }
         }

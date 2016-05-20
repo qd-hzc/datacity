@@ -85,6 +85,19 @@ public class ConvertUtil<T> {
                             }
                         }
                     }
+                } else if (nameGet.indexOf("is") == 0) {//is方法
+                    Object pge = getter(source, nameGet);//pojo的get方法
+                    if (pge != null) {
+                        for (Method methodSet : methods) {
+                            String nameSet = methodSet.getName();
+                            if (nameSet.indexOf("set") == 0 && nameGet.substring(2).equals(nameSet.substring(3))) {
+                                Class<?>[] parameterTypes = methodSet.getParameterTypes();
+                                Class<?> parameterType = parameterTypes[0];
+                                setter(pojo, nameSet, pge, parameterType);
+                            }
+                        }
+                    }
+
                 }
             }
         } catch (NoSuchMethodException e) {

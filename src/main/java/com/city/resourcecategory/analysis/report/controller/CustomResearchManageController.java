@@ -117,7 +117,7 @@ public class CustomResearchManageController extends BaseController {
             boolean isRepeat = true;
             if (null != entity.getId()) {
                 for (ResearchGroupEntity rg : group) {
-                    if (entity.getId() == rg.getId()) {
+                    if (entity.getId().intValue() == rg.getId().intValue()) {
                         isRepeat = false;
                     }
                 }
@@ -161,7 +161,7 @@ public class CustomResearchManageController extends BaseController {
             boolean isRepeat = true;
             if (null != entity.getId()) {
                 for (CustomResearchEntity rg : list) {
-                    if (entity.getId() == rg.getId()) {
+                    if (entity.getId().intValue() == rg.getId().intValue()) {
                         isRepeat = false;
                     }
                 }

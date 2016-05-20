@@ -260,7 +260,14 @@ public class AppDataDictMenuService {
     /**
      * 保存目录
      */
-    public void saveDictMenu(AppDataDictMenu menu) {
+    public boolean saveDictMenu(AppDataDictMenu menu) {
+        if (menu.getId() == null) {
+            List<AppDataDictMenu> menusByName = appDataDictMenuDao.queryByFullName(menu.getParentId(), menu.getName());
+            if (menusByName.size() > 0) {
+                return false;
+            }
+        }
+        //首先查询是否已含有名字
         //设置图标
         AppDataDictMenuIcon menuIcon = menu.getMenuIcon();
         if (menuIcon != null && menuIcon.getId() != null) {
@@ -282,6 +289,7 @@ public class AppDataDictMenuService {
             menu.setSortIndex(queryMaxSort(menu.getParentId()));
         }
         appDataDictMenuDao.saveOrUpdate(menu, false);
+        return true;
     }
 
     /**

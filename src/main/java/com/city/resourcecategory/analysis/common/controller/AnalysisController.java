@@ -135,4 +135,5 @@ public class AnalysisController extends BaseController {
         mv.addObject("text", request.getParameter("text"));
         return mv;
     }
+
 }

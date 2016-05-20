@@ -112,9 +112,13 @@ public class AppDataDictMenuController extends BaseController {
     public Map<String, Object> saveDictMenu(AppDataDictMenu menu, HttpServletRequest request) {
         Map<String, Object> result = null;
         try {
-            appDataDictMenuService.saveDictMenu(menu);
-            menu.setIconByPath(request.getContextPath());
-            result = genSuccessMsg(gson.toJson(menu), "保存成功", 200);
+            boolean flag = appDataDictMenuService.saveDictMenu(menu);
+            if (flag) {
+                menu.setIconByPath(request.getContextPath());
+                result = genSuccessMsg(gson.toJson(menu), "保存成功", 200);
+            } else {
+                result = genFaultMsg("保存失败,名称重复!");
+            }
         } catch (Exception e) {
             e.printStackTrace();
             result = genFaultMsg("保存失败,服务端运行异常!");

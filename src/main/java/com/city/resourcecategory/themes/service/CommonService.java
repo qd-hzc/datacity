@@ -188,33 +188,33 @@ public class CommonService {
         if (1 == 1) {// 权限验证
             Map<String, Object> result = new HashMap<>();
             //开始的时候
-            long begin=System.currentTimeMillis();
+            long begin = System.currentTimeMillis();
             List<TextContent> textContentList = textContentService.queryAllTextContentByThemeId(null, themeId, TextTheme.SORT_BY_DATE, null, Constant.TEXT_CONTENT_STATUS.CHECKED);
-            System.out.println((System.currentTimeMillis()-begin));
-            begin=System.currentTimeMillis();
+            System.out.println((System.currentTimeMillis() - begin));
+            begin = System.currentTimeMillis();
             List<TextContent> textContentListByUser = textContentService.queryAllTextContentByThemeId(user.getUser(), themeId, TextTheme.SORT_BY_DATE, null, null);
-            System.out.println((System.currentTimeMillis()-begin));
+            System.out.println((System.currentTimeMillis() - begin));
             if (textContentList != null) {
                 List<Map<String, Object>> allTextMapList = new ArrayList<>();
                 List<Map<String, Object>> userTextMapList = new ArrayList<>();
-                for(TextContent textContent: textContentList){
+                for (TextContent textContent : textContentList) {
                     Map<String, Object> map = new HashMap<>();
-                    map.put("id",textContent.getId());
+                    map.put("id", textContent.getId());
                     map.put("creatorName", textContent.getCreatorName());
-                    map.put("analysisDate",textContent.getAnalysisDate());
+                    map.put("analysisDate", textContent.getAnalysisDate());
                     map.put("name", textContent.getName());
-                    map.put("subtitle",textContent.getSubTitle());
-                    map.put("isSel",false);
+                    map.put("subtitle", textContent.getSubTitle());
+                    map.put("isSel", false);
                     allTextMapList.add(map);
                 }
-                for(TextContent textContent: textContentListByUser){
+                for (TextContent textContent : textContentListByUser) {
                     Map<String, Object> map = new HashMap<>();
-                    map.put("id",textContent.getId());
+                    map.put("id", textContent.getId());
                     map.put("creatorName", textContent.getCreatorName());
-                    map.put("analysisDate",textContent.getAnalysisDate());
+                    map.put("analysisDate", textContent.getAnalysisDate());
                     map.put("name", textContent.getName());
-                    map.put("subtitle",textContent.getSubTitle());
-                    map.put("isSel",false);
+                    map.put("subtitle", textContent.getSubTitle());
+                    map.put("isSel", false);
                     userTextMapList.add(map);
                 }
                 result.put("all", allTextMapList);
@@ -918,6 +918,12 @@ public class CommonService {
         menus = menus.replaceAll(";", ",");
 
         List<ThemePage> list = themesService.getThemesPageByIds(menus);
+        Collections.sort(list, new Comparator<ThemePage>() {
+            @Override
+            public int compare(ThemePage o1, ThemePage o2) {
+                return o1.getSortIndex() - o2.getSortIndex();
+            }
+        });
 
         List<ThemePage> treeList = listToTreeList(list);
 

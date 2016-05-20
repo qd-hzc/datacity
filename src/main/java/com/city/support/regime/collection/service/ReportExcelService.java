@@ -219,10 +219,12 @@ public class ReportExcelService {
                                             cell.setCellValue(excelCell.getCellValue());
 
                                             int nodeType = excelCell.getNodeType();
+                                            int columnType = excelCell.getColumnType();
                                             if (ExcelCellPojo.real == nodeType) {
                                                 Map<String, Object> map = new HashMap<>();
                                                 map.put("address", new CellRangeAddress(beginRowCell, endRowCell, colCell[0], colCell[1]));
                                                 map.put("nodeType", ExcelCellPojo.real);
+                                                map.put("columnType",excelCell.getColumnType());
                                                 cellRangeAddressList.add(map);
                                             }
                                             if (excelCell.getCellType() != null) {
@@ -238,6 +240,7 @@ public class ReportExcelService {
                                                 Map<String, Object> map = new HashMap<>();
                                                 map.put("address", new CellRangeAddress(beginRowCell, endRowCell, colCell[0], colCell[1]));
                                                 map.put("nodeType", excelCell.getNodeType());
+                                                map.put("columnType",excelCell.getColumnType());
                                                 cellRangeAddressList.add(map);
                                             }
                                         }
@@ -264,7 +267,8 @@ public class ReportExcelService {
                                 for (Map<String, Object> map : cellRangeAddressList) {
                                     CellRangeAddress cellRangeAddress = (CellRangeAddress) map.get("address");
                                     int nodeType = (int) map.get("nodeType");
-                                    ExportUtils.setRegionBorder(HSSFCellStyle.BORDER_THIN, cellRangeAddress, sheet, wb, nodeType);
+                                    int columnType = (int) map.get("columnType");
+                                    ExportUtils.setRegionBorder(HSSFCellStyle.BORDER_THIN, cellRangeAddress, sheet, wb, nodeType,columnType);
                                 }
                                 RegionUtil.setBorderRight(HSSFCellStyle.BORDER_NONE, new CellRangeAddress(beginRow, beginRow, 0, collength - 1), sheet, wb);
                             }

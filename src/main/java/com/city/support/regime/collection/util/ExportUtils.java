@@ -319,7 +319,47 @@ public class ExportUtils {
         }
 
     }
+    /**
+     * 添加边框
+     *
+     * @param border
+     * @param region
+     * @param sheet
+     * @param wb
+     * @param nodeType 节点类型
+     * @param columnType 主宾栏
+     */
+    public static void setRegionBorder(int border, CellRangeAddress region, Sheet sheet, Workbook wb, int nodeType,int columnType) {
+        RegionUtil.setBorderBottom(HSSFCellStyle.BORDER_NONE, region, sheet, wb);
+        if (ExcelCellPojo.real == nodeType&& ExcelCellPojo.main==columnType) {
+            RegionUtil.setBorderLeft(HSSFCellStyle.BORDER_NONE, region, sheet, wb);
+        } else {
+            RegionUtil.setBorderLeft(border, region, sheet, wb);
+        }
+        if (ExcelCellPojo.main==columnType) {
+            RegionUtil.setBorderRight(HSSFCellStyle.BORDER_NONE, region, sheet, wb);
+        } else {
+            RegionUtil.setBorderRight(border, region, sheet, wb);
+        }
+        if (ExcelCellPojo.real == nodeType&& ExcelCellPojo.guest==columnType) {
+            RegionUtil.setBorderTop(HSSFCellStyle.BORDER_NONE, region, sheet, wb);
+        } else {
+            RegionUtil.setBorderTop(border, region, sheet, wb);
+        }
 
+    }
+    public static void setRegionBorder1(int border, CellRangeAddress region, Sheet sheet, Workbook wb, int nodeType) {
+        RegionUtil.setBorderBottom(HSSFCellStyle.BORDER_NONE, region, sheet, wb);
+        if (ExcelCellPojo.real == nodeType) {
+            RegionUtil.setBorderLeft(HSSFCellStyle.BORDER_NONE, region, sheet, wb);
+        } else {
+            RegionUtil.setBorderLeft(border, region, sheet, wb);
+        }
+        RegionUtil.setBorderRight(HSSFCellStyle.BORDER_NONE, region, sheet, wb);
+        RegionUtil.setBorderTop(border, region, sheet, wb);
+
+
+    }
     /**
      * 在每一行添加单元格占多行的情况
      *
@@ -385,6 +425,11 @@ public class ExportUtils {
                     excelCellPojo.setNodeType(ExcelCellPojo.real);
                 } else {
                     excelCellPojo.setNodeType(ExcelCellPojo.virtual);
+                }
+                if(td.attr("esi-type").equals(Constant.TdEsiType.MAIN_BAR)){
+                    excelCellPojo.setColumnType(ExcelCellPojo.main);
+                }else if(td.attr("esi-type").equals(Constant.TdEsiType.GUEST_BAR)){
+                    excelCellPojo.setColumnType(ExcelCellPojo.guest);
                 }
                 excelCellList.add(excelCellPojo);
                 beginColCell = beginColCell + Integer.valueOf(colspan);

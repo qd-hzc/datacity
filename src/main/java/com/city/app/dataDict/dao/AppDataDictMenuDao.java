@@ -39,6 +39,16 @@ public class AppDataDictMenuDao extends BaseDao<AppDataDictMenu> {
     }
 
     /**
+     * 根据名称查询
+     *
+     * @param name
+     */
+    public List<AppDataDictMenu> queryByFullName(Integer parentId, String name) {
+        StringBuilder sb = new StringBuilder("from AppDataDictMenu where parentId=").append(parentId).append(" and name= '").append(name).append("'");
+        return queryByHQL(sb.toString());
+    }
+
+    /**
      * 查询
      */
     public List<AppDataDictMenu> queryDictMenu(String roleIds, Integer type) {

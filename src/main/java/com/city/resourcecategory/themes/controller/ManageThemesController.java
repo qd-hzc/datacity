@@ -88,13 +88,21 @@ public class ManageThemesController extends BaseController {
         Integer parentId = page.getParentId();
 //        判断是否名称重复
         List<ThemePage> list = themesService.getThemePagesByNameAndPId(name, parentId);
-        if (list.size()==0){
-            ThemePage themePage = themesService.saveOrUpdateManageTheme(page);
-            return genSuccessMsg(themePage, "请求成功", null);
-
-        }else {
-            return  genFaultMsg("请求失败", "名称重复", null);
+        if (null != list && list.size() > 0) {
+            boolean isRepeat = true;
+            if (null != page.getId()) {
+                for (ThemePage rg : list) {
+                    if (page.getId().intValue() == rg.getId().intValue()) {
+                        isRepeat = false;
+                    }
+                }
+            }
+            if (isRepeat) {
+                return genFaultMsg("请求失败", "名称重复", null);
+            }
         }
+        ThemePage themePage = themesService.saveOrUpdateManageTheme(page);
+        return genSuccessMsg(themePage, "请求成功", null);
     }
 
     /**
